@@ -11,6 +11,9 @@ jobs:
       - run:
           command: npm ci
           name: Install Packages
+      - run:
+          command: npm test
+          name: Run tests
 workflows:
   test_app:
     jobs:
