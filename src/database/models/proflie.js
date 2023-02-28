@@ -1,19 +1,19 @@
-module.exports = (sequelize,DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
   const Profile = sequelize.define('Profile', {
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     address: DataTypes.STRING,
     telephone: DataTypes.NUMBER,
     userId: DataTypes.INTEGER
-    
+
   }, {});
-  
-  Profile.associate = function(models) {
+
+  Profile.associate = function (models) {
     Profile.belongsTo(models.User, {
       foreignKey: 'userId',
       as: 'profile',
       onDelete: 'CASCADE'
     });
-  }
+  };
   return Profile;
-} 
+};
