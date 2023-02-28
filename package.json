@@ -1,0 +1,44 @@
+{
+  "name": "e-comm-team-amigos-bn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run build && node ./build/index.js",
+    "dev": "nodemon --exec babel-node src/index.js",
+    "clean": "rimraf build && mkdir build",
+    "build-babel": "babel -d ./build src/ -s",
+    "build": "npm run clean && npm run build-babel"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atlp-rwanda/e-comm-team-amigos-bn.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atlp-rwanda/e-comm-team-amigos-bn/issues"
+  },
+  "homepage": "https://github.com/atlp-rwanda/e-comm-team-amigos-bn#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.9.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.29.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.0",
+    "@babel/node": "^7.20.7",
+    "@babel/plugin-transform-runtime": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/register": "^7.21.0",
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.20",
+    "rimraf": "^4.1.2",
+    "sequelize-cli": "^6.6.0"
+  }
+}
