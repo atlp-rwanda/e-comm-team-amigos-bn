@@ -1,4 +1,4 @@
-const Cube = require('../src/app').Cube;
+const Cube = require('../app').Cube;
 const expect = require('chai').expect;
 
 describe('Testing the Cube Functions', function() {
