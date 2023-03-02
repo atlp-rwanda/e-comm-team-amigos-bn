@@ -8,7 +8,7 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
-      -run:
+      - run:
           command: npm ci
           name: Install Packages
       - run:
@@ -17,4 +17,3 @@ jobs:
       - run:
           command: yarn build
           name: Build app
-      
