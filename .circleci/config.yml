@@ -17,3 +17,8 @@ jobs:
       - run:
           command: yarn build
           name: Build app
+
+workflows:
+  test_app:
+    jobs:
+      - test
