@@ -9,7 +9,7 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          command: npm ci
+          command: npm -v
           name: Install Packages
 workflows:
   test_app:
