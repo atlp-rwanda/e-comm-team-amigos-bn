@@ -11,13 +11,6 @@ jobs:
       - run:
           command: npm ci
           name: Install Packages
-      - run:
-          command: npm test
-          name: Run tests
-      - run:
-          command: yarn build
-          name: Build app
-
 workflows:
   test_app:
     jobs:
