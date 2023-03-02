@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import express from "express";
 import logger from "morgan";
 import dotenv from "dotenv";
@@ -23,26 +22,3 @@ app.get("/", (req, res) => {
 });
 
 export default app;
-=======
-class Cube {
-    constructor(length) {
-    this.length = length;
-    }
-    
-    getSideLength () {
-    return this.length;
-    }
-    
-    getSurfaceArea () {
-    return (this.length * this.length) * 6;
-    }
-    
-    getVolume () {
-    return Math.pow(this.length,3);
-    }
-    }
-    
-    module.exports = {
-    Cube:Cube
-    }
->>>>>>> 7c7fd8c (chore(unit testing):setup of unit testing by mocha and chai)
