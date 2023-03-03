@@ -25,6 +25,10 @@
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.21.0",
     "@babel/register": "^7.21.0",
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.0",
+    "@babel/node": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
     "babel": "^6.23.0",
     "chai-http": "^4.3.0",
     "cors": "^2.8.5",
@@ -38,15 +42,9 @@
     "util.promisify": "^1.1.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.21.0",
-    "@babel/core": "^7.21.0",
-    "@babel/node": "^7.20.7",
-    "@babel/preset-env": "^7.20.2",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.21",
-    "rimraf": "^4.1.2",
-    "save-dev": "^0.0.1-security",
     "sequelize-cli": "^6.6.0"
   }
 }
