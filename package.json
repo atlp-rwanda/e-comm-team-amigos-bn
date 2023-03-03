@@ -23,26 +23,30 @@
   },
   "homepage": "https://github.com/atlp-rwanda/e-comm-team-amigos-bn#readme",
   "dependencies": {
-    "@babel/cli": "^7.21.0",
-    "@babel/core": "^7.21.0",
-    "@babel/node": "^7.20.7",
     "@babel/plugin-transform-runtime": "^7.21.0",
-    "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.21.0",
+    "babel": "^6.23.0",
+    "chai-http": "^4.3.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "morgan": "^1.10.0",
     "pg": "^8.9.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.29.0"
+    "sequelize": "^6.29.0",
+    "supertest": "^6.3.3",
+    "util.promisify": "^1.1.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20",
-    "rimraf": "^4.1.2",
-    "sequelize-cli": "^6.6.0",
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.0",
+    "@babel/node": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
-    "save-dev": "^0.0.1-security"
+    "nodemon": "^2.0.21",
+    "rimraf": "^4.1.2",
+    "save-dev": "^0.0.1-security",
+    "sequelize-cli": "^6.6.0"
   }
 }
