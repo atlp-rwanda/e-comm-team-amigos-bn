@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@5.0.2
+  coveralls: coveralls/coveralls@1.0.4
 jobs:
   test: # Name of job
     executor: node/default # use the default executor defined within the orb
@@ -14,7 +15,14 @@ jobs:
       - run:
           command: npm test
           name: Run tests
+      # - run: # run code coverage report
+      #     name: code-coverage
+      #     command: npm run coverage
+      # - coveralls/upload
 workflows:
   test_app:
     jobs:
       - test
+notify:
+  webhooks:
+    - url: https://coveralls.io/webhook?repo_token=${COVERALLS_REPO_TOKEN}
