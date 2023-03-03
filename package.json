@@ -9,7 +9,7 @@
     "clean": "rimraf build && mkdir build",
     "build-babel": "babel -d ./build src/ -s",
     "build": "npm run clean && npm run build-babel",
-    "test": "mocha **/*.test.js  --timeout 60000 --exit"
+    "test": "mocha --require @babel/register src/tests/*.test.js  --timeout 60000 --exit"
   },
   "repository": {
     "type": "git",
