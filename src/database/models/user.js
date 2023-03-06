@@ -1,4 +1,4 @@
-module.exports = (sequelize,DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     userName: DataTypes.STRING,
     email: DataTypes.STRING,
@@ -7,13 +7,13 @@ module.exports = (sequelize,DataTypes) => {
     status: DataTypes.ENUM('active', 'inactive'),
     verified: DataTypes.BOOLEAN
   }, {});
-  
-  User.associate = function(models) {
+
+  User.associate = function (models) {
     User.hasOne(models.Profile, {
       foreignKey: 'userId',
       as: 'profile',
       onDelete: 'CASCADE'
     });
-  }
+  };
   return User;
-} 
+};

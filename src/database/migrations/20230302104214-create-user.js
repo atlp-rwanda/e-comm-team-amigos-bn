@@ -1,4 +1,3 @@
-'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -21,21 +20,21 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      role:{
-        type:Sequelize.ENUM(['admin','vendor','normal']),
+      role: {
+        type: Sequelize.ENUM(['admin', 'vendor', 'normal']),
         allowNull: false,
-        defaultValue:'normal'
-        },
-      status:{
-        type: Sequelize.ENUM(['active','inactive']),
+        defaultValue: 'normal'
+      },
+      status: {
+        type: Sequelize.ENUM(['active', 'inactive']),
         allowNull: false,
         defaultValue: 'inactive'
-        },
-      verified:{
-        type:Sequelize.BOOLEAN,
-        allowNull:false,
-        defaultValue:false
-        },
+      },
+      verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -1,18 +1,18 @@
-import app from "../app";
-import chai, {expect}from "chai";
-import chaiHttp from "chai-http";
+import chai, { expect } from 'chai';
+import chaiHttp from 'chai-http';
+import app from '../app';
 
 chai.use(chaiHttp);
-describe("get a message", () => {
-  it("test a welcome message", (done) => {
+describe('get a message', () => {
+  it('test a welcome message', (done) => {
     chai
       .request(app)
-      .get("/")
+      .get('/')
       .end((err, res) => {
         if (err) done(err);
         else {
           expect(res).to.have.status(200);
-          expect('Content-Type', /html/)
+          expect('Content-Type', /html/);
           done();
         }
       });

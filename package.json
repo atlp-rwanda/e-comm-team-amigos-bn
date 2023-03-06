@@ -9,7 +9,9 @@
     "clean": "rimraf build && mkdir build",
     "build-babel": "babel -d ./build src/ -s",
     "build": "npm run clean && npm run build-babel",
-    "test": "mocha --require @babel/register src/tests/*.test.js  --timeout 60000 --exit"
+    "test": "mocha --require @babel/register src/tests/*.test.js  --timeout 60000 --exit",
+    "lint": "eslint src/",
+    "lint-fix":"eslint src/ --fix"
   },
   "repository": {
     "type": "git",
@@ -43,6 +45,10 @@
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.21",
-    "sequelize-cli": "^6.6.0"
+    "rimraf": "^4.1.2",
+    "sequelize-cli": "^6.6.0",
+    "eslint": "^8.35.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5"
   }
 }
