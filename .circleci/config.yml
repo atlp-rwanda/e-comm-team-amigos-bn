@@ -1,0 +1,20 @@
+version: 2.1
+orbs:
+  node: circleci/node@5.0.2
+jobs:
+  test: # Name of job
+    executor: node/default # use the default executor defined within the orb
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm ci
+          name: Install Packages
+      - run:
+          command: npm test
+          name: Run tests
+workflows:
+  test_app:
+    jobs:
+      - test
