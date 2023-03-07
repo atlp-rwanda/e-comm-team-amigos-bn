@@ -53,7 +53,6 @@
     "eslint-plugin-import": "^2.27.5",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.21",
-    "rimraf": "^4.1.2",
     "sequelize-cli": "^6.6.0"
   }
 }
