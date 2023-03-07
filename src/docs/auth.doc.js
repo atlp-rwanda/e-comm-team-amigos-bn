@@ -68,34 +68,6 @@
  *                     description: Internal server error
  *
  *
- * /user/otp:
- *      post:
- *          tags: [Authentication]
- *          summary: This helps a user to use otp generated.
- *          description: Enter email and otp.
- *          requestBody:
- *              description: Provide email and otp
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              email:
- *                                  type: string
- *                              otp:
- *                                  type: string
- *
- *
- *          responses:
- *                  200:
- *                     description: user logged in successfully!
- *                  400:
- *                     description: Bad Request
- *                  404:
- *                     description: Not Found
- *                  500:
- *                     description: Internal server error
- *
  * /user/verify_email/{token}:
  *   get:
  *     summary: Verify user's email address
@@ -116,4 +88,59 @@
  *         description: User not found
  *       '500':
  *         description: Internal server error
+  * /user/forgotPassword/:
+ *       post:
+ *           tags: [Authentication]
+ *           summary: Send reset password email
+ *           description: Send an email to the user with a link to reset their password
+ *           requestBody:
+ *               required: true
+ *               content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              email:
+ *                                  type: string
+ *           responses:
+ *               200:
+ *                  description: Email sent successfully
+ *               400:
+ *                  description: Bad Request
+ *               404:
+ *                  description: User not found
+ *               500:
+ *                  description: Internal server error
+ * /user/resetPassword/{token}:
+ *   put:
+ *     tags: [Authentication]
+ *     summary: Resets the user's password.
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         description: The password reset token sent to the user's email address.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       description: The new password.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *               confirmPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated successfully.
+ *       400:
+ *         description: Password is not matched.
+ *       404:
+ *         description: User not found.
+ *       500:
+ *         description: Internal server error.
  */

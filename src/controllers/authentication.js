@@ -6,6 +6,7 @@ import models from '../database/models';
 import tokenGenerator from '../helpers/generateToken';
 import { sendMail } from '../helpers/sendMail';
 import createOTP from '../helpers/createotp';
+import { sendResetMail } from '../helpers/sendResetPasswordEmail';
 
 dotenv.config();
 const createUser = async (req, res) => {
@@ -106,10 +107,48 @@ const checkotp = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const forgotPassword = async (req, res) => {
+  const userEmail = req.body.email;
+  const userExist = await models.User.findOne({ where: { email: userEmail } });
+  if (!userExist) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+  if (userExist.verified == false) {
+    res.json({ message: 'Your account is not verified' });
+  }
+  const token = tokenGenerator({ email: userEmail, id: userExist.id });
+  const link = `${process.env.BASE_URL}/user/resetPassword/${token}`;
+  sendResetMail(userEmail, 'Reset password email', 'reset password', link);
+  return res.status(200).json({ message: 'email sent successfully' });
+};
+
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
+  const userId = decodeToken.id;
+  const userEmail = decodeToken.email;
+  const link = `${process.env.BASE_URL}/user/login`;
+
+  const userExist = await models.User.findOne({ where: { id: userId } });
+  if (!userExist) {
+    return res.status(404).json({ message: 'user not found' });
+  }
+
+  const { password, confirmPassword } = req.body;
+  if (password != confirmPassword) {
+    return res.json({ message: 'password is not matched' });
+  }
+  const hashedPass = await bcrypt.hash(req.body.password, 10);
+  await models.User.update({ password: hashedPass }, { where: { id: userId } });
+  sendResetMail(userEmail, ' password updated Email', 'login', link);
+  return res.status(200).json({ message: 'password updated successfully' });
+};
 
 export default {
   createUser,
   loginUser,
   emailVerification,
-  checkotp
+  checkotp,
+  forgotPassword,
+  resetPassword
 };
