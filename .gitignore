@@ -7,10 +7,6 @@ yarn-error.log*
 lerna-debug.log*
 
 build/
-services/
-utils/
-validations/
-views/
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

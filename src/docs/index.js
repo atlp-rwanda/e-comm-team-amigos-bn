@@ -1,4 +1,5 @@
 import swaggerJsDoc from 'swagger-jsdoc';
+const swaggerJSON = require('./google-sign.doc.json');
 
 const options = {
   swaggerDefinition: {
@@ -20,9 +21,10 @@ const options = {
     securit: [{
       bearerAuth: []
     }],
+    paths: swaggerJSON,
     servers: [{
-      url: ''
-    }]
+      url: 'http://localhost:3000'
+    }, { url: "http://localhost:4000" }]
 
   },
   apis: ['src/**/*doc.js'],
