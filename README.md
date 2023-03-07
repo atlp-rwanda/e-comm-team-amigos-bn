@@ -55,3 +55,6 @@ DB_NAME=<your_database_name>
 by writing POST http://localhost:3000/user/create
 key:Context-Type value: application/json
 - You can also use `http://localhost:3000/docs` see the documentation
+[![CircleCI](https://circleci.com/gh/atlp-rwanda/e-comm-team-amigos-bn.svg?style=svg&circle-token=98f879ef16fb4e3428dcc029a5d03636afbeb563)](https://github.com/atlp-rwanda/e-comm-team-amigos-bn/pulls)
+
+[![HoundCI](https://img.shields.io/badge/houndci-checked-brightgreen.svg)](https://houndci.com)
