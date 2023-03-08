@@ -1,15 +1,16 @@
-import models from '../database/models';
-import { validateUser, hashPassword } from '../middleware/user';
+import { v4 as uuidv4 } from "uuid";
+import models from "../database/models";
+import bcrypt from "bcrypt";
+
 const getUsers = async (req, res) => {
   try {
     const users = await models.User.findAll({
       include: [
         {
           model: models.Profile,
-          as: 'profile'
-
-        }
-      ]
+          as: "profile",
+        },
+      ],
     });
     return res.status(200).json({ users });
   } catch (error) {
@@ -26,30 +27,35 @@ const getUserById = async (req, res) => {
       include: [
         {
           model: models.Profile,
-          as: 'profile'
-
-        }
-      ]
+          as: "profile",
+        },
+      ],
     });
     if (user) return res.status(200).json({ user });
-    return res.status(404).json({ message: 'User not found' });
+    return res.status(404).json({ message: "User not found" });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
 };
 
 const createUser = async (req, res) => {
-  const { error, value } = validateUser(req.body);
-  if (error) {
-    console.log(error);
-    return res.status(400).json({ error: error.details });
-  }
-  let user = await User.findOne({ email: req.body.email });
-  if (user) return res.status(400).send('User already registered');
-  req.body.password = await hashPassword(req.body.password);
+  let user = await models.User.findOne({ where: { email: req.body.email } });
+  if (user) return res.status(400).send("User already registered");
+  const password = await bcrypt.hash(req.body.password, 10);
   try {
-    const user = await models.User.create(req.body);
-    return res.status(201).json({ message: 'Your account has been created successfully', data: user });
+    const user = await models.User.create({
+      id:uuidv4(),
+      userName: req.body.userName,
+      email: req.body.email,
+      password: password,
+      role: req.body.role,
+      status: req.body.status,
+      verified: req.body.verified,
+    });
+    return res.status(201).json({
+      message: "Your account has been created successfully",
+      data: user,
+    });
   } catch (error) {
     return res.status(500).json({ message: error });
   }
@@ -58,5 +64,5 @@ const createUser = async (req, res) => {
 module.exports = {
   getUsers,
   getUserById,
-  createUser
+  createUser,
 };
