@@ -7,9 +7,6 @@ yarn-error.log*
 lerna-debug.log*
 
 build/
-docs/
-helpers/
-middleware/
 services/
 utils/
 validations/
