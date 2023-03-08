@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import models from "../database/models";
 import bcrypt from "bcrypt";
+import tokenGenerator from "../helpers/generateToken";
 
 const getUsers = async (req, res) => {
   try {
@@ -44,7 +45,7 @@ const createUser = async (req, res) => {
   const password = await bcrypt.hash(req.body.password, 10);
   try {
     const user = await models.User.create({
-      id:uuidv4(),
+      id: uuidv4(),
       userName: req.body.userName,
       email: req.body.email,
       password: password,
@@ -52,9 +53,11 @@ const createUser = async (req, res) => {
       status: req.body.status,
       verified: req.body.verified,
     });
+    const token = tokenGenerator({ userId: user.id });
     return res.status(201).json({
       message: "Your account has been created successfully",
       data: user,
+      token: token,
     });
   } catch (error) {
     return res.status(500).json({ message: error });
