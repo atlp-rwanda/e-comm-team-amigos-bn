@@ -9,6 +9,7 @@ import userRoute from './routes/user';
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 
 if (process.env.NODE_ENV === 'development') {
   app.use(logger('dev'));
@@ -16,7 +17,6 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/user', userRoute);
 
-app.use(express.json());
 app.use(cors());
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.get('/', (req, res) => {
