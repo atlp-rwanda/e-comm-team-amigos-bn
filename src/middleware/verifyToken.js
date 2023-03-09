@@ -27,6 +27,6 @@ export const verifyToken = async (req, res, next) => {
     req.user = decodeToken;
     return next();
   } catch (error) {
-    return res.status(500).json({ error: error });
+    return res.status(500).json({ error });
   }
 };

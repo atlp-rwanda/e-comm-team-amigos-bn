@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import models from '../database/models';
 import tokenGenerator from '../helpers/generateToken';
 import { sendMail } from '../helpers/sendMail';
+import createOTP from '../helpers/createotp';
 
 dotenv.config();
 const createUser = async (req, res) => {
@@ -57,9 +58,9 @@ const emailVerification = async (req, res) => {
   }
 };
 
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   const user = await models.User.findOne({
-    where: { email: req.body.email },
+    where: { email: req.body.email }
   });
   if (!user) {
     return res.status(400).json({ message: 'Email or Password Incorrect' });
@@ -68,19 +69,48 @@ const loginUser = async (req, res) => {
   {
     return res.json({ message: 'You have to first verify your account' });
   }
-  bcrypt.compare(req.body.password, user.password, (err, data) => {
+  bcrypt.compare(req.body.password, user.password, async (err, data) => {
     if (err) throw err;
     if (data) {
+      if (user.role === 'vendor') {
+        const otp = await createOTP(user);
+        return res.status(200).json({ message: 'Enter OTP to be be verified', otp });
+      }
       const token = tokenGenerator({ userId: user.id });
-      return res
-        .status(200)
-        .json({ message: 'User Logged Successfully', token });
-    } return res.status(400).json({ message: ' Email or Password Incorrect' });
+      return res.status(200).json({ message: 'User Logged Successfully', token });
+    }
+    return res.status(400).json({ message: ' Email or Password Incorrect' });
   });
+};
+
+const checkotp = async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    const user = await models.User.findOne({
+      where: { email }
+    });
+
+    const currenttime = new Date().getTime();
+    const expiredtime = new Date(user.otpcodeexpiration).getTime();
+    if (currenttime < expiredtime) {
+      bcrypt.compare(otp, user.otpcode, (err, result) => {
+        if (err) throw err;
+        if (result) {
+          const token = tokenGenerator({ userId: user.id });
+          return res.status(200).json({ message: 'User Logged Successfully', token });
+        }
+      });
+    } else {
+      return res.status(401).json({ message: 'OTPCODE is expired try again' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 export default {
   createUser,
   loginUser,
   emailVerification,
+  checkotp
 };

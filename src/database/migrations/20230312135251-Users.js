@@ -51,6 +51,14 @@ module.exports = {
         allowNull: false,
         defaultValue: false
       },
+      otpcode: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      otpcodeexpiration: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -61,7 +69,8 @@ module.exports = {
       }
     });
   },
-  async down(queryInterface, Sequelize) {
+
+  async down(queryInterface) {
     await queryInterface.dropTable('Users');
   }
 };

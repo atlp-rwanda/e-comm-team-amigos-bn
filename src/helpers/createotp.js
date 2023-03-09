@@ -1,22 +1,26 @@
+const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+const models = require('../database/models');
 
-function sendMail(recepient, subject, text, url) {
-  return new Promise((resolve, reject) => {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.AUTH_USER,
-        pass: process.env.AUTH_PASSWORD,
-      },
-    });
-    const mailOption = {
-      from: 'kananuraabdulkhaliq59@gmail.com',
-      to: recepient,
-      subject,
-      html: `<!doctype html>
-      <html lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-      
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.AUTH_USER,
+    pass: process.env.AUTH_PASS,
+  },
+});
+
+const createOTP = async (user) => {
+  try {
+    const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const mailOptions = {
+      from: process.env.AUTH_USER,
+      to: user.email,
+      subject: 'Verification code',
+      html: `<!doctype html> <html lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       <head>
       <meta charset="utf-8" />
       <meta content="width=device-width" name="viewport" />
@@ -26,15 +30,6 @@ function sendMail(recepient, subject, text, url) {
       <title>Template 03</title>
       <link href="https://fonts.googleapis.com/css?family=Roboto:400" rel="stylesheet" type="text/css">
       <link href="https://fonts.googleapis.com/css?family=Roboto:700" rel="stylesheet" type="text/css">
-      <!--[if mso]>
-                  <style>
-                      * {
-                          font-family: sans-serif !important;
-                      }
-                  </style>
-              <![endif]-->
-      <!--[if !mso]><!-->
-      <!-- <![endif]-->
       <style>
       html {
           margin: 0 !important;
@@ -72,14 +67,6 @@ function sendMail(recepient, subject, text, url) {
           }
       }
       </style>
-      <!--[if gte mso 9]>
-              <xml>
-                  <o:OfficeDocumentSettings>
-                      <o:AllowPNG/>
-                      <o:PixelsPerInch>96</o:PixelsPerInch>
-                  </o:OfficeDocumentSettings>
-              </xml>
-              <![endif]-->
       <style>
       @media only screen and (max-device-width: 598px), only screen and (max-width: 598px) {
       
@@ -140,11 +127,6 @@ function sendMail(recepient, subject, text, url) {
       
       <body width="100%" style="background-color:#0c5a86;margin:0;padding:0!important;mso-line-height-rule:exactly;">
       <div style="background-color:#0c5a86">
-      <!--[if gte mso 9]>
-                      <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
-                      <v:fill type="tile" color="#0c5a86"/>
-                      </v:background>
-                      <![endif]-->
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
       <td valign="top" align="center">
@@ -226,7 +208,7 @@ function sendMail(recepient, subject, text, url) {
       </tr>
       <tr>
       <td align="center">
-      <div style="line-height:20px;text-align:center;"><span style="color:#979dad;font-family:Roboto,Arial,sans-serif;font-size:15px;line-height:20px;text-align:center;">This is an email verification for your account,<br>Click here</span></div>
+      <div style="line-height:20px;text-align:center;"><span style="color:#979dad;font-family:Roboto,Arial,sans-serif;font-size:15px;line-height:20px;text-align:center;">This is an email verification code for your account,<br>Use this code to login . <span><br> This code will be expired in <u>15 minutes</u></span> </span></div>
       </td>
       </tr>
       <tr>
@@ -255,7 +237,7 @@ function sendMail(recepient, subject, text, url) {
       <table width="100%" border="0" cellpadding="0" cellspacing="0">
       <tr>
       <td width="100%">
-      <a href="${url}">
+      <a href="#">
       <table width="100%" cellspacing="0" cellpadding="0" border="0">
       <tr>
       <td width="100%" align="center">
@@ -266,13 +248,7 @@ function sendMail(recepient, subject, text, url) {
       <tr>
       <td align="center">
       <div>
-      <!--[if mso]>
-                              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${url}" style="height:44px;v-text-anchor:middle;width:130px;" fillcolor="#339989"  stroke="f" arcsize="18%">
-                              <w:anchorlock/>
-                              <center style="white-space:nowrap;display:inline-block;text-align:center;color:#ffffff;font-weight:700;font-family:Roboto,Arial,sans-serif;font-size:15px;">Verify Email</center>
-                              </v:roundrect>
-                          <![endif]-->
-      <a href="${url}" style="white-space:nowrap;background-color:#339989;border-radius:8px; display:inline-block;text-align:center;color:#ffffff;font-weight:700;font-family:Roboto,Arial,sans-serif;font-size:15px;line-height:44px;width:130px; -webkit-text-size-adjust:none;mso-hide:all;">Verify Email</a>
+      <a href="#" style="white-space:nowrap;background-color:#0b6455;border-radius:8px; display:inline-block;text-align:center;color:#ffffff;font-weight:700;font-family:Roboto,Arial,sans-serif;font-size:15px;line-height:44px;width:130px; -webkit-text-size-adjust:none; mso-hide:all;">${otp}</a>
       </div>
       </td>
       </tr>
@@ -481,13 +457,38 @@ function sendMail(recepient, subject, text, url) {
       
       </html>`,
     };
-
-    transporter.sendMail(mailOption, (error, info) => {
+    transporter.sendMail(mailOptions, (error) => {
       if (error) {
-        return reject({ message: 'An error Has occured' });
+        return {
+          status: 'FAILED',
+          message: error,
+        };
       }
-      resolve({ message: 'Email sent successfully' });
+      return {
+        status: 'OK',
+        email: mailOptions.html,
+        otp,
+      };
     });
-  });
-}
-module.exports = { sendMail };
+    const saltRounds = 10;
+    const hashOtp = await bcrypt.hash(otp, saltRounds);
+    const expDate = Date.now() + 900000;
+    await models.User.update(
+      { otpcode: hashOtp, otpcodeexpiration: expDate },
+      { where: { id: user.id } }
+    );
+    return ({
+      status: 'OK',
+      otp,
+      email: user.email,
+      otpcodeexpiration: expDate,
+    });
+  } catch (err) {
+    return {
+      status: 'FAILED',
+      message: err.message,
+    };
+  }
+};
+
+export default createOTP;
