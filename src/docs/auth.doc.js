@@ -39,7 +39,7 @@
  *                     description: Internal server error
  * 
  * 
- * /auth/login:
+ * /user/login:
  *      post:
  *          tags: [Authentication]
  *          summary: This helps a user to login to the ecommerce platform.
@@ -58,7 +58,7 @@
  * 
  * 
  *          responses:
- *                  201:
+ *                  200:
  *                     description: user logged in successfully!
  *                  400:
  *                     description: Bad Request
