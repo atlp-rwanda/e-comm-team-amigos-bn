@@ -66,6 +66,7 @@
  *                     description: Not Found
  *                  500:
  *                     description: Internal server error
+ *
  * /user/verify_email/{token}:
  *   get:
  *     summary: Verify user's email address
