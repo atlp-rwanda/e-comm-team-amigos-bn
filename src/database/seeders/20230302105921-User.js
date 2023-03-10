@@ -5,7 +5,6 @@ module.exports = {
     'Users',
     [
       {
-        id: uuidv4(),
         firstName: 'Emille',
         lastName: 'Shumbusho',
         userName: 'Emile-x',
@@ -22,8 +21,6 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-<<<<<<< HEAD
-        id: uuidv4(),
         firstName: 'wilbrord',
         lastName: 'ibyimana',
         userName: 'wilb',
@@ -36,14 +33,6 @@ module.exports = {
         verified: 'true',
         otpcode: '3245',
         otpcodeexpiration: new Date(),
-=======
-        userName: 'cyusa',
-        email: 'cyusa.khevin100@gmail.com',
-        password: '12345',
-        role: 'admin',
-        status: 'active',
-        verified: 'true',
->>>>>>> 1d3e016 (feat(sign-in): add option to use google to authenticate users)
         createdAt: new Date(),
         updatedAt: new Date(),
       }

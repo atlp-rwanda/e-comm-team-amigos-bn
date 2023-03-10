@@ -23,13 +23,11 @@ export async function successGoogleLogin(req, res) {
         }
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json(err);
+        res.status(500).json({ error: "Server issues!", err: err });
     }
 
 }
 
 export async function failureGogleLogin(req, res) {
-    res.send("Error");
-    res.status(400).json({ message: "Could not complete this process", error: true });
+    res.status(400).json({ error: "Could not complete this process" });
 }

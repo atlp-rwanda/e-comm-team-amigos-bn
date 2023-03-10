@@ -6,11 +6,9 @@ import swaggerUi from "swagger-ui-express";
 import specs from "./docs";
 import routes from "./routes";
 import db from "./database/models";
-import userRoute from './routes/user';
 import tokenRoute from './routes/token.routes';
 import passport from 'passport';
 import cookieSession from 'cookie-session';
-import "./helpers/google.oath";
 
 dotenv.config();
 
@@ -32,7 +30,6 @@ app.use(passport.session());
 
 
 
-app.use('/user', userRoute);
 app.use("/token", tokenRoute);
 
 app.use(cors());
