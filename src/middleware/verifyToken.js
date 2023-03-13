@@ -1,19 +1,19 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 export const verifyToken = async (req, res, next) => {
   try {
-    const authHeader = await req.get("Authorization");
+    const authHeader = await req.get('Authorization');
     if (!authHeader) {
-      return res.status(403).json({ error: "No token provided!" });
+      return res.status(403).json({ error: 'No token provided!' });
     }
 
-    const token = authHeader.split(":")[1];
+    const token = authHeader.split(':')[1];
     if (!token) {
-      return res.status(401).json({ error: "Please provide token first." });
+      return res.status(401).json({ error: 'Please provide token first.' });
     }
 
     const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -21,7 +21,7 @@ export const verifyToken = async (req, res, next) => {
     if (decodeToken.errors || !decodeToken) {
       return res
         .status(401)
-        .json({ error: "Sorry, we fail to authenticate you." });
+        .json({ error: 'Sorry, we fail to authenticate you.' });
     }
 
     req.user = decodeToken;
