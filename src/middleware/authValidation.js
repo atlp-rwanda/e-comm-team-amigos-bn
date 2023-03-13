@@ -12,10 +12,15 @@ const signUpValidator = async (req, res, next) => {
       .email()
       .required()
       .external(async (value) => {
+<<<<<<< HEAD
+=======
+        // Check if email already exists in the database
+>>>>>>> ft(signUp):sign up a user
         let user = await models.User.findOne({
           where: { email: req.body.email },
         });
         if (user) {
+<<<<<<< HEAD
           res.status(400).json({error: 'Email address already in use'})
         }
         return value;
@@ -32,13 +37,33 @@ const signUpValidator = async (req, res, next) => {
         'password.invalid': 'Password is invalid.',
       }),
   });
+=======
+          throw new Error("Email address already in use");
+        }
+        return value;
+      }),
+      password: Joi.string().required().min(8),
+  });
+
+>>>>>>> ft(signUp):sign up a user
   try {
     await schema.validateAsync(req.body);
     next();
   } catch (error) {
+<<<<<<< HEAD
     res.status(400).send(error.message);
   }
 };
 export default {
   signUpValidator,
 };
+=======
+    console.log(error);
+    res.status(400).send(error.message);
+  }
+};
+
+export default {
+  signUpValidator,
+};
+>>>>>>> ft(signUp):sign up a user
