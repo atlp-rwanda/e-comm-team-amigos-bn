@@ -10,10 +10,9 @@ const options = {
     },
     components: {
       securitySchemes: {
-        bearerAuth: {
+        BearerToken: {
           type: 'http',
           scheme: 'bearer',
-          in: 'header',
           bearerformat: 'JWT',
         }
       }
@@ -22,11 +21,11 @@ const options = {
       bearerAuth: []
     }],
     servers: [{
-      url: 'http://localhost:3000'
+      url: ''
     }]
 
   },
-  apis: ['routes/*.js'],
+  apis: ['src/**/*doc.js'],
 };
 
 const specs = swaggerJsDoc(options);
