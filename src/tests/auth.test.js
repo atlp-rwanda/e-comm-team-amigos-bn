@@ -6,18 +6,14 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
 chai.use(chaiHttp);
-const should = chai.should();
 const expect = chai.expect;
 
 
 
 describe("createUser function", function () {
-  after(async function () {
-    await models.User.destroy({where: {}});
-   // await models.sequelize.close();
-  });
   before(async function () {
     await models.sequelize.sync();
+    await models.User.destroy({where: {}});
     await models.User.create({
       id: uuidv4(),
       firstName: "Kaneza",

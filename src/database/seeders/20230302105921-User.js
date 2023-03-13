@@ -1,18 +1,15 @@
+import { v4 as uuidv4 } from "uuid";
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.bulkInsert(
     'Users',
     [
       {
-<<<<<<< HEAD
-        userName: 'Didas',
-=======
         id: uuidv4(),
         firstName: 'Emille',
         lastName: 'Shumbusho',
         userName: 'Emile-x',
         telephone: '0780908888',
         address: 'Kigali',
->>>>>>> f61402a (ft(signUp):sign up a user)
         email: 'gasanajr08@gmail.com',
         password: '12345',
         role: 'admin',
