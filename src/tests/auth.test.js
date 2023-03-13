@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 
 chai.use(chaiHttp);
+const should = chai.should();
 const expect = chai.expect;
 
 
@@ -74,3 +75,76 @@ describe("createUser function", function () {
     expect(res).to.have.status(404);
   });
 });
+
+describe("User Login", () => {
+  before(async function () {
+    await models.sequelize.sync();
+    await models.User.create({
+      id: uuidv4(),
+      firstName: "Didas",
+      lastName: "Junior",
+      userName: "Junior",
+      telephone: "0790994799",
+      address: "Kigali",
+      email: "d.gasana@alustudent.com",
+      password: await bcrypt.hash("Password@123", 10),
+    });
+  });
+
+  after(async function () {
+    await models.User.destroy({where: {}});
+    //await models.sequelize.close();
+  });
+
+    it("Should LOGIN a USER", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+            email: "d.gasana@alustudent.com",
+            password: "Password@123",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+})
+    it("it Shouldn't LOGIN a USER who has wrong credentials", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+            email: "evarist@gmail.com",
+            password: "Password@123",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(400);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+    })
+    it("it Shouldn't LOGIN a USER who has wrong credentials", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+            email: "d.gasana@alustudent.com",
+            password: "Password@12345",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(400);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+})
+})

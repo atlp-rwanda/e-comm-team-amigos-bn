@@ -28,6 +28,24 @@ const createUser = async (req, res) => {
   }
 };
 
+export const loginUser = async(req,res) => {
+  const user = await models.User.findOne({
+      where: {email: req.body.email}
+  });
+  if (!user) return res.status(400).json({ message: "Email or Password Incorrect"});
+  //const valid = await bcrypt.compare(req.body.password, user.password);
+   bcrypt.compare(req.body.password, user.password, (err, data) => {
+     if (err) throw err;
+     if (data) {
+      const token = tokenGenerator({ userId: user.id });
+       return res.status(200).json({ message: "User Logged Successfully", token: token});
+     }else {
+       return res.status(400).json({ message: " Email or Password Incorrect"});
+     }
+   })  
+}
+
 module.exports = {
   createUser,
+  loginUser
 };
