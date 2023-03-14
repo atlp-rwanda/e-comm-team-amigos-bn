@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import { User } from '../database/models';
 
+dotenv.config();
 export const verifyToken = async (req, res, next) => {
   try {
     const authHeader = await req.get('Authorization');
@@ -39,6 +41,21 @@ export const verifyToken = async (req, res, next) => {
 
     req.user = user;
     return next();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
+};
+export const authorize = (roles) => async (req, res, next) => {
+  try {
+    const user = req.user;
+  const role  = user.role;
+  if (!roles.includes(role)) {
+    return res.status(401).json({
+      error: 'Access denied! You are not allowed to perform this operation.'
+    });
+  }
+  next();
   } catch (error) {
     return res.status(500).json({ error });
   }

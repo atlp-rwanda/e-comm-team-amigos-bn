@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -7,6 +8,17 @@ import tokenGenerator from "../helpers/generateToken";
 import { sendMail } from "../helpers/sendMail";
 import createOTP from "../helpers/createotp";
 import { sendResetMail } from "../helpers/sendResetPasswordEmail";
+=======
+import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import models from '../database/models';
+import tokenGenerator from '../helpers/generateToken';
+import { sendMail } from '../helpers/sendMail';
+import createOTP from '../helpers/createotp';
+import { sendResetMail } from '../helpers/sendResetPasswordEmail';
+>>>>>>> feat(user): User Password Update
 
 dotenv.config();
 const createUser = async (req, res) => {
