@@ -178,7 +178,6 @@ describe("User Login", () => {
 
   after(async function () {
     await models.User.destroy({where: {}});
-    //await models.sequelize.close();
   });
 
     it("Should LOGIN a USER", (done) => {
@@ -226,6 +225,91 @@ describe("User Login", () => {
             if(err) done(err);
             else {
                 res.should.have.status(400);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+})
+})
+
+describe("Password Update", () => {
+  before(async function () {
+    await models.sequelize.sync();
+    await models.User.create({
+      id: uuidv4(),
+      firstName: "Didas",
+      lastName: "Junior",
+      userName: "Junior",
+      telephone: "0790994799",
+      address: "Kigali",
+      email: "gasanajr08@gmail.com",
+      password: await bcrypt.hash("Password@123", 10),
+    });
+  });
+
+  after(async function () {
+    await models.User.destroy({where: {}});
+  });
+
+    it("Should update a  USER PASSWORD", (done) => {
+      chai.request(app)
+             .post('/user/login')
+             .send({
+                 email: "gasanajr08@gmail.com",
+                 password: "Password@123"
+             })
+             .end((err,resp) => {
+              if(err) done (err);
+              const token = resp.body.token;
+              chai.request(app)
+              .post('/user/updatePassword')
+              .set('auth-token', token)
+              .send({
+                  email: "gasanajr08@gmail.com",
+                  oldPass: "Password@123",
+                  newPass: "Junior@08"
+              })
+              .end((error,res) => {
+                  if(error) done(error);
+                  else {
+                      res.should.have.status(200);
+                      res.should.be.json;
+                      res.body.should.have.property('message');
+                      done();
+                  }
+              })
+                  })
+        
+})
+    it("Shouldn't LOGIN a USER using OLD PASSWORD", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+          email: "gasanajr08@gmail.com",
+          password: "Password@123",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(400);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+    })
+    it("Should LOGIN a USER with UPDATED CREDENTIALS", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+          email: "gasanajr08@gmail.com",
+          password: "Junior@08",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(200);
                 res.should.be.json;
                 res.body.should.have.property('message');
                 done();

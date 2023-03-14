@@ -5,6 +5,7 @@ import models from "../database/models";
 import tokenGenerator from "../helpers/generateToken";
 import { sendMail } from "../helpers/sendMail";
 import dotenv from "dotenv";
+
 dotenv.config();
 const createUser = async (req, res) => {
   const userData = {
@@ -62,7 +63,6 @@ export const loginUser = async (req, res) => {
   });
   if (!user)
     return res.status(400).json({ message: "Email or Password Incorrect" });
-  //const valid = await bcrypt.compare(req.body.password, user.password);
   if(user.verified==false)
   {
     return res.json({message: "You have to first verify your account"})
@@ -80,8 +80,32 @@ export const loginUser = async (req, res) => {
   });
 };
 
+const updatePassword = async(req,res) => {
+const {email, oldPass, newPass} = req.body
+ 
+ try {
+  const user = await models.User.findOne({ where: { email: email } });
+  const isMatch = await bcrypt.compare(oldPass, user.password);
+  if (!isMatch) return res.status(400).json({message: "Incorrect Old Password"});
+  const salt = await bcrypt.genSalt(10);
+  const hashedNewPassword = await bcrypt.hash(newPass, salt);
+  const updatedUser = await models.User.update(
+    {
+      password: hashedNewPassword
+    },
+    {
+      where: {email: email}
+    }
+  )
+  if (updatedUser) return res.status(200).json({message: "Password Updated Successfully"});
+ } catch (error) {
+      return res.status(500).json({message: error});
+ }
+}
+
 module.exports = {
   createUser,
   loginUser,
   emailVerification,
+  updatePassword
 };
