@@ -45,7 +45,6 @@
  *               error:
  *                 type: object
  *                 description: The error message and details
- * @swagger
  * /product/create:
  *   post:
  *     tags:

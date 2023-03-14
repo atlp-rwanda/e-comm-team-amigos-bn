@@ -1,9 +1,8 @@
-import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 import asyncHandler from 'express-async-handler';
 import models from '../database/models';
 
-const signUpValidator = async (req, res, next) => {
+const signUpValidator = asyncHandler(async (req, res, next) => {
   const schema = Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
@@ -29,12 +28,12 @@ const signUpValidator = async (req, res, next) => {
       .required()
       .messages({
         'string.pattern.base':
-                    'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+          'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         'any.required': 'Password is required.',
         'string.empty': 'Password is required.',
         'string.base': 'Password must be a string.',
         'string.min':
-                    'Password must be at least {#limit} characters long.',
+          'Password must be at least {#limit} characters long.',
         'password.invalid': 'Password is invalid.',
       }),
     role: Joi.string().valid('admin', 'vendor', 'normal').messages({
@@ -47,7 +46,7 @@ const signUpValidator = async (req, res, next) => {
   } catch (error) {
     res.status(400).json(error.message);
   }
-};
+});
 const loginValidator = async (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
@@ -56,12 +55,12 @@ const loginValidator = async (req, res, next) => {
       .required()
       .messages({
         'string.pattern.base':
-                    'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+          'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         'any.required': 'Password is required.',
         'string.empty': 'Password is required.',
         'string.base': 'Password must be a string.',
         'string.min':
-                    'Password must be at least {#limit} characters long.',
+          'Password must be at least {#limit} characters long.',
         'password.invalid': 'Password is invalid.',
       }),
   });
@@ -81,12 +80,12 @@ const resetPassValidator = async (req, res, next) => {
       .required()
       .messages({
         'string.pattern.base':
-                    'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+          'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         'any.required': 'Password is required.',
         'string.empty': 'Password is required.',
         'string.base': 'Password must be a string.',
         'string.min':
-                    'Password must be at least {#limit} characters long.',
+          'Password must be at least {#limit} characters long.',
         'password.invalid': 'Password is invalid.',
       }),
     confirmPassword: Joi.string()
@@ -94,12 +93,12 @@ const resetPassValidator = async (req, res, next) => {
       .required()
       .messages({
         'string.pattern.base':
-                    'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+          'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         'any.required': 'Password is required.',
         'string.empty': 'Password is required.',
         'string.base': 'Password must be a string.',
         'string.min':
-                    'Password must be at least {#limit} characters long.',
+          'Password must be at least {#limit} characters long.',
         'password.invalid': 'Password is invalid.',
       }),
   });
@@ -114,5 +113,5 @@ const resetPassValidator = async (req, res, next) => {
 export default {
   signUpValidator,
   loginValidator,
-  resetPassValidator,
+  resetPassValidator
 };
