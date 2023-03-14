@@ -160,6 +160,78 @@ describe('email verification function', () => {
   });
 });
 
+describe("User Login", () => {
+  before(async function () {
+    await models.sequelize.sync();
+    await models.User.create({
+      firstName: "Didas",
+      lastName: "Junior",
+      userName: "Junior",
+      telephone: "0790994799",
+      address: "Kigali",
+      email: "d.gasana@alustudent.com",
+      password: await bcrypt.hash("Password@123", 10),
+    });
+  });
+
+  after(async function () {
+    await models.User.destroy({where: {}});
+  });
+
+    it("Should LOGIN a USER", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+            email: "d.gasana@alustudent.com",
+            password: "Password@123",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+})
+    it("it Shouldn't LOGIN a USER who has wrong credentials", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+            email: "evarist@gmail.com",
+            password: "Password@123",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(400);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+    })
+    it("it Shouldn't LOGIN a USER who has wrong credentials", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+            email: "d.gasana@alustudent.com",
+            password: "Password@12345",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(400);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+})
+})
+
+
 describe('check OTP for USER with role VENDOR to LOGIN', () => {
   let user;
   let otp;
@@ -251,7 +323,7 @@ describe('User Login', () => {
       userName: 'Junior',
       telephone: '0790994799',
       address: 'Kigali',
-      email: 'd.gasana@alustudent.com',
+      email: 'test@alustudent.com',
       password: await bcrypt.hash('Password@123', 10),
     });
   });
@@ -266,7 +338,7 @@ describe('User Login', () => {
       .request(app)
       .post('/user/login')
       .send({
-        email: 'd.gasana@alustudent.com',
+        email: 'test@alustudent.com',
         password: 'Password@123',
       })
       .end((err, res) => {
@@ -302,7 +374,7 @@ describe('User Login', () => {
       .request(app)
       .post('/user/login')
       .send({
-        email: 'd.gasana@alustudent.com',
+        email: 'test@alustudent.com',
         password: 'Password@12345',
       })
       .end((err, res) => {
@@ -355,7 +427,7 @@ describe('resetPassword function', () => {
   let token;
 
   before(async () => {
-    await models.sequelize.sync({ force: true });
+    await models.sequelize.sync();
     await models.User.destroy({ where: {} });
     const user = await models.User.create({
       firstName: 'Kaneza',
@@ -399,82 +471,188 @@ describe('resetPassword function', () => {
       });
     expect(res.body.message).to.equal('password is not matched');
   });
+  it("should reset the user's password with a valid token and new password", async () => {
+    const user = await models.User.findOne({
+      where: { email: 'eriman@example.com' },
+    });
+    const token = tokenGenerator({ email: user.email, id: user.id });
+    const res = await chai
+      .request(app)
+      .put(`/user/resetPassword/${token}`)
+      .send({
+        password: 'NewPassword@123',
+        confirmPassword: 'NewPassword@123',
+      });
+    expect(res).to.have.status(200);
+    expect(res.body.message).to.equal('password updated successfully');
+    after(async () => {
+      await user.destroy({ where: {} });
+    });
+  });
 });
 
-it("should reset the user's password with a valid token and new password", async () => {
-  const user = await models.User.findOne({
-    where: { email: 'eriman@example.com' },
-  });
-  const token = tokenGenerator({ email: user.email, id: user.id });
-  const res = await chai
-    .request(app)
-    .put(`/user/resetPassword/${token}`)
-    .send({
-      password: 'NewPassword@123',
-      confirmPassword: 'NewPassword@123',
-    });
-  expect(res).to.have.status(200);
-  expect(res.body.message).to.equal('password updated successfully');
-  after(async () => {
-    await user.destroy({ where: {} });
-  });
-
-  it('should send OTPCODE', (done) => {
-    chai.request(app)
-      .post('/user/login')
-      .send({
+  describe('check OTP for USER with role VENDOR to LOGIN', () => {
+    let user;
+    let otp;
+  
+    before(async () => {
+      await models.sequelize.sync({ force: true });
+      user = await models.User.create({
+        firstName: 'wilbrord',
+        lastName: 'ibyimana',
+        userName: 'wilb',
+        role: 'vendor',
+        telephone: '0790994799',
+        address: 'Kigali',
+        password: await bcrypt.hash('Password@123', 10),
         email: 'bwilbrord@gmail.com',
-        password: 'Password@123',
-      })
-      .end((err, res) => {
-        if (err) done(err);
-        else {
-          otp = res.body.otp.otp;
-          expect(res).to.have.status(200);
-          expect(res.body.message).to.equal('Enter OTP to be be verified');
-          done();
-        }
       });
-  });
-  it('should return a token if OTPCODE is valid', (done) => {
-    chai.request(app)
-      .post('/user/otp')
-      .send({
-        email: 'bwilbrord@gmail.com',
-        otp,
-      })
-      .end((err, res) => {
-        if (err) done(err);
-        else {
-          expect(res.body.message).to.equal('User Logged Successfully');
-          expect(res).to.have.status(200);
-          expect(res.body).to.have.property('token');
-          done();
-        }
-      });
-  });
-
-  it('should return an error message if OTPCODE is expired', async () => {
-    await user.update({
-      otpcodeexpiration: new Date(new Date().getTime() - 901000)
     });
-
-    const { email } = user;
-    const response = await chai.request(app)
-      .post('/user/otp')
-      .send({ email, otp });
-
-    expect(response.status).to.equal(401);
-    expect(response.body.message).to.equal('OTPCODE is expired try again');
+  
+    after(async () => {
+      await user.destroy({ where: {} });
+    });
+  
+    it('should send OTPCODE', (done) => {
+      chai.request(app)
+        .post('/user/login')
+        .send({
+          email: 'bwilbrord@gmail.com',
+          password: 'Password@123',
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          else {
+            otp = res.body.otp.otp;
+            expect(res).to.have.status(200);
+            expect(res.body.message).to.equal('Enter OTP to be be verified');
+            done();
+          }
+        });
+    });
+    it('should return a token if OTPCODE is valid', (done) => {
+      chai.request(app)
+        .post('/user/otp')
+        .send({
+          email: 'bwilbrord@gmail.com',
+          otp,
+        })
+        .end((err, res) => {
+          if (err) done(err);
+          else {
+            expect(res.body.message).to.equal('User Logged Successfully');
+            expect(res).to.have.status(200);
+            expect(res.body).to.have.property('token');
+            done();
+          }
+        });
+    });
+  
+    it('should return an error message if OTPCODE is expired', async () => {
+      await user.update({
+        otpcodeexpiration: new Date(new Date().getTime() - 901000)
+      });
+  
+      const { email } = user;
+      const response = await chai.request(app)
+        .post('/user/otp')
+        .send({ email, otp });
+  
+      expect(response.status).to.equal(401);
+      expect(response.body.message).to.equal('OTPCODE is expired try again');
+    });
+  
+    it('should return an error message if OTPCODE is invalid or expired', async () => {
+      const { email } = user;
+      const otpe = '6543';
+      const response = await chai.request(app)
+        .post('/user/otp')
+        .send({ email, otpe });
+      expect(response.status).to.equal(401);
+      expect(['Invalid OTPCODE', 'OTPCODE is expired try again']).to.include(response.body.message);
+    });
   });
 
-  it('should return an error message if OTPCODE is invalid or expired', async () => {
-    const { email } = user;
-    const otpe = '6543';
-    const response = await chai.request(app)
-      .post('/user/otp')
-      .send({ email, otpe });
-    expect(response.status).to.equal(401);
-    expect(['Invalid OTPCODE', 'OTPCODE is expired try again']).to.include(response.body.message);
+describe("Password Update", () => {
+  before(async function () {
+    await models.sequelize.sync();
+    await models.User.create({
+      firstName: "Didas",
+      lastName: "Junior",
+      userName: "Junior",
+      telephone: "0790994799",
+      address: "Kigali",
+      email: "gasanajr08@gmail.com",
+      password: await bcrypt.hash("Password@123", 10),
+    });
   });
-});
+
+  after(async function () {
+    await models.User.destroy({where: {}});
+  });
+
+    it("Should update a  USER PASSWORD", (done) => {
+      chai.request(app)
+             .post('/user/login')
+             .send({
+                 email: "gasanajr08@gmail.com",
+                 password: "Password@123"
+             })
+             .end((err,resp) => {
+              if(err) done (err);
+              const token = resp.body.token;
+              chai.request(app)
+              .patch('/user/updatePassword')
+              .set('auth-token', token)
+              .send({
+                  email: "gasanajr08@gmail.com",
+                  oldPass: "Password@123",
+                  newPass: "Junior@08"
+              })
+              .end((error,res) => {
+                  if(error) done(error);
+                  else {
+                      res.should.have.status(200);
+                      res.should.be.json;
+                      res.body.should.have.property('message');
+                      done();
+                  }
+              })
+                  })
+        
+})
+    it("Shouldn't LOGIN a USER using OLD PASSWORD", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+          email: "gasanajr08@gmail.com",
+          password: "Password@123",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(400);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+    })
+    it("Should LOGIN a USER with UPDATED CREDENTIALS", (done) => {
+        chai.request(app)
+        .post('/user/login')
+        .send({
+          email: "gasanajr08@gmail.com",
+          password: "Junior@08",
+        })
+        .end((err,res) => {
+            if(err) done(err);
+            else {
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.have.property('message');
+                done();
+            }
+        })
+})
+})

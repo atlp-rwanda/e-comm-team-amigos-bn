@@ -6,17 +6,12 @@ dotenv.config();
 
 export const verifyToken = async (req, res, next) => {
   try {
-    const authHeader = await req.get('Authorization');
+    const authHeader = await req.get("auth-token");
     if (!authHeader) {
-      return res.status(403).json({ error: 'No token provided!' });
+      return res.status(401).json({ error: "No token provided!" });
     }
 
-    const token = authHeader.split(':')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Please provide token first.' });
-    }
-
-    const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
+    const decodeToken = jwt.verify(authHeader, process.env.SECRET_KEY);
 
     if (decodeToken.errors || !decodeToken) {
       return res

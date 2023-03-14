@@ -83,6 +83,29 @@ export const loginUser = async (req, res) => {
   });
 };
 
+const updatePassword = async(req,res) => {
+const {email, oldPass, newPass} = req.body
+ 
+ try {
+  const user = await models.User.findOne({ where: { email: email } });
+  const isMatch = await bcrypt.compare(oldPass, user.password);
+  if (!isMatch) return res.status(400).json({message: "Incorrect Old Password"});
+  const salt = await bcrypt.genSalt(10);
+  const hashedNewPassword = await bcrypt.hash(newPass, salt);
+  const updatedUser = await models.User.update(
+    {
+      password: hashedNewPassword
+    },
+    {
+      where: {email: email}
+    }
+  )
+  if (updatedUser) return res.status(200).json({message: "Password Updated Successfully"});
+ } catch (error) {
+      return res.status(500).json({message: error});
+ }
+}
+
 const checkotp = async (req, res) => {
   const { email, otp } = req.body;
   try {
@@ -150,5 +173,6 @@ export default {
   emailVerification,
   checkotp,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  updatePassword
 };
