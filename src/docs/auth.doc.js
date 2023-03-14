@@ -1,14 +1,14 @@
 /**
  * @openapi
- * 
+ *
  * /user/create:
  *      post:
  *          tags: [Authentication]
- *          summary: This helps to register as a user. 
+ *          summary: This helps to register as a user.
  *          description: start your registration with names, email, and password.
  *          requestBody:
  *              description: Provide information
- *              content: 
+ *              content:
  *                  application/json:
  *                      schema:
  *                          type: object
@@ -25,9 +25,9 @@
  *                                  type: string
  *                              email:
  *                                  type: string
- *                              password: 
+ *                              password:
  *                                  type: string
- * 
+ *
  *          responses:
  *                  201:
  *                     description: user registered successfully!
@@ -37,8 +37,8 @@
  *                     description: Not Found
  *                  500:
  *                     description: Internal server error
- * 
- * 
+ *
+ *
  * /user/login:
  *      post:
  *          tags: [Authentication]
@@ -46,17 +46,46 @@
  *          description: Enter email and password.
  *          requestBody:
  *              description: Provide email and password
- *              content: 
+ *              content:
  *                  application/json:
  *                      schema:
  *                          type: object
  *                          properties:
  *                              email:
  *                                  type: string
- *                              password: 
+ *                              password:
  *                                  type: string
- * 
- * 
+ *
+ *
+ *          responses:
+ *                  200:
+ *                     description: user logged in successfully!
+ *                  400:
+ *                     description: Bad Request
+ *                  404:
+ *                     description: Not Found
+ *                  500:
+ *                     description: Internal server error
+ *
+ *
+ * /user/otp:
+ *      post:
+ *          tags: [Authentication]
+ *          summary: This helps a user to use otp generated.
+ *          description: Enter email and otp.
+ *          requestBody:
+ *              description: Provide email and otp
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              email:
+ *                                  type: string
+ *                              otp:
+ *                                  type: string
+ *
+ *
  *          responses:
  *                  200:
  *                     description: user logged in successfully!

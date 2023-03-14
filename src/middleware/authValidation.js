@@ -1,5 +1,5 @@
-import Joi from "joi";
-import models from "../database/models";
+import Joi from 'joi';
+import models from '../database/models';
 
 const signUpValidator = async (req, res, next) => {
   const schema = Joi.object({
@@ -12,15 +12,15 @@ const signUpValidator = async (req, res, next) => {
       .email()
       .required()
       .external(async (value) => {
-        let user = await models.User.findOne({
+        const user = await models.User.findOne({
           where: { email: req.body.email },
         });
         if (user) {
-          res.status(400).json({error: 'Email address already in use'})
+          res.status(400).json({ error: 'Email address already in use' });
         }
         return value;
       }),
-      password: Joi.string()
+    password: Joi.string()
       .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/)
       .required()
       .messages({
@@ -36,15 +36,16 @@ const signUpValidator = async (req, res, next) => {
     await schema.validateAsync(req.body);
     next();
   } catch (error) {
+    console.log(error);
     res.status(400).send(error.message);
   }
 };
-const loginValidator = async(req, res, next) => {
+const loginValidator = async (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string()
       .email()
       .required(),
-      password: Joi.string()
+    password: Joi.string()
       .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/)
       .required()
       .messages({
@@ -55,17 +56,15 @@ const loginValidator = async(req, res, next) => {
         'string.min': 'Password must be at least {#limit} characters long.',
         'password.invalid': 'Password is invalid.',
       }),
-    })
+  });
 
-    try {
-      await schema.validateAsync(req.body);
-      next();
-    } catch (error) {
-      res.status(400).send(error.message);
-    }
-
+  try {
+    await schema.validateAsync(req.body);
+    next();
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
 };
-
 
 export default {
   signUpValidator,
