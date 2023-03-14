@@ -36,7 +36,6 @@ const signUpValidator = async (req, res, next) => {
     await schema.validateAsync(req.body);
     next();
   } catch (error) {
-    console.log(error);
     res.status(400).send(error.message);
   }
 };
