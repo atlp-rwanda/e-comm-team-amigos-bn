@@ -108,10 +108,10 @@ const updatePassword = async (req, res) => {
     const hashedNewPassword = await bcrypt.hash(newPass, salt);
     const updatedUser = await models.User.update(
       {
-        password: hashedNewPassword,
+        password: hashedNewPassword
       },
       {
-        where: { email },
+        where: { email }
       }
     );
     if (updatedUser) return res.status(200).json({ message: 'Password Updated Successfully' });

@@ -24,15 +24,16 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       password: DataTypes.STRING,
       role: DataTypes.ENUM("admin", "vendor", "normal"),
-      status: DataTypes.ENUM("active", "inactive"),
+      status: DataTypes.ENUM('active', 'inactive'),
       verified: DataTypes.BOOLEAN,
     },
     {}
   );
-  User.association = (models) => {
-    User.hasMany(models.Product, {
-      foriegnKey: "userId",
-      as: "user",
+
+  User.associate = (models) => {
+    User.hasMany(models.UserRole, {
+      foreignKey: 'userId',
+      as: 'UserRoles',
     });
   };
   return User;
