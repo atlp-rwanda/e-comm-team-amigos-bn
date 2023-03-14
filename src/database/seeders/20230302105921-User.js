@@ -5,7 +5,6 @@ module.exports = {
     'Users',
     [
       {
-        id: uuidv4(),
         firstName: 'Emille',
         lastName: 'Shumbusho',
         userName: 'Emile-x',
@@ -22,7 +21,6 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        id: uuidv4(),
         firstName: 'wilbrord',
         lastName: 'ibyimana',
         userName: 'wilb',

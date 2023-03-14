@@ -10,7 +10,6 @@ import createOTP from '../helpers/createotp';
 dotenv.config();
 const createUser = async (req, res) => {
   const userData = {
-    id: uuidv4(),
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     userName: req.body.userName,
@@ -29,6 +28,7 @@ const createUser = async (req, res) => {
       'you can now verify your account',
       url
     );
+    const { password, ...data } = user.toJSON();
     return res.status(201).json({
       message: 'Account created successfully',
       data: user,
@@ -65,8 +65,7 @@ export const loginUser = async (req, res) => {
   if (!user) {
     return res.status(400).json({ message: 'Email or Password Incorrect' });
   }
-  if (user.verified === false)
-  {
+  if (user.verified === false) {
     return res.json({ message: 'You have to first verify your account' });
   }
   bcrypt.compare(req.body.password, user.password, async (err, data) => {

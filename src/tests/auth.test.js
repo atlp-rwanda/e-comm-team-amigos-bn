@@ -15,14 +15,13 @@ describe('createUser function', () => {
     await models.sequelize.sync({ force: true });
     await models.User.destroy({ where: {} });
     await models.User.create({
-      id: uuidv4(),
-      firstName: 'Kaneza',
-      lastName: 'Erica',
-      userName: 'Eriallan',
-      telephone: '0785188981',
-      address: 'Kigali',
-      email: 'eriman@example.com',
-      password: await bcrypt.hash('Password@123', 10),
+      firstName: "Kaneza",
+      lastName: "Erica",
+      userName: "Eriallan",
+      telephone: "0785188981",
+      address: "Kigali",
+      email: "eriman@example.com",
+      password: await bcrypt.hash("Password@123", 10),
     });
   });
 
@@ -79,14 +78,13 @@ describe('email verification function', () => {
   before(async () => {
     await models.sequelize.sync({ force: true });
     user = await models.User.create({
-      id: uuidv4(),
-      firstName: 'John',
-      lastName: 'Doe',
-      userName: 'johndoe',
-      telephone: '555-5555',
-      address: '123 Main St',
-      email: 'kananura221023924@gmail.com',
-      password: 'password',
+      firstName: "John",
+      lastName: "Doe",
+      userName: "johndoe",
+      telephone: "555-5555",
+      address: "123 Main St",
+      email: "kananura221023924@gmail.com",
+      password: "password",
       verified: false,
     });
     token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
@@ -94,8 +92,8 @@ describe('email verification function', () => {
   after(async () => {
     await models.User.destroy({ where: {} });
   });
-  it('should return an error if the user does not exist', async () => {
-    const fakeUserId = '1860c8f6-9106-4f6e-ae1f-2793968cf8b2';
+  it("should return an error if the user does not exist", async () => {
+    const fakeUserId = "445223453";
     const fakeToken = jwt.sign({ userId: fakeUserId }, process.env.SECRET_KEY);
     const res = await chai
       .request(app)
@@ -117,14 +115,13 @@ describe('email verification function', () => {
 
   it('should verify the user s email and return a success message', async () => {
     const user = await models.User.create({
-      id: uuidv4(),
-      firstName: 'John',
-      lastName: 'Doe',
-      userName: 'johndoe',
-      telephone: '555-5555',
-      address: '123 Main St',
-      email: 'kananura221023924@gmail.com',
-      password: 'password',
+      firstName: "John",
+      lastName: "Doe",
+      userName: "johndoe",
+      telephone: "555-5555",
+      address: "123 Main St",
+      email: "kananura221023924@gmail.com",
+      password: "password",
       verified: false,
     });
     const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
@@ -140,14 +137,13 @@ describe('email verification function', () => {
 
   it('should return an error if the token is invalid', async () => {
     const user = await models.User.create({
-      id: uuidv4(),
-      firstName: 'John',
-      lastName: 'Doe',
-      userName: 'johndoe',
-      telephone: '555-5555',
-      address: '123 Main St',
-      email: 'kananura221023924@gmail.com',
-      password: 'password',
+      firstName: "John",
+      lastName: "Doe",
+      userName: "johndoe",
+      telephone: "555-5555",
+      address: "123 Main St",
+      email: "kananura221023924@gmail.com",
+      password: "password",
       verified: false,
     });
     const secretKey = 'different_secret_key';
@@ -170,7 +166,6 @@ describe('check OTP for USER with role VENDOR to LOGIN', () => {
   before(async () => {
     await models.sequelize.sync({ force: true });
     user = await models.User.create({
-      id: uuidv4(),
       firstName: 'wilbrord',
       lastName: 'ibyimana',
       userName: 'wilb',
@@ -223,7 +218,7 @@ describe('check OTP for USER with role VENDOR to LOGIN', () => {
 
   it('should return an error message if OTPCODE is expired', async () => {
     await user.update({
-      otpcodeexpiration: new Date(new Date().getTime() - 901000) 
+      otpcodeexpiration: new Date(new Date().getTime() - 901000)
     });
 
     const { email } = user;
