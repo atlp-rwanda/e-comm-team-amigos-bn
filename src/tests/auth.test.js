@@ -354,7 +354,7 @@ describe('resetPassword function', () => {
   let token;
 
   before(async () => {
-    await models.sequelize.sync({ force: true });
+    await models.sequelize.sync();
     await models.User.destroy({ where: {} });
     const user = await models.User.create({
       firstName: 'Kaneza',
@@ -398,22 +398,44 @@ describe('resetPassword function', () => {
       });
     expect(res.body.message).to.equal('password is not matched');
   });
+  it("should reset the user's password with a valid token and new password", async () => {
+    const user = await models.User.findOne({
+      where: { email: 'eriman@example.com' },
+    });
+    const token = tokenGenerator({ email: user.email, id: user.id });
+    const res = await chai
+      .request(app)
+      .put(`/user/resetPassword/${token}`)
+      .send({
+        password: 'NewPassword@123',
+        confirmPassword: 'NewPassword@123',
+      });
+    expect(res).to.have.status(200);
+    expect(res.body.message).to.equal('password updated successfully');
+    after(async () => {
+      await user.destroy({ where: {} });
+    });
+  });
 });
 
-it("should reset the user's password with a valid token and new password", async () => {
-  const user = await models.User.findOne({
-    where: { email: 'eriman@example.com' },
-  });
-  const token = tokenGenerator({ email: user.email, id: user.id });
-  const res = await chai
-    .request(app)
-    .put(`/user/resetPassword/${token}`)
-    .send({
-      password: 'NewPassword@123',
-      confirmPassword: 'NewPassword@123',
+describe('check OTP for USER with role VENDOR to LOGIN', () => {
+  let user;
+  let otp;
+
+  before(async () => {
+    await models.sequelize.sync({ force: true });
+    user = await models.User.create({
+      firstName: 'wilbrord',
+      lastName: 'ibyimana',
+      userName: 'wilb',
+      role: 'vendor',
+      telephone: '0790994799',
+      address: 'Kigali',
+      password: await bcrypt.hash('Password@123', 10),
+      email: 'bwilbrord@gmail.com',
     });
-  expect(res).to.have.status(200);
-  expect(res.body.message).to.equal('password updated successfully');
+  });
+
   after(async () => {
     await user.destroy({ where: {} });
   });
