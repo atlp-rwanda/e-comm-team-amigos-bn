@@ -52,6 +52,9 @@ const options = {
             {
                 url: 'http://localhost:4000',
             },
+            {
+                url: "https://e-comm-team-amigos-bn-project.onrender.com"
+            }
         ],
     },
     apis: ['src/**/*doc.js'],

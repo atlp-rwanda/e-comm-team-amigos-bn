@@ -152,9 +152,9 @@ describe("View shopping cart test", function () {
                 ec: 30
             });
 
-            const token = jwt.sign({ userId: user.id, role: user.role }, process.env.SECRET_KEY);
-            agent = chai.request.agent(app);
-            await agent.post(`/cart/?productId=${product.id}&quantity=${1}`).set("Authorization", `bearer ${token}`);
+        const token = jwt.sign({ userId: user.id, role: user.role }, process.env.SECRET_KEY);
+        agent = chai.request.agent(app);
+        await agent.post(`/cart/?productId=${product.id}&quantity=${1}`).set("Authorization", `bearer ${token}`);
     });
 
     it('returns the correct cart items when there are items in the cart', async () => {
@@ -162,11 +162,11 @@ describe("View shopping cart test", function () {
         const res = await agent.get('/cart/view-cart').send().set("Authorization", `Bearer ${token}`);
         expect(res.status).to.equal(200);
         expect(res.body.message).to.equal('Cart Items');
-      })
-    
-      it("Should return an error if a product does not exist", async()=> {
+    });
+
+    it("Should return an error if a product does not exist", async () => {
         const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
         const res = await chai.request(app).get('/cart/view-cart').send().set("Authorization", `Bearer ${token}`);
         expect(res.status).to.equal(204);
-});
+    });
 });
