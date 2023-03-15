@@ -14,7 +14,8 @@ const options = {
           type: 'http',
           scheme: 'bearer',
           bearerformat: 'JWT',
-        }, google_auth: {
+        },
+        google_auth: {
           type: 'oauth2',
           flows: {
             authorizationCode: {
@@ -41,7 +42,7 @@ const options = {
     }],
     servers: [{
       url: 'http://localhost:3000'
-    }, { url: "http://localhost:4000" }]
+    }, { url: 'http://localhost:4000' }]
 
   },
   apis: ['src/**/*doc.js'],
