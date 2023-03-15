@@ -1,14 +1,14 @@
-import express from "express";
-import logger from "morgan";
-import dotenv from "dotenv";
-import cors from "cors";
-import swaggerUi from "swagger-ui-express";
-import specs from "./docs";
-import routes from "./routes";
-import db from "./database/models";
-import tokenRoute from './routes/token.routes';
+import express from 'express';
+import logger from 'morgan';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import passport from 'passport';
 import cookieSession from 'cookie-session';
+import specs from './docs';
+import routes from './routes';
+import db from './database/models';
+import tokenRoute from './routes/token.routes';
 
 dotenv.config();
 
@@ -28,9 +28,7 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-
-app.use("/token", tokenRoute);
+app.use('/token', tokenRoute);
 
 app.use(cors());
 app.use('/', routes);

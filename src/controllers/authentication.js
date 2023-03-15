@@ -6,6 +6,7 @@ import models from '../database/models';
 import tokenGenerator from '../helpers/generateToken';
 import { sendMail } from '../helpers/sendMail';
 import createOTP from '../helpers/createotp';
+import { sendResetMail } from '../helpers/sendResetPasswordEmail';
 
 dotenv.config();
 const createUser = async (req, res) => {
@@ -22,23 +23,24 @@ const createUser = async (req, res) => {
     const user = await models.User.create(userData);
     const token = tokenGenerator({ userId: user.id }, { expiresIn: '1d' });
     const url = `${process.env.BASE_URL}/user/verify_email/${token}`;
+    const { password, ...data } = user.toJSON();
     sendMail(
       user.email,
       'Email Verification',
       'you can now verify your account',
       url
     );
-    const { password, ...data } = user.toJSON();
     return res.status(201).json({
       message: 'Account created successfully',
-      data: user,
+      data,
       token,
     });
   } catch (error) {
     return res.status(500).json(error);
   }
 };
-const emailVerification = async (req, res) => {
+
+const emailVerification = async (req, res, next) => {
   const { token } = req.params;
   try {
     const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -62,10 +64,8 @@ export const loginUser = async (req, res) => {
   const user = await models.User.findOne({
     where: { email: req.body.email }
   });
-  if (!user) {
-    return res.status(400).json({ message: 'Email or Password Incorrect' });
-  }
-  if (user.verified === false) {
+  if (!user) { return res.status(400).json({ message: 'Email or Password Incorrect' }); }
+  if (user.verified == false) {
     return res.json({ message: 'You have to first verify your account' });
   }
   bcrypt.compare(req.body.password, user.password, async (err, data) => {
@@ -107,9 +107,47 @@ const checkotp = async (req, res) => {
   }
 };
 
-export default {
+const forgotPassword = async (req, res) => {
+  const userEmail = req.body.email;
+  const userExist = await models.User.findOne({ where: { email: userEmail } });
+  if (!userExist) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+  if (userExist.verified == false) {
+    res.json({ message: 'Your account is not verified' });
+  }
+  const token = tokenGenerator({ email: userEmail, id: userExist.id });
+  const link = `${process.env.BASE_URL}/user/resetPassword/${token}`;
+  sendResetMail(userEmail, 'Reset password email', 'reset password', link);
+  return res.status(200).json({ message: 'email sent successfully' });
+};
+
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
+  const userId = decodeToken.id;
+  const userEmail = decodeToken.email;
+  const link = `${process.env.BASE_URL}/user/login`;
+
+  const userExist = await models.User.findOne({ where: { id: userId } });
+  if (!userExist) {
+    return res.status(404).json({ message: 'user not found' });
+  }
+
+  const { password, confirmPassword } = req.body;
+  if (password != confirmPassword) {
+    return res.json({ message: 'password is not matched' });
+  }
+  const hashedPass = await bcrypt.hash(req.body.password, 10);
+  await models.User.update({ password: hashedPass }, { where: { id: userId } });
+  sendResetMail(userEmail, ' password updated Email', 'login', link);
+  return res.status(200).json({ message: 'password updated successfully' });
+};
+module.exports = {
   createUser,
   loginUser,
   emailVerification,
+  forgotPassword,
+  resetPassword,
   checkotp
 };
