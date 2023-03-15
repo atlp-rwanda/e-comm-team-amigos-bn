@@ -18,6 +18,7 @@ const createUser = async (req, res) => {
     address: req.body.address,
     email: req.body.email,
     password: await bcrypt.hash(req.body.password, 10),
+    role: req.body.role,
   };
   try {
     const user = await models.User.create(userData);
@@ -76,39 +77,48 @@ export const loginUser = async (req, res) => {
         const otp = await createOTP(user);
         return res
           .status(200)
-          .json({ message: "Enter OTP to be be verified", otp });
+          .json({ message: 'Enter OTP to be be verified', otp });
       }
-      const token = tokenGenerator({ userId: user.id });
+
+      // Generate token and save it in the header
+      const token = jwt.sign(
+        { userId: user.id, userEmail: user.email },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: '1h',
+        }
+      );
+      res.setHeader('Authorization', `Bearer ${token}`);
       return res
         .status(200)
-        .json({ message: "User Logged Successfully", token });
+        .json({ message: 'User Logged Successfully', token });
     }
     return res.status(400).json({ message: " Email or Password Incorrect" });
   });
 };
 
-const updatePassword = async(req,res) => {
-const {email, oldPass, newPass} = req.body
- 
- try {
-  const user = await models.User.findOne({ where: { email: email } });
-  const isMatch = await bcrypt.compare(oldPass, user.password);
-  if (!isMatch) return res.status(400).json({message: "Incorrect Old Password"});
-  const salt = await bcrypt.genSalt(10);
-  const hashedNewPassword = await bcrypt.hash(newPass, salt);
-  const updatedUser = await models.User.update(
-    {
-      password: hashedNewPassword
-    },
-    {
-      where: {email: email}
-    }
-  )
-  if (updatedUser) return res.status(200).json({message: "Password Updated Successfully"});
- } catch (error) {
-      return res.status(500).json({message: error});
- }
-}
+const updatePassword = async (req, res) => {
+  const { email, oldPass, newPass } = req.body;
+
+  try {
+    const user = await models.User.findOne({ where: { email } });
+    const isMatch = await bcrypt.compare(oldPass, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Incorrect Old Password' });
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPass, salt);
+    const updatedUser = await models.User.update(
+      {
+        password: hashedNewPassword,
+      },
+      {
+        where: { email },
+      }
+    );
+    if (updatedUser) return res.status(200).json({ message: 'Password Updated Successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
 
 const checkotp = async (req, res) => {
   const { email, otp } = req.body;
@@ -123,10 +133,13 @@ const checkotp = async (req, res) => {
       bcrypt.compare(otp, user.otpcode, (err, result) => {
         if (err) throw err;
         if (result) {
-          const token = tokenGenerator({ userId: user.id });
+          const token = tokenGenerator({
+            userId: user.id,
+            userRole: user.role,
+          });
           return res
             .status(200)
-            .json({ message: "User Logged Successfully", token });
+            .json({ message: 'User Logged Successfully', token });
         }
       });
     } else {
@@ -145,7 +158,10 @@ const forgotPassword = async (req, res) => {
   if (userExist.verified == false) {
     res.json({ message: 'Your account is not verified' });
   }
-  const token = tokenGenerator({ email: userEmail, id: userExist.id });
+  const token = tokenGenerator(
+    { email: userEmail, id: userExist.id },
+    { expiresIn: '1d' }
+  );
   const link = `${process.env.BASE_URL}/user/resetPassword/${token}`;
   sendResetMail(userEmail, 'Reset password email', 'reset password', link);
   return res.status(200).json({ message: 'email sent successfully' });
@@ -180,5 +196,5 @@ export default {
   checkotp,
   forgotPassword,
   resetPassword,
-  updatePassword
+  updatePassword,
 };

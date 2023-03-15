@@ -55,8 +55,6 @@
  *                                  type: string
  *                              password:
  *                                  type: string
- *
- *
  *          responses:
  *                  200:
  *                     description: user logged in successfully!
@@ -69,7 +67,8 @@
  *
  *
  * /user/verify_email/{token}:
- *   post:
+ *   get:
+ *     tags: [Authentication]
  *     summary: Verify user's email address
  *     description: Verify user's email address using token generated during registration
  *     parameters:
@@ -157,19 +156,19 @@
  *                type: string
  *          requestBody:
  *              description: Provide email, old password, and new password
- *              content: 
+ *              content:
  *                  application/json:
  *                      schema:
  *                          type: object
  *                          properties:
  *                              email:
  *                                  type: string
- *                              oldPass: 
+ *                              oldPass:
  *                                  type: string
- *                              newPass: 
+ *                              newPass:
  *                                  type: string
- * 
- * 
+ *
+ *
  *
  *          responses:
  *                  '200':
@@ -183,4 +182,3 @@
  *                  '500':
  *                     description: Internal server error
  */
- 
