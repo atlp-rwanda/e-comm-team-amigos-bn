@@ -1,13 +1,13 @@
-### Feature Reset your pasword via email
-## Description
+## Feature Reset your pasword via email
+### Description
 This branch allows a user reset password vial email
 
-## Documentation
+### Documentation
 POST user/forgetPassword for insert email and send emil of token
 
 PUT auth/ResetPassword for update password used that token
 
-## Dependencies
+### Dependencies
 bcrypt
 callsites
 chai-http
@@ -25,7 +25,7 @@ swagger-jsdoc
 swagger-ui-express
 nodemailer
 
-## Getting Started
+### Getting Started
 Clone this repo git clone https://github.com/atlp-rwanda/e-comm-team-amigos-bn
 Switch your working directory cd e-comm-team-amigos-bn
 Create an .env file and update it with .env-example
