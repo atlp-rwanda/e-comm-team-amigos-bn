@@ -10,6 +10,10 @@ router.get('/verify_email/:token', authentication.emailVerification);
 router.post('/forgotPassword', authentication.forgotPassword);
 router.put('/resetPassword/:token', validate.resetPassValidator, authentication.resetPassword);
 router.post('/otp', authentication.checkotp);
-router.patch('/updatePassword', verifyToken, authentication.updatePassword)
+router.patch('/updatePassword', verifyToken, authentication.updatePassword);
+router.get('/check', validate.authorize(['admin', 'vendor', 'normal']), (req, res) => {
+  res.status(200).json({
+    message: 'You are authorized',
+  });
+});
 export default router;
-// , validate.authorize(['admin', 'vendor', 'normal'])

@@ -486,7 +486,7 @@ function sendMail(recepient, subject, text, url) {
       if (error) {
         return reject({ message: 'An error Has occured' });
       }
-      resolve({ message: 'Email sent successfully' });
+      return resolve({ message: 'Email sent successfully' });
     });
   });
 }

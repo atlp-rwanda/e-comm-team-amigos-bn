@@ -32,6 +32,7 @@
     "@babel/plugin-transform-runtime": "^7.21.0",
     "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.21.0",
+    "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
     "callsites": "^3.1.0",
     "chai-http": "^4.3.0",
@@ -40,11 +41,8 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-<<<<<<< HEAD
-    "express-session": "^1.17.3",
-=======
     "express-async-handler": "^1.2.0",
->>>>>>> ch(user): add authorization
+    "express-session": "^1.17.3",
     "joi": "^17.8.3",
     "jsonwebtoken": "^9.0.0",
     "lodash.merge": "^4.6.2",
