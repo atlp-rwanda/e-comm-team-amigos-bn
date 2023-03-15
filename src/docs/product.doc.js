@@ -45,4 +45,101 @@
  *               error:
  *                 type: object
  *                 description: The error message and details
+ * @swagger
+ * /product/create:
+ *   post:
+ *     tags:
+ *       - Products
+ *     summary: Add a new product
+ *     security:
+ *       - BearerToken: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: integer
+ *                 minimum: 1
+ *               quantity:
+ *                 type: integer
+ *                 minimum: 1
+ *               available:
+ *                 type: boolean
+ *               category:
+ *                 type: string
+ *               bonus:
+ *                 type: integer
+ *                 minimum: 0
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: uri
+ *                   pattern: ^(https?|ftp)://.*(jpeg|jpg|png|gif|bmp)$
+ *                 minItems: 4
+ *                 maxItems: 8
+ *                 uniqueItems: true
+ *               expiryDate:
+ *                 type: string
+ *                 format: date
+ *               ec:
+ *                 type: integer
+ *                 minimum: 0
+ *                 nullable: true
+ *     responses:
+ *       '201':
+ *         description: Created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       '400':
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: The request body is invalid
+ *       '401':
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: Authorization header missing
+ *       '403':
+ *         description: Forbidden
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: Unauthorized access
+ *       '409':
+ *         description: Conflict
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: Product already exists, please update that product instead
  */

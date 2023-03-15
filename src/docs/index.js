@@ -37,8 +37,8 @@ const options = {
         },
       }
     },
-    securit: [{
-      bearerAuth: []
+    security: [{
+      BearerToken: []
     }],
     servers: [{
       url: 'http://localhost:3000'
