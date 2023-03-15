@@ -8,6 +8,7 @@ import models from '../database/models';
 import app from '../app';
 import tokenGenerator from '../helpers/generateToken';
 
+
 dotenv.config();
 chai.use(chaiHttp);
 const should = chai.should();
