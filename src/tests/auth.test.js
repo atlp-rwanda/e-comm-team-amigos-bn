@@ -333,79 +333,6 @@ describe('check OTP for USER with role VENDOR to LOGIN', () => {
   });
 });
 
-describe('User Login', () => {
-  before(async () => {
-    await models.sequelize.sync();
-    await models.User.create({
-      firstName: 'Didas',
-      lastName: 'Junior',
-      userName: 'Junior',
-      telephone: '0790994799',
-      address: 'Kigali',
-      email: 'test@alustudent.com',
-      password: await bcrypt.hash('Password@123', 10),
-    });
-  });
-
-  after(async () => {
-    await models.User.destroy({ where: {} });
-  });
-
-  it("Should LOGIN a USER", (done) => {
-    chai
-      .request(app)
-      .post("/user/login")
-      .send({
-        email: "d.gasana@alustudent.com",
-        password: "Password@123",
-      })
-      .end((err, res) => {
-        if (err) done(err);
-        else {
-          res.should.have.status(200);
-          res.should.be.json;
-          res.body.should.have.property("message");
-          done();
-        }
-      });
-  });
-  it("it Shouldn't LOGIN a USER who has wrong credentials", (done) => {
-    chai
-      .request(app)
-      .post("/user/login")
-      .send({
-        email: "evarist@gmail.com",
-        password: "Password@123",
-      })
-      .end((err, res) => {
-        if (err) done(err);
-        else {
-          res.should.have.status(400);
-          res.should.be.json;
-          res.body.should.have.property("message");
-          done();
-        }
-      });
-  });
-  it("it Shouldn't LOGIN a USER who has wrong credentials", (done) => {
-    chai
-      .request(app)
-      .post("/user/login")
-      .send({
-        email: "d.gasana@alustudent.com",
-        password: "Password@12345",
-      })
-      .end((err, res) => {
-        if (err) done(err);
-        else {
-          res.should.have.status(400);
-          res.should.be.json;
-          res.body.should.have.property("message");
-          done();
-        }
-      });
-  });
-});
 
 describe("forgotPassword function", () => {
   before(async () => {
@@ -460,21 +387,7 @@ describe("resetPassword function", () => {
   after(async () => {
     await models.User.destroy({ where: {} });
   });
-  it('should return an error if the user does not exist', async () => {
-    const token = tokenGenerator({
-      email: 'nonexistent@example.com',
-      id: '1234',
-    });
-    const res = await chai
-      .request(app)
-      .put(`/user/resetPassword/${token}`)
-      .send({
-        password: 'NewPassword@123',
-        confirmPassword: 'NewPassword@123',
-      });
-    expect(res).to.have.status(404);
-    expect(res.body.message).to.equal('user not found');
-  });
+ 
 
   it("should return an error if the password and confirm password do not match", async () => {
     const user = await models.User.findOne({

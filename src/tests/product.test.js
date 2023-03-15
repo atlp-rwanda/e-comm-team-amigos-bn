@@ -8,8 +8,9 @@ import models from "../database/models";
 import app from "../app";
 import tokenGenerator from "../helpers/generateToken";
 chai.use(chaiHttp);
-let user;
+dotenv.config();
 describe("get All Product", () => {
+  let user;
   before(async () => {
     await models.sequelize.sync({ force: true });
     user = await models.User.create({
@@ -37,8 +38,8 @@ describe("get All Product", () => {
     });
   });
   after(async () => {
-    await models.User.destroy({ where: {} });
     await models.Product.destroy({ where: {} });
+    await models.User.destroy({ where: {} });
   });
 
   it("should return a list of all products", (done) => {
@@ -69,6 +70,85 @@ describe("get All Product", () => {
       .to.equal("There is no product in Stock");
   });
 });
+describe('Available Product API', () => {
+    let user;
+    let product;
+    before(async () => {
+        await models.sequelize.sync({ force: true });
+        user = await models.User.create({
+          firstName: "Kaneza",
+          lastName: "Erica",
+          userName: "Eriallan",
+          telephone: "0785188981",
+          address: "Kigali",
+          email: "eriman@example.com",
+          password: await bcrypt.hash("Password@123", 10),
+          role: "vendor",
+        });
+        await models.Product.create({
+            id: uuidv4(),
+            userId: user.id,
+            name: "Product 1",
+            price: 10,
+            quantity: 1,
+            available: true,
+            category: "food",
+            bonus: 20,
+            images: ["image1", "image2"],
+            expiryDate: "2023-12-31T00:00:00.000Z",
+            ec: 30,
+    });
+      });
+      after(async () => {
+        await models.Product.destroy({ where: {} });
+        await models.User.destroy({ where: {} });
+      });
+  
+    describe('GET /product/availableProduct', () => {
+      it('should return a list of available products', async () => {
+        const res = await chai.request(app).get('/product/availableProduct');
+        expect(res.statusCode).to.equal(200);
+        expect(res.body.response).to.be.an('array');
+        expect(res.body.response).to.have.lengthOf(1);
+        expect(res.body.response[0]).to.have.property('name', 'Product 1');
+        expect(res.body.response[0]).to.have.property('available', true);
+      });
+    });
+  
+    describe('PUT /product/availableProduct/:id', () => {
+      it('should update the availability of a product', async () => {
+        product = await models.Product.findOne({ where: { name: 'Product 1' } });
+        const res = await chai.request(app)
+          .put(`/product/availableProduct/${product.id}`)
+          .send({ available: false });
+        expect(res.statusCode).to.equal(200);
+        expect(res.body).to.have.property('message', 'updated successfully');
+        const updatedProduct = await models.Product.findByPk(product.id);
+        expect(updatedProduct).to.have.property('available', false);
+      });
+  
+      it('should return an error for an invalid product ID', async () => {
+        let id = '1860xy'
+        const res = await chai.request(app)
+          .put(`/product/availableProduct/${id}`)
+          .send({ available: false });
+        expect(res.statusCode).to.equal(500);
+        expect(res.body).to.have.property('error', 'Internal server error');
+      });
+  
+      it('should return an error for an invalid availability status', async () => {
+        product = await models.Product.findOne({ where: { name: 'Product 1' } });
+        const res = await chai.request(app)
+          .put(`/product/availableProduct/${product.id}`)
+          .send({ available: 'invalid-status' });
+        expect(res.statusCode).to.equal(400);
+        expect(res.body).to.have.property('error', 'Invalid availability status');
+      });
+    });
+  });
+
+
+
 
 describe("addProduct function", () => {
   let user;
@@ -76,7 +156,7 @@ describe("addProduct function", () => {
   before(async () => {
     await models.sequelize.sync();
     await models.User.destroy({ where: {} });
-    await models.Product.destroy({ where: {} });
+    // await models.Product.destroy({ where: {} });
     user = await models.User.create({
       firstName: "Kaneza",
       lastName: "Erica",
