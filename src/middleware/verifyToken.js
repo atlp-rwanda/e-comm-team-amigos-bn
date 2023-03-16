@@ -1,32 +1,30 @@
-import jwt from "jsonwebtoken";
-
-import dotenv from "dotenv";
+import jwt from 'jsonwebtoken';
+import asyncHandler from 'express-async-handler';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const verifyToken = async (req, res, next) => {
-  try {
-    const authHeader = await req.get("Authorization");
-    if (!authHeader) {
-      return res.status(403).json({ error: "No token provided!" });
+export default {
+  verifyToken: async (req, res, next) => {
+    try {
+      const authHeader = req.get('auth-token');
+      if (!authHeader) {
+        return res.status(401).json({ error: 'No token provided!' });
+      }
+
+      const decodeToken = jwt.verify(authHeader, process.env.SECRET_KEY);
+
+      if (decodeToken.errors || !decodeToken) {
+        return res
+          .status(401)
+          .json({ error: 'Sorry, we fail to authenticate you.' });
+      }
+
+      req.user = decodeToken; // set the decoded token as the user property in the request object
+
+      return next();
+    } catch (error) {
+      return res.status(500).json({ error });
     }
-
-    const token = authHeader.split(":")[1];
-    if (!token) {
-      return res.status(401).json({ error: "Please provide token first." });
-    }
-
-    const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
-
-    if (decodeToken.errors || !decodeToken) {
-      return res
-        .status(401)
-        .json({ error: "Sorry, we fail to authenticate you." });
-    }
-
-    req.user = decodeToken;
-    return next();
-  } catch (error) {
-    return res.status(500).json({ error: error });
-  }
+  },
 };
