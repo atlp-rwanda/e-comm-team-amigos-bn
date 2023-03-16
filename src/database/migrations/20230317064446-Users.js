@@ -16,10 +16,6 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
-            address: {
-                type: Sequelize.STRING,
-                allowNull: false,
-            },
             userName: {
                 type: Sequelize.STRING,
                 allowNull: false,
@@ -28,27 +24,9 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
-            billingAddress: {
+            address: {
                 type: Sequelize.STRING,
-                allowNull: true,
-            },
-            preferredLanguage: {
-                type: Sequelize.STRING,
-                allowNull: true,
-            },
-            birthdate: {
-                type: Sequelize.DATE,
-                allowNull: true,
-            },
-            preferredCurrency: {
-                type: Sequelize.ENUM(['Frw', 'USD']),
-                allowNull: true,
-                defaultValue: 'Frw',
-            },
-            gender: {
-                type: Sequelize.ENUM(['Male', 'Female']),
-                allowNull: true,
-                defaultValue: 'Male',
+                allowNull: false,
             },
             email: {
                 type: Sequelize.STRING,
@@ -58,6 +36,10 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
+            birthdate: Sequelize.DATE,
+            preferredCurrency: Sequelize.ENUM('Frw', 'USD'),
+            gender: Sequelize.ENUM('Male', 'Female'),
+
             role: {
                 type: Sequelize.ENUM(['admin', 'vendor', 'normal']),
                 allowNull: false,
@@ -68,6 +50,8 @@ module.exports = {
                 allowNull: false,
                 defaultValue: 'inactive',
             },
+            preferredLanguage: Sequelize.STRING,
+            billingAddress: Sequelize.STRING,
             verified: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,

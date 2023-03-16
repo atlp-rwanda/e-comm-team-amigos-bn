@@ -2,8 +2,8 @@ import { User } from '../database/models'
 
 exports.getProfile = async (req, res) => {
     try {
-      const profile = req.user;
-        (profile.otpcode = undefined),
+        const profile = req.user
+        ;(profile.otpcode = undefined),
             (profile.otpcodeexpiration = undefined),
             res.status(200).json({
                 status: 'success',
