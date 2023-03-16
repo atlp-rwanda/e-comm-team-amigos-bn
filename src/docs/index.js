@@ -1,4 +1,4 @@
-import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerJsDoc from 'swagger-jsdoc'
 
 const options = {
     swaggerDefinition: {
@@ -60,5 +60,5 @@ const options = {
     apis: ['src/**/*doc.js'],
 };
 
-const specs = swaggerJsDoc(options);
-export default specs;
+const specs = swaggerJsDoc(options)
+export default specs

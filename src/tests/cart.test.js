@@ -10,15 +10,18 @@ import models from '../database/models';
 dotenv.config();
 
 chai.use(chaiHttp);
+const should = chai.should();
 
 describe('Cart Tests', function () {
     let product;
     let user;
     let agent;
+    let roles;
     before(async function () {
         await models.sequelize.sync({ force: true });
 
         user = await models.User.create({
+            id: uuidv4(),
             firstName: 'Kaneza',
             lastName: 'Erica',
             userName: 'Eriallan',
@@ -26,7 +29,6 @@ describe('Cart Tests', function () {
             address: 'Kigali',
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'vendor',
         });
 
         product = await models.Product.create({
@@ -50,25 +52,17 @@ describe('Cart Tests', function () {
     });
 
     it('Should return an error if no token sent', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
-
         const res = await chai
             .request(app)
             .post(`/cart/?productId=${uuidv4()}&quantity=${1}`);
 
         expect(res.status).to.equal(401);
-        expect(res.body).to.have.property('error');
-        expect(res.body.error).to.equal('No token provided!');
+        expect(res.body).to.have.property('message');
+        expect(res.body.message).to.equal('No token provided!');
     });
 
     it('Should return an error if a product does not exist', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
 
         const res = await chai
             .request(app)
@@ -81,26 +75,22 @@ describe('Cart Tests', function () {
     });
 
     it('Should add a cart of valid users only', async function () {
-        const token = jwt.sign(
-            { userId: uuidv4(), role: user.role },
-            process.env.SECRET_KEY
-        );
+        const token = jwt.sign({ userId: uuidv4() }, process.env.SECRET_KEY);
 
         const res = await chai
             .request(app)
             .post(`/cart/?productId=${uuidv4()}&quantity=${1}`)
-            .set('Authorization', `bearer ${token}`);
+            .set('Authorization', `Bearer ${token}`);
 
-        expect(res.status).to.equal(400);
-        expect(res.body).to.have.property('error');
-        expect(res.body.error).to.equal('User does not exist.');
+        expect(res.status).to.equal(401);
+        expect(res.body).to.have.property('message');
+        expect(res.body.message).to.equal(
+            'There is no user with token provided.'
+        );
     });
 
     it('Should return an error if quantity is less than 1', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
 
         const res = await chai
             .request(app)
@@ -112,10 +102,7 @@ describe('Cart Tests', function () {
         expect(res.body.error).to.equal('Quantity cannot be null..');
     });
     it('Should add items to the cart', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
 
         agent = chai.request.agent(app);
         const res = await agent
@@ -129,10 +116,7 @@ describe('Cart Tests', function () {
     });
 
     it('Should not add an existing product in the cart', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
 
         const res = await agent
             .post(`/cart/?productId=${product.id}&quantity=${1}`)
@@ -161,7 +145,6 @@ describe('View shopping cart test', function () {
             address: 'Kigali',
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'vendor',
         });
 
         product = await models.Product.create({
@@ -183,10 +166,7 @@ describe('View shopping cart test', function () {
             ec: 30,
         });
 
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
         agent = chai.request.agent(app);
         await agent
             .post(`/cart/?productId=${product.id}&quantity=${1}`)
@@ -213,6 +193,7 @@ describe('View shopping cart test', function () {
         expect(res.status).to.equal(204);
     });
 });
+
 describe('updateCart function', () => {
     let agent;
     let user;
@@ -230,7 +211,6 @@ describe('updateCart function', () => {
             address: 'Kigali',
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'vendor',
         });
 
         product = await models.Product.create({
@@ -253,10 +233,7 @@ describe('updateCart function', () => {
         });
 
         productId = product.id;
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
+        const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
         agent = chai.request.agent(app);
         await agent
             .post(`/cart/?productId=${productId}&quantity=${3}`)
@@ -296,56 +273,89 @@ describe('updateCart function', () => {
     });
 });
 
-describe('/DELETE clean-up-cart', () => {
-    let product;
-    let user;
-    let user1;
-    let user2;
-    let agent;
-    let token;
-    let token1;
-    let token2;
-    // make sure to replace 'your_token_here' with an actual token
-    before(async function () {
+describe('Clear Cart', () => {
+    let prod, merchant, customer, agent, token, token2;
+    let roles;
+
+    before(async () => {
         await models.sequelize.sync({ force: true });
+        await models.Role.destroy({ where: {} });
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
 
-        user = await models.User.create({
-            firstName: 'Kaneza',
-            lastName: 'Erica',
-            userName: 'Eriallan',
+        roles = JSON.parse(JSON.stringify(roles));
+
+        const merchantRole = roles.find((role) => role.name === 'Merchant');
+        const customerRole = roles.find((role) => role.name === 'Customer');
+
+        merchant = await models.User.create({
+            firstName: 'seller',
+            lastName: 'seller',
+            userName: 'seller',
             telephone: '0785188981',
             address: 'Kigali',
-            email: 'eriman@example.com',
+            verified: true,
+            email: 'seller@example.com',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'vendor',
-        });
-        user1 = await models.User.create({
-            firstName: 'Kaneza1',
-            lastName: 'Erica1',
-            userName: 'Eriallan1',
-            telephone: '0785188981',
-            address: 'Kigali',
-            email: 'eriman1@example.com',
-            password: await bcrypt.hash('Password@123', 10),
-            role: 'normal',
-        });
-        user2 = await models.User.create({
-            firstName: 'Kaneza1',
-            lastName: 'Erica2',
-            userName: 'Eriallan2',
-            telephone: '0785188981',
-            address: 'Kigali',
-            email: 'eriman2@example.com',
-            password: await bcrypt.hash('Password@123', 10),
-            role: 'normal',
         });
 
-        product = await models.Product.create({
+        customer = await models.User.create({
+            firstName: 'merchant',
+            lastName: 'merchant',
+            userName: 'merchant',
+            telephone: '0785188981',
+            address: 'Kigali',
+            email: 'merchant@example.com',
+            verified: true,
+            password: await bcrypt.hash('Password@123', 10),
+        });
+
+        await models.UserRole.create({
             id: uuidv4(),
-            userId: user.id,
+            userId: merchant.dataValues.id,
+            roleId: merchantRole.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        await models.UserRole.create({
+            id: uuidv4(),
+            userId: customer.dataValues.id,
+            roleId: customerRole.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        prod = await models.Product.create({
+            id: uuidv4(),
+            userId: merchant.dataValues.id,
             name: 'Product 1',
             price: 10,
-            quantity: 1,
+            quantity: 5,
             available: true,
             category: 'food',
             bonus: 20,
@@ -359,57 +369,41 @@ describe('/DELETE clean-up-cart', () => {
             ec: 30,
         });
 
-        token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.SECRET_KEY
-        );
-        token1 = jwt.sign(
-            { userId: user1.id, role: user1.role },
-            process.env.SECRET_KEY
-        );
-        token2 = jwt.sign(
-            { userId: user2.id, role: user2.role },
-            process.env.SECRET_KEY
-        );
+        token = jwt.sign({ userId: customer.id }, process.env.SECRET_KEY);
+        token2 = jwt.sign({ userId: merchant.id }, process.env.SECRET_KEY);
+
         agent = chai.request.agent(app);
         await agent
-            .post(`/cart/?productId=${product.id}&quantity=${1}`)
-            .set('Authorization', `bearer ${token}`);
+            .post(`/cart/?productId=${prod.dataValues.id}&quantity=${3}`)
+            .set('Authorization', 'Bearer ' + token);
     });
 
     it('should return status 401 if user is not authenticated', (done) => {
-        chai.request(app)
-            .delete('/cart/clean-up-cart')
-            .end((err, res) => {
-                res.should.have.status(401);
-                done();
-            });
+        agent.delete('/cart/clean-up-cart').end((err, res) => {
+            res.should.have.status(401);
+            done();
+        });
     });
 
-    it('should return status 401 if user is not authorized', (done) => {
-        chai.request(app)
+    it('should return status 403 if user is not authorized', (done) => {
+        agent
             .delete('/cart/clean-up-cart')
-            .set('Authorization', `Bearer ${token1}`)
+            .set('Authorization', 'Bearer ' + token2)
             .end((err, res) => {
-                res.should.have.status(401);
+                res.should.have.status(403);
+                expect(res.body.message).to.equal(
+                    'Access denied! You are not allowed to perform this operation.'
+                );
                 done();
             });
     });
 
     it('should clean up the cart if user is authenticated and authorized', async function () {
-        const res = await chai
-            .request(app)
+        const res = await agent
             .delete('/cart/clean-up-cart')
             .set('Authorization', `Bearer ${token}`);
+
         expect(res.status).to.equal(200);
         expect(res.body).to.have.property('message');
-    });
-    it('should allow buyers who added products to cart to the one who can clear it', async function () {
-        const res = await chai
-            .request(app)
-            .delete('/cart/clean-up-cart')
-            .set('Authorization', `Bearer ${token2}`);
-        expect(res.status).to.equal(401);
-        expect(res.body).to.have.property('error');
     });
 });

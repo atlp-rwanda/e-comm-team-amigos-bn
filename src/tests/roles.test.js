@@ -2,16 +2,45 @@ import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
 import app from '../app';
 import models from '../database/models';
+import { v4 as uuidv4 } from 'uuid';
 
 chai.use(chaiHttp);
 
 describe('Set user roles or permissions', () => {
-    let role, user;
+    let user, roles;
     before(async () => {
         await models.sequelize.sync({ force: true });
         await models.Permission.destroy({ where: {} });
+        await models.User.destroy({ where: {} });
+        await models.UserRole.destroy({ where: {} });
         await models.Role.destroy({ where: {} });
-        await models.User.destroy({ where: { email: 'rolecheck@gmail.com' } });
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+
         const res = await chai.request(app).post('/user/create').send({
             firstName: 'Role',
             lastName: 'EvarisCheckte',
@@ -23,6 +52,49 @@ describe('Set user roles or permissions', () => {
         });
 
         user = res.body;
+
+        roles = JSON.parse(JSON.stringify(roles));
+    });
+
+    it('it should set a role', async () => {
+        const { id } = roles.find((role) => role.name === 'Admin');
+
+        const userRole = await chai.request(app).post('/role/set').send({
+            userId: user.data.id,
+            roleId: id,
+        });
+
+        expect(userRole).to.have.status(201);
+    });
+
+    it('Should return a user with a coresponding role', (done) => {
+        chai.request(app)
+            .get(`/user/role/${user.data.id}`)
+            .send()
+            .end((error, res) => {
+                if (error) done(error);
+                else {
+                    expect(res).to.have.status(200);
+                    done();
+                }
+            });
+    });
+
+    it("it shouldn't not set a role without valid userId and roleId", (done) => {
+        chai.request(app)
+            .post('/role/set')
+            .send({
+                userId: 'i32u9ejwq832',
+                roleId: 'wqe09320',
+            })
+            .end((error, res) => {
+                if (error) {
+                    done(error);
+                } else {
+                    expect(res).to.have.status(404);
+                    done();
+                }
+            });
     });
 
     it('Should return all users', async () => {
@@ -32,12 +104,12 @@ describe('Set user roles or permissions', () => {
     });
 
     it('Should create a role', async () => {
+        await models.Role.destroy({ where: {} });
         const res = await chai.request(app).post('/role/create').send({
             name: 'Admin',
             description: 'Admin has access to every component of a system',
         });
 
-        role = res.body.response.id;
         expect(res).to.have.status(201);
         expect(res.body.message).to.equal('Role');
         expect(res.body.response).to.have.property('id');
@@ -74,50 +146,12 @@ describe('Set user roles or permissions', () => {
         expect(res.body.count).to.equal(res.body.response.permissions.length);
     });
 
-    it("it shouldn't not set a role without valid userId and roleId", (done) => {
-        chai.request(app)
-            .post('/role/set')
-            .send({
-                userId: 'eee1d041-a074-4f62-81c0-8e0b130647c6',
-                roleId: '542f0bda-f0d7-469c-913e-80772d800617',
-            })
-            .end((error, res) => {
-                if (error) done(error);
-                else {
-                    expect(res).to.have.status(404);
-                    done();
-                }
-            });
-    });
-
-    it('it should set a role', async () => {
-        const userRole = await chai.request(app).post('/role/set').send({
-            userId: user.data.id,
-            roleId: role,
-        });
-
-        expect(userRole).to.have.status(201);
-    });
-
-    it('Should return a user with a coresponding role', (done) => {
-        chai.request(app)
-            .get(`/user/role/${user.data.id}`)
-            .send()
-            .end((error, res) => {
-                if (error) done(error);
-                else {
-                    expect(res).to.have.status(200);
-                    done();
-                }
-            });
-    });
-
     it("it shouldn't set a permission without valid roleId and permissionId", (done) => {
         chai.request(app)
             .post('/permission/set')
             .send({
-                roleId: 'eee1d041-a074-4f62-81c0-8e0b130647c6',
-                permissionId: '542f0bda-f0d7-469c-913e-80772d800617',
+                roleId: 'eee1d041-a074-4f62',
+                permissionId: '542f0bda-f0d7-469',
             })
             .end((error, res) => {
                 if (error) done(error);

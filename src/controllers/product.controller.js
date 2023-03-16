@@ -4,6 +4,7 @@ import models from '../database/models';
 import jwt from 'jsonwebtoken';
 import { verifyUuid } from '../utils/verify_uuid';
 import { verifyToken } from '../middleware/verifyToken';
+import { transformUserRoles } from '../helpers/transformUserRoles';
 
 const PAGE_SIZE = 5; // Number of products per page
 export const getAllProduct = async (req, res) => {
@@ -111,25 +112,6 @@ export const updateProductAvailability = async (req, res) => {
 };
 export const addProduct = async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader) {
-            return res
-                .status(401)
-                .json({ message: 'Authorization header missing' });
-        }
-        const token = authHeader.split(' ')[1];
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-        const sellerId = decodedToken.userId;
-        const user = await models.User.findByPk(sellerId);
-        if (!user) {
-            return res.status(400).json({ message: 'Seller not found' });
-        }
-        if (
-            sellerId !== decodedToken.userId ||
-            decodedToken.userRole !== 'vendor'
-        ) {
-            return res.status(403).json({ message: 'Unauthorized access' });
-        }
         const {
             name,
             price,
@@ -151,7 +133,7 @@ export const addProduct = async (req, res) => {
             });
         }
         const product = await models.Product.create({
-            userId: sellerId,
+            userId: req.user.id,
             name,
             price,
             quantity,
@@ -164,7 +146,7 @@ export const addProduct = async (req, res) => {
         });
         res.status(201).json(product);
     } catch (error) {
-        res.status(500).json(error);
+        res.status(500).json({ status: 'fail', message: error.message });
     }
 };
 export const getAllForSeller = async (req, res) => {
@@ -298,15 +280,17 @@ export const getProduct = async (req, res) => {
             raw: true,
         });
 
-        if (
-            req.user &&
-            req.user.role === 'vendor' &&
-            req.user.id !== product.userId
-        ) {
-            return res.status(403).json({
-                status: 'fail',
-                message: 'You are not allowed to perform this operation',
-            });
+        if (req.user) {
+            const userRoles = transformUserRoles(req.user.UserRoles);
+            if (
+                userRoles.includes('Merchant') &&
+                req.user.id !== product.userId
+            ) {
+                return res.status(403).json({
+                    status: 'fail',
+                    message: 'You are not allowed to perform this operation',
+                });
+            }
         }
 
         if (!product) {
@@ -375,23 +359,21 @@ export async function updateProduct(req, res) {
 
 export const deleteProduct = async (req, res) => {
     try {
-        await verifyToken(req, res, async () => {
-            const userId = req.user.id;
-            const productId = req.params.id;
+        const userId = req.user.id;
+        const productId = req.params.id;
 
-            const product = await models.Product.findOne({
-                where: { id: productId, userId },
-            });
+        const product = await models.Product.findOne({
+            where: { id: productId, userId },
+        });
 
-            if (!product) {
-                return res.status(404).json({ message: 'Product not found' });
-            }
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
 
-            await models.Product.destroy({ where: { id: productId } });
+        await models.Product.destroy({ where: { id: productId } });
 
-            res.status(200).json({
-                message: 'deleted successfully',
-            });
+        res.status(200).json({
+            message: 'deleted successfully',
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

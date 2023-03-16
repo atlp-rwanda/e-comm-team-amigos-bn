@@ -18,24 +18,30 @@ import { authorize, verifyToken } from '../../middleware/verifyToken';
 
 const router = express.Router();
 
-router.post('/create', validateProductInput, addProduct);
+router.post(
+    '/create',
+    validateProductInput,
+    verifyToken,
+    authorize(['Merchant']),
+    addProduct
+);
 router.get('/', getAllProduct);
 router.get('/collection', getAllForSeller);
 
 router.get('/availableProduct', getAvailableProducts);
 
 router.put('/availableProduct/:id', updateProductAvailability);
-router.get('/:id', verifyToken, getProduct);
 router.get('/search', searchProduct);
+router.get('/:id', verifyToken, getProduct);
 
 router.patch(
     '/:id',
     verifyToken,
-    authorize(['vendor']),
+    authorize(['Merchant']),
     validateProductUpdate,
     updateProduct
 );
 
-router.delete('/delete/:id', deleteProduct);
+router.delete('/delete/:id', verifyToken, authorize(['Merchant']), deleteProduct);
 
 export default router;

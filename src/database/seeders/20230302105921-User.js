@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid'
+import bcrypt from 'bcryptjs'
 
 module.exports = {
     up: async (queryInterface, Sequelize) =>
@@ -69,6 +69,10 @@ module.exports = {
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
+
+
+
+                
 
                 {
                     id: uuidv4(),

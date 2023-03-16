@@ -52,11 +52,6 @@ app.use(
     })
 );
 
-
-
-app.use(passport.initialize());
-app.use(passport.authenticate('session'));
-
 app.use(passport.initialize());
 app.use(passport.authenticate('session'));
 app.use(passport.session());
@@ -72,7 +67,7 @@ app.get('/', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-    console.log('***ERROR***', err);
+    console.log('***ERROR***', err.message);
 
     res.status(500).json({
         status: 'error',

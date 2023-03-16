@@ -11,65 +11,113 @@ chai.use(chaiHttp);
 const should = chai.should();
 
 describe('Order Tests', () => {
-    let vendorUser, normalUser1, normalUser2, prod1, prod2;
+    let roles, customerUser1, customerUser2, merchantUser, product, product2;
+
     before(async () => {
         await models.sequelize.sync({ force: true });
-        await models.User.destroy({ where: {} });
 
-        vendorUser = await models.User.create({
-            id: uuidv4(),
-            firstName: 'vendor',
-            lastName: 'vendor',
-            userName: 'vendor',
-            telephone: '0785188981',
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+
+        roles = JSON.parse(JSON.stringify(roles));
+
+        const customerRole = roles.find((role) => role.name === 'Customer');
+        const merchantRole = roles.find((role) => role.name === 'Merchant');
+
+        customerUser1 = await models.User.create({
+            firstName: 'Didas',
+            lastName: 'Junior',
+            userName: 'Junior',
+            telephone: '0790994799',
             address: 'Kigali',
-            email: 'vendor@example.com',
+            email: 'gasanajr@example.com',
             verified: true,
             active: true,
-            role: 'vendor',
             password: await bcrypt.hash('Password@123', 10),
+        });
+
+        customerUser2 = await models.User.create({
+            firstName: 'Didas',
+            lastName: 'Junior',
+            userName: 'Junior',
+            telephone: '0790994799',
+            address: 'Kigali',
+            email: 'gasanajr08@example.com',
+            verified: true,
+            active: true,
+            password: await bcrypt.hash('Password@123', 10),
+        });
+
+        merchantUser = await models.User.create({
+            firstName: 'Didas',
+            lastName: 'Junior',
+            userName: 'Junior',
+            telephone: '0790994799',
+            address: 'Kigali',
+            email: 'x@example.com',
+            verified: true,
+            active: true,
+            password: await bcrypt.hash('Password@123', 10),
+        });
+
+        // UserRoles
+        await models.UserRole.create({
+            // Merchant
+            id: uuidv4(),
+            userId: customerUser1.id,
+            roleId: customerRole.id,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
 
-        normalUser1 = await models.User.create({
+        // UserRoles
+        await models.UserRole.create({
+            // Customer
             id: uuidv4(),
-            firstName: 'normal1',
-            lastName: 'normal1',
-            userName: 'normal1',
-            telephone: '0785188981',
-            address: 'Kigali',
-            email: 'normal1@example.com',
-            verified: true,
-            active: true,
-            role: 'normal',
-            password: await bcrypt.hash('Password@123', 10),
+            userId: customerUser2.id,
+            roleId: customerRole.id,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
 
-        normalUser2 = await models.User.create({
+        // UserRoles
+        await models.UserRole.create({
+            // Customer
             id: uuidv4(),
-            firstName: 'normal2',
-            lastName: 'normal2',
-            userName: 'normal2',
-            telephone: '0785188981',
-            address: 'Kigali',
-            email: 'normal2@example.com',
-            verified: true,
-            active: true,
-            role: 'normal',
-            password: await bcrypt.hash('Password@123', 10),
+            userId: merchantUser.id,
+            roleId: merchantRole.id,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
 
-        // Products
-
-        prod1 = await models.Product.create({
+        product = await models.Product.create({
             id: uuidv4(),
-            userId: vendorUser.dataValues.id,
-            name: 'Product 1',
+            userId: merchantUser.id,
+            name: 'testProduct',
             price: 40,
             quantity: 1,
             available: true,
@@ -78,14 +126,12 @@ describe('Order Tests', () => {
             images: ['image1', 'image2'],
             expiryDate: '2023-12-31T00:00:00.000Z',
             ec: 30,
-            createdAt: new Date(),
-            updatedAt: new Date(),
         });
 
-        prod2 = await models.Product.create({
+        product2 = await models.Product.create({
             id: uuidv4(),
-            userId: vendorUser.dataValues.id,
-            name: 'Product 2',
+            userId: merchantUser.id,
+            name: 'testProduct 2',
             price: 40,
             quantity: 1,
             available: true,
@@ -94,19 +140,19 @@ describe('Order Tests', () => {
             images: ['image1', 'image2'],
             expiryDate: '2023-12-31T00:00:00.000Z',
             ec: 30,
-            updatedAt: new Date(),
-            updatedAt: new Date(),
         });
     });
 
     after(async () => {
         await models.User.destroy({ where: {} });
         await models.Product.destroy({ where: {} });
+        await models.Product.destroy({ where: {} });
+        await models.Order.destroy({ where: {} });
     });
 
     it('Chould Create an Order', async () => {
         const signin = await chai.request(app).post('/user/login').send({
-            email: normalUser1.email,
+            email: customerUser1.email,
             password: 'Password@123',
         });
 
@@ -118,14 +164,9 @@ describe('Order Tests', () => {
             .send({
                 items: [
                     {
-                        product: prod1.dataValues.id,
+                        product: product.id,
                         quantity: 4,
-                        unitProce: prod1.price,
-                    },
-                    {
-                        product: prod2.dataValues.id,
-                        quantity: 40,
-                        unitProce: prod2.price,
+                        unitProce: product.price,
                     },
                 ],
             })
@@ -138,7 +179,7 @@ describe('Order Tests', () => {
 
     it('Should delete an order', async () => {
         const signin = await chai.request(app).post('/user/login').send({
-            email: normalUser1.email,
+            email: customerUser1.email,
             password: 'Password@123',
         });
 
@@ -150,14 +191,9 @@ describe('Order Tests', () => {
             .send({
                 items: [
                     {
-                        product: prod1.dataValues.id,
+                        product: product2.id,
                         quantity: 4,
-                        unitProce: prod1.price,
-                    },
-                    {
-                        product: prod2.dataValues.id,
-                        quantity: 40,
-                        unitProce: prod2.price,
+                        unitProce: product2.price,
                     },
                 ],
             })
@@ -177,12 +213,12 @@ describe('Order Tests', () => {
 
     it('Should not delete an order if user did not create it', async () => {
         const signin = await chai.request(app).post('/user/login').send({
-            email: normalUser1.email,
+            email: customerUser1.email,
             password: 'Password@123',
         });
 
         const signin2 = await chai.request(app).post('/user/login').send({
-            email: normalUser2.email,
+            email: customerUser2.email,
             password: 'Password@123',
         });
 
@@ -195,14 +231,9 @@ describe('Order Tests', () => {
             .send({
                 items: [
                     {
-                        product: prod1.dataValues.id,
+                        product: product2.id,
                         quantity: 4,
-                        unitProce: prod1.price,
-                    },
-                    {
-                        product: prod2.dataValues.id,
-                        quantity: 40,
-                        unitProce: prod2.price,
+                        unitProce: product2.price,
                     },
                 ],
             })
@@ -224,7 +255,7 @@ describe('Order Tests', () => {
 
     it('Should return all orders', async () => {
         const signin = await chai.request(app).post('/user/login').send({
-            email: normalUser1.email,
+            email: customerUser1.email,
             password: 'Password@123',
         });
 
@@ -243,31 +274,45 @@ describe('Order Tests', () => {
 
     it('Should update order', async () => {
         const signin = await chai.request(app).post('/user/login').send({
-            email: normalUser1.email,
+            email: customerUser1.email,
             password: 'Password@123',
         });
 
         let token = signin.body.token;
 
-        const orders = await chai
-            .request(app)
-            .get('/orders')
-            .set('Authorization', 'Bearer ' + token);
-
         const order = await chai
             .request(app)
-            .put(`/orders/${orders.body.data.orders[0].id}`)
+            .post('/orders')
             .send({
                 items: [
                     {
-                        product: prod1.dataValues.id,
+                        product: product.id,
                         quantity: 4,
-                        unitProce: prod1.price,
+                        unitProce: product.price,
+                    },
+                    {
+                        product: product2.id,
+                        quantity: 4,
+                        unitProce: product2.price,
                     },
                 ],
             })
             .set('Authorization', 'Bearer ' + token);
 
-        expect(order.body.data.order.products.length).to.equal(1);
+        const updateOrder = await chai
+            .request(app)
+            .put(`/orders/${order.body.data.order.id}`)
+            .send({
+                items: [
+                    {
+                        product: product.id,
+                        quantity: 4,
+                        unitProce: product.price,
+                    },
+                ],
+            })
+            .set('Authorization', 'Bearer ' + token);
+
+        expect(updateOrder.body.data.order.products.length).to.equal(1);
     });
 });

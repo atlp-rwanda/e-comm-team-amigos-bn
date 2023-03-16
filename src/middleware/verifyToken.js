@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken'
 
-import dotenv from 'dotenv'
-import { User } from '../database/models'
+import dotenv from 'dotenv';
+import { User, UserRole, Role } from '../database/models';
+import { transformUserRoles } from '../helpers/transformUserRoles';
 
 dotenv.config()
 
@@ -17,8 +18,10 @@ export const verifyToken = async (req, res, next) => {
         const authHeader = await req.get('Authorization')
 
         if (!authHeader) {
-            if (checkGetItem(req)) return next()
-            return res.status(401).json({ error: 'No token provided!' })
+            if (checkGetItem(req)) return next();
+            return res
+                .status(401)
+                .json({ status: 'fail', message: 'No token provided!' });
         }
 
         const token = authHeader.split(' ')[1]
@@ -45,35 +48,57 @@ export const verifyToken = async (req, res, next) => {
             attributes: {
                 exclude: ['password', 'email', 'otpcode', 'otpcodeexpiration'],
             },
-            raw: true,
-        })
+            include: [
+                {
+                    model: UserRole,
+                    as: 'UserRoles',
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt', 'id', 'userId'],
+                    },
+                    include: [
+                        {
+                            model: Role,
+                            as: 'Role',
+                            attributes: {
+                                exclude: [
+                                    'createdAt',
+                                    'updatedAt',
+                                    'id',
+                                    'description',
+                                ],
+                            },
+                        },
+                    ],
+                },
+            ],
+        });
 
         if (!user) {
-            if (checkGetItem(req)) return next()
-            return res
-                .status(400)
-                .json({ status: 'error', error: 'User does not exist.' });
+            if (checkGetItem(req)) return next();
+            return res.status(401).json({
+                status: 'fail',
+                message: 'There is no user with token provided.',
+            });
         }
 
-        req.user = user
-        return next()
+        req.user = user.toJSON();
+        return next();
     } catch (error) {
         if (checkGetItem(req)) return next()
         return res.status(500).json({ error })
     }
 }
 
-export const authorize = (roles) => async (req, res, next) => {
-    try {
-        const user = req.user
-        const role = user.role
-        if (!roles.includes(role)) {
-            return res.status(401).json({
-                error: 'Access denied! You are not allowed to perform this operation.',
-            })
-        }
-        next()
-    } catch (error) {
-        return res.status(500).json({ error })
-    }
-}
+export const authorize = (roles) => (req, res, next) => {
+    let autherize = false;
+    const userRoles = transformUserRoles(req.user.UserRoles);
+    autherize = userRoles.some((userRole) => roles.includes(userRole));
+
+    if (autherize) return next();
+
+    return res.status(403).json({
+        status: 'fail',
+        message:
+            'Access denied! You are not allowed to perform this operation.',
+    });
+};

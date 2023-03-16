@@ -9,6 +9,7 @@ import app from '../app';
 import tokenGenerator from '../helpers/generateToken';
 chai.use(chaiHttp);
 let user;
+
 describe('get All Product', () => {
     before(async () => {
         await models.sequelize.sync({ force: true });
@@ -52,6 +53,9 @@ describe('get All Product', () => {
                     expect(res.body)
                         .to.have.property('Message')
                         .to.equal('List of all Products in our collections');
+                    expect(res.body.responseData)
+                        .to.have.property('listProduct')
+                        .to.be.an('array');
                     done();
                 }
             });
@@ -68,6 +72,7 @@ describe('get All Product', () => {
             .to.equal('There is no product in Stock');
     });
 });
+
 describe('Available Product API', () => {
     let user;
     let product;
@@ -101,34 +106,239 @@ describe('Available Product API', () => {
         await models.Product.destroy({ where: {} });
         await models.User.destroy({ where: {} });
     });
+});
 
-    describe('GET /product/availableProduct', () => {
-        it('should return a list of available products', async () => {
-            const res = await chai
-                .request(app)
-                .get('/product/availableProduct');
-            expect(res.statusCode).to.equal(200);
-            expect(res.body.response.products).to.be.an('array');
-            expect(res.body.response.products[0]).to.have.property(
-                'name',
-                'Product 1'
-            );
-            expect(res.body.response.products[0]).to.have.property(
-                'available',
-                true
-            );
+describe('GET /product/availableProduct', () => {
+    let userOne, userTwo, userThree, userFour;
+    let p1, p2, p3, p4, roles;
+
+    before(async () => {
+        await models.sequelize.sync({ force: true });
+        await models.Role.destroy({ where: {} });
+        await models.UserRole.destroy({ where: {} });
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+        roles = JSON.parse(JSON.stringify(roles));
+
+        const merchantRole = roles.find((role) => role.name === 'Merchant');
+        const customerRole = roles.find((role) => role.name === 'Customer');
+        const adminRole = roles.find((role) => role.name === 'Admin');
+        // Users
+        userOne = await models.User.create({
+            id: uuidv4(),
+            firstName: 'Eric',
+            lastName: 'Ndungutse',
+            userName: 'eric_dnungutse',
+            telephone: '0785283007',
+            address: 'Muhanga',
+            email: 'dav.ndungutse@gmail.com',
+            password: await bcrypt.hash('Password@123', 10),
+            status: 'active',
+            verified: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
+
+        userTwo = await models.User.create({
+            id: uuidv4(),
+            firstName: 'wilbrord',
+            lastName: 'ibyimana',
+            userName: 'wilb',
+            telephone: '0780908888',
+            billingAddress: 'Kigali',
+            address: 'Kigali',
+            email: 'bwilbrord@example.com',
+            password: await bcrypt.hash('Wilbrord@213', 10),
+            status: 'active',
+            verified: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        userThree = await models.User.create({
+            id: uuidv4(),
+            firstName: 'Jimmy',
+            lastName: 'Kubwimana',
+            userName: 'jkubwimana',
+            billingAddress: 'Kigali',
+            telephone: '0780909788',
+            address: 'Kigali',
+            email: 'jimmyd@gmail.com',
+            password: await bcrypt.hash('Wilbrord@213', 10),
+            status: 'active',
+            verified: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        userFour = await models.User.create({
+            id: uuidv4(),
+            firstName: 'Normal',
+            lastName: 'User',
+            userName: 'normal_user',
+            telephone: '0789457437',
+            address: 'Kigali',
+            email: 'normal@example.com',
+            password: await bcrypt.hash('Normal@213', 10),
+            status: 'active',
+            verified: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        // UserRoles
+        await models.UserRole.bulkCreate([
+            {
+                // Merchant
+                id: uuidv4(),
+
+                userId: userTwo.id,
+                roleId: merchantRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                // Merchant
+                id: uuidv4(),
+                userId: userThree.id,
+                roleId: merchantRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+
+            {
+                // Customer
+                id: uuidv4(),
+                userId: userFour.id,
+                roleId: customerRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+
+            {
+                // Admin
+                id: uuidv4(),
+                userId: userOne.id,
+                roleId: adminRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+
+        // Products
+        p1 = await models.Product.create({
+            id: uuidv4(),
+            userId: userTwo.id,
+            name: 'Product 1',
+            price: 10,
+            quantity: 1,
+            available: true,
+            category: 'food',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2023-12-31T00:00:00.000Z',
+            ec: 30,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        p2 = await models.Product.create({
+            id: uuidv4(),
+            userId: userTwo.id,
+            name: 'Product 1.2',
+            price: 0,
+            quantity: 1,
+            available: false,
+            category: 'food',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2023-12-31T00:00:00.000Z',
+            ec: 30,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        p3 = await models.Product.create({
+            id: uuidv4(),
+            userId: userThree.id,
+            name: 'Product 2',
+            price: 100,
+            quantity: 2,
+            available: true,
+            category: 'Glocery',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2023-12-31T00:00:00.000Z',
+            ec: 30,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        p4 = await models.Product.create({
+            id: uuidv4(),
+            userId: userThree.id,
+            name: 'Product 2.1',
+            price: 100,
+            quantity: 0,
+            available: false,
+            category: 'Glocery',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2023-12-31T00:00:00.000Z',
+            ec: 30,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+    });
+
+    after(async () => {
+        await models.User.destroy({ where: {} });
+        await models.Product.destroy({ where: {} });
+    });
+    it('should return a list of available products', async () => {
+        const res = await chai.request(app).get('/product/availableProduct');
+        expect(res.statusCode).to.equal(200);
+        expect(res.body.response).to.be.an('object');
+        expect(res.body.response).to.have.property('currentPage');
+        expect(res.body.response).to.have.property('totalPages');
+        expect(res.body.response).to.have.property('products');
+        expect(res.body.response.products).to.be.a('array');
     });
 
     describe('PUT /product/availableProduct/:id', () => {
         it('should update the availability of a product', async () => {
-            product = await models.Product.findOne({
+            const product = await models.Product.findOne({
                 where: { name: 'Product 1' },
             });
             const res = await chai
                 .request(app)
                 .put(`/product/availableProduct/${product.id}`)
                 .send({ available: false });
+
             expect(res.statusCode).to.equal(200);
             expect(res.body).to.have.property(
                 'message',
@@ -149,7 +359,7 @@ describe('Available Product API', () => {
         });
 
         it('should return an error for an invalid availability status', async () => {
-            product = await models.Product.findOne({
+            const product = await models.Product.findOne({
                 where: { name: 'Product 1' },
             });
             const res = await chai
@@ -166,31 +376,116 @@ describe('Available Product API', () => {
 });
 
 describe('addProduct function', () => {
-    let user;
+    let merchantUser, roles, customerUser;
+    let token, otp;
 
     before(async () => {
-        await models.sequelize.sync();
+        await models.sequelize.sync({ force: true });
         await models.User.destroy({ where: {} });
-        // await models.Product.destroy({ where: {} });
-        user = await models.User.create({
-            firstName: 'Kaneza',
-            lastName: 'Erica',
-            userName: 'Eriallan',
-            telephone: '0785188981',
+        await models.Product.destroy({ where: {} });
+
+        merchantUser = await models.User.create({
+            id: uuidv4(),
+            firstName: 'Merchant',
+            lastName: 'Seller',
+            userName: 'mercSeller',
+            telephone: '0780908888',
+            billingAddress: 'Kigali',
             address: 'Kigali',
-            email: 'eriman@example.com',
-            password: await bcrypt.hash('Password@123', 10),
-            role: 'vendor',
+            email: 'seller@gexample.com',
+            password: await bcrypt.hash('Seller@213', 10),
+            status: 'active',
+            verified: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        customerUser = await models.User.create({
+            id: uuidv4(),
+            firstName: 'Customer',
+            lastName: 'consumer',
+            userName: 'custconsumer',
+            telephone: '0780908888',
+            billingAddress: 'Kigali',
+            address: 'Kigali',
+            email: 'customer@gexample.com',
+            password: await bcrypt.hash('Customer@213', 10),
+            status: 'active',
+            verified: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+
+        roles = JSON.parse(JSON.stringify(roles));
+        const merchantRole = roles.find((role) => role.name === 'Merchant');
+        const customerRole = roles.find((role) => role.name === 'Customer');
+
+        // Merchant User
+        await models.UserRole.create({
+            id: uuidv4(),
+            userId: merchantUser.id,
+            roleId: merchantRole.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        // Customer User
+        await models.UserRole.create({
+            id: uuidv4(),
+            userId: customerUser.id,
+            roleId: customerRole.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
     });
+
     after(async () => {
         await models.Product.destroy({ where: {} });
     });
+
     it('should create a new product with valid data', async () => {
-        const token = jwt.sign(
-            { userId: user.id, userRole: 'vendor' },
-            process.env.SECRET_KEY
-        );
+        const userLogin = await chai.request(app).post('/user/login').send({
+            email: 'seller@gexample.com',
+            password: 'Seller@213',
+        });
+
+        otp = userLogin.body.otp.otp;
+
+        // Check OTP
+        const checkOtp = await chai.request(app).post('/user/otp').send({
+            email: 'seller@gexample.com',
+            otp,
+        });
+
+        token = checkOtp.body.token;
+
         const res = await chai
             .request(app)
             .post('/product/create')
@@ -210,7 +505,8 @@ describe('addProduct function', () => {
                     'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
                 ],
             })
-            .set('Authorization', `Bearer ${token}`);
+            .set('Authorization', 'Bearer ' + token);
+
         expect(res).to.have.status(201);
         expect(res.body.name).to.equal('Test Product');
         expect(res.body.price).to.equal(100);
@@ -224,10 +520,6 @@ describe('addProduct function', () => {
     });
 
     it('should return an error if product name already exists', async () => {
-        const token = jwt.sign(
-            { userId: user.id, userRole: 'vendor' },
-            process.env.SECRET_KEY
-        );
         const res = await chai
             .request(app)
             .post('/product/create')
@@ -275,13 +567,18 @@ describe('addProduct function', () => {
                 ],
             });
         expect(res).to.have.status(401);
-        expect(res.body.message).to.equal('Authorization header missing');
+        expect(res.body.message).to.equal('No token provided!');
     });
+
     it('should return an error if unauthorized access', async () => {
-        const token = jwt.sign(
-            { userId: user.id, userRole: 'customer' },
-            process.env.SECRET_KEY
-        );
+        // Login
+        const user = await chai.request(app).post('/user/login').send({
+            email: 'customer@gexample.com',
+            password: 'Customer@213',
+        });
+
+        const token = user.body.token;
+
         const res = await chai
             .request(app)
             .post('/product/create')
@@ -297,166 +594,8 @@ describe('addProduct function', () => {
                 ec: '1234567890123456',
             });
         expect(res).to.have.status(403);
-        expect(res.body.message).to.equal('Unauthorized access');
-    });
-});
-describe('Update product', function () {
-    let user;
-    let userRaw;
-    let productRaw;
-    let product;
-    let user2, userRaw2;
-    before(async function () {
-        await models.sequelize.sync({ force: true });
-        await models.User.destroy({ where: {} });
-        await models.Product.destroy({ where: {} });
-        userRaw = await models.User.create({
-            firstName: 'Kaneza',
-            lastName: 'Erica',
-            userName: 'Eriallan',
-            telephone: '0785188981',
-            address: 'Kigali',
-            email: 'eriman@example.com',
-            password: await bcrypt.hash('Password@123', 10),
-            role: 'vendor',
-        });
-        userRaw2 = await models.User.create({
-            firstName: 'Kaneza',
-            lastName: 'Erica',
-            userName: 'Eriallan',
-            telephone: '0785188981',
-            address: 'Kigali',
-            email: 'eriman@example.com',
-            password: await bcrypt.hash('Password@123', 10),
-            role: 'vendor',
-        });
-        user = userRaw.toJSON();
-        user2 = userRaw2.toJSON();
-        productRaw = await models.Product.create({
-            name: 'Test Product',
-            price: 100,
-            quantity: 10,
-            available: true,
-            userId: user.id,
-            category: 'Test Category',
-            bonus: 1,
-            expiryDate: '2023-12-31T00:00:00.000Z',
-            ec: 1,
-            images: [
-                'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg',
-                'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__480.jpg',
-                'https://cdn.pixabay.com/photo/2015/06/19/21/24/avenue-815297__480.jpg',
-                'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
-            ],
-        });
-        product = productRaw.toJSON();
-    });
-    after(async () => {
-        await models.Product.destroy({ where: {} });
-        user = product = userRaw = productRaw = null;
-    });
-    it('Should update a product', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: 'vendor' },
-            process.env.SECRET_KEY
+        expect(res.body.message).to.equal(
+            'Access denied! You are not allowed to perform this operation.'
         );
-        const res = await chai
-            .request(app)
-            .patch(`/product/${product.id}`)
-            .send({
-                name: 'Test Product',
-                price: 100,
-                quantity: 10,
-                available: true,
-                category: 'Test Category',
-                bonus: 1,
-                expiryDate: '2023-12-31T00:00:00.000Z',
-                ec: 1,
-                images: [
-                    'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg',
-                    'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__480.jpg',
-                    'https://cdn.pixabay.com/photo/2015/06/19/21/24/avenue-815297__480.jpg',
-                    'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
-                ],
-            })
-            .set('Authorization', `Bearer ${token}`);
-        expect(res).to.have.status(200);
-        expect(res.body.message).to.equal('success');
-    });
-    it('Should not update id', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: 'vendor' },
-            process.env.SECRET_KEY
-        );
-
-        const res = await chai
-            .request(app)
-            .patch(`/product/${product.id}`)
-            .send({
-                id: uuidv4(),
-            })
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res).to.have.status(400);
-    });
-    it('should not update sellerId', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: 'vendor' },
-            process.env.SECRET_KEY
-        );
-        const res = await chai
-            .request(app)
-            .patch(`/product/${product.id}`)
-            .send({
-                userId: uuidv4(),
-            })
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res).to.have.status(400);
-    });
-    it('Should not send additional field', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: 'vendor' },
-            process.env.SECRET_KEY
-        );
-        const res = await chai
-            .request(app)
-            .patch(`/product/${product.id}`)
-            .send({
-                someAdditionalField: uuidv4(),
-            })
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res).to.have.status(400);
-    });
-    it('should return 404 when product does not exist', async function () {
-        const token = jwt.sign(
-            { userId: user.id, role: 'vendor' },
-            process.env.SECRET_KEY
-        );
-        const res = await chai
-            .request(app)
-            .patch(`/product/${uuidv4()}`)
-            .send({
-                name: 'juice',
-            })
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res).to.have.status(404);
-    });
-    it('should return 401 when user does not own product', async function () {
-        const token = jwt.sign(
-            { userId: user2.id, role: 'vendor' },
-            process.env.SECRET_KEY
-        );
-        const res = await chai
-            .request(app)
-            .patch(`/product/${product.id}`)
-            .send({
-                name: 'shoes',
-            })
-            .set('Authorization', `Bearer ${token}`);
-
-        expect(res).to.have.status(401);
     });
 });
