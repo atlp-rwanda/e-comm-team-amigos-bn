@@ -65,6 +65,9 @@ const loginValidator = asyncHandler(async (req, res, next) => {
 
 const resetPassValidator = async (req, res, next) => {
   const schema = Joi.object({
+    email: Joi.string()
+      .email()
+      .required(),
     password: Joi.string()
       .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/)
       .required()

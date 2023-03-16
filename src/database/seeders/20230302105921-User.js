@@ -70,4 +70,7 @@ module.exports = {
   ),
   down: (queryInterface, Sequelize) => queryInterface.bulkDelete('Users', null, {}),
 };
+<<<<<<< HEAD
 >>>>>>> ch(user): add authorization
+=======
+>>>>>>> c7571d3889fc32488bff605098720d2d3e549411
