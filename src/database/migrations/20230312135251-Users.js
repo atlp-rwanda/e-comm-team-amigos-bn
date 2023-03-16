@@ -6,71 +6,71 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4
+        defaultValue: Sequelize.UUIDV4,
       },
       firstName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       userName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       telephone: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       address: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       password: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       role: {
         type: Sequelize.ENUM(['admin', 'vendor', 'normal']),
         allowNull: false,
-        defaultValue: 'normal'
+        defaultValue: 'normal',
       },
       status: {
         type: Sequelize.ENUM(['active', 'inactive']),
         allowNull: false,
-        defaultValue: 'inactive'
+        defaultValue: 'inactive',
       },
       verified: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
       },
       otpcode: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       otpcodeexpiration: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
 
   async down(queryInterface) {
     await queryInterface.dropTable('Users');
-  }
+  },
 };
