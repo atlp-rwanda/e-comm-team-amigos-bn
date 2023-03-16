@@ -15,6 +15,7 @@ const should = chai.should();
 describe('createUser function', () => {
     let roles;
 
+
     before(async () => {
         await models.sequelize.sync({ force: true });
         await models.User.destroy({ where: {} });
@@ -24,9 +25,38 @@ describe('createUser function', () => {
             userName: 'Eriallan',
             telephone: '0785188981',
             address: 'Kigali',
-            email: 'dav.ndungutse@example.com',
+            email: 'dav.ndungutse@gmail.com',
             password: await bcrypt.hash('Password@123', 10),
         });
+
+        await models.Role.destroy({ where: {} });
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+        roles = JSON.parse(JSON.stringify(roles));
 
         await models.Role.destroy({ where: {} });
         roles = await models.Role.bulkCreate([
@@ -69,7 +99,7 @@ describe('createUser function', () => {
             userName: 'Manzi212',
             telephone: '0785188981',
             address: 'Kiyovu',
-            email: 'eric.tuyizere.ndungutse@example.com',
+            email: 'eric.tuyizere.ndungutse@gmail.com',
             password: 'Password@123',
         });
 
@@ -82,7 +112,7 @@ describe('createUser function', () => {
         expect(res.body.data.telephone).to.equal('0785188981');
         expect(res.body.data.address).to.equal('Kiyovu');
         expect(res.body.data.email).to.equal(
-            'eric.tuyizere.ndungutse@example.com'
+            'eric.tuyizere.ndungutse@gmail.com'
         );
         expect(res.body).to.have.property('token');
     });
@@ -94,7 +124,7 @@ describe('createUser function', () => {
             userName: 'Manzi212',
             telephone: '0785188981',
             address: 'Kiyovu',
-            email: 'eric.tuyizere.ndungutse@example.com',
+            email: 'eric.tuyizere.ndungutse@gmail.com',
             password: 'Password@123',
         });
         expect(res).to.have.status(400);

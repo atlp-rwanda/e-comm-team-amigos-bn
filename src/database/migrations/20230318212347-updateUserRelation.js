@@ -5,15 +5,6 @@ module.exports = {
       queryInterface.addColumn('Users', 'preferredCurrency', {
         type: Sequelize.STRING,
       }),
-      queryInterface.addColumn('Users', 'deliveryInfo', {
-        type: Sequelize.JSONB,
-        allowNull: true,
-      }),
-
-      queryInterface.addColumn('Users', 'paymentInfo', {
-        type: Sequelize.JSONB,
-        allowNull: true,
-      }),
 
       queryInterface.addColumn('Users', 'gender', {
         type: Sequelize.STRING,
