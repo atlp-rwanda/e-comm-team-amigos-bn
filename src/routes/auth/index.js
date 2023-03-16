@@ -12,3 +12,4 @@ router.put('/resetPassword/:token', validate.resetPassValidator, authentication.
 router.post('/otp', authentication.checkotp);
 router.patch('/updatePassword', verifyToken, authentication.updatePassword)
 export default router;
+// , validate.authorize(['admin', 'vendor', 'normal'])

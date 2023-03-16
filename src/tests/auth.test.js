@@ -219,7 +219,7 @@ describe("User Login", () => {
             email: "d.gasana@alustudent.com",
             password: "Password@12345",
         })
-        .end((err,res) => {
+        .end((err, res) => {
             if(err) done(err);
             else {
                 res.should.have.status(400);

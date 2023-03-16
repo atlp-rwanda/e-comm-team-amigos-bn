@@ -1,12 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
+<<<<<<< HEAD
 import bcrypt from 'bcryptjs';
+=======
+import bcrypt from 'bcrypt';
+>>>>>>> ch(user): add authorization
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import models from '../database/models';
 import tokenGenerator from '../helpers/generateToken';
 import { sendMail } from '../helpers/sendMail';
+<<<<<<< HEAD
 import createOTP from '../helpers/createotp';
 import { sendResetMail } from '../helpers/sendResetPasswordEmail';
+=======
+>>>>>>> ch(user): add authorization
 
 dotenv.config();
 const createUser = async (req, res) => {
@@ -21,7 +28,11 @@ const createUser = async (req, res) => {
   };
   try {
     const user = await models.User.create(userData);
+<<<<<<< HEAD
     const token = tokenGenerator({ userId: user.id }, { expiresIn: '1d' });
+=======
+    const token = tokenGenerator({ userId: user.id, role: user.role }, { expiresIn: '1d' });
+>>>>>>> ch(user): add authorization
     const url = `${process.env.BASE_URL}/user/verify_email/${token}`;
     sendMail(
       user.email,
@@ -63,9 +74,14 @@ export const loginUser = async (req, res) => {
   const user = await models.User.findOne({
     where: { email: req.body.email }
   });
+<<<<<<< HEAD
   if (!user) {
     return res.status(400).json({ message: 'Email or Password Incorrect' });
   }
+=======
+  if (!user) { return res.status(400).json({ message: 'Email or Password Incorrect' }); }
+  // const valid = await bcrypt.compare(req.body.password, user.password);
+>>>>>>> ch(user): add authorization
   if (user.verified === false) {
     return res.json({ message: 'You have to first verify your account' });
   }
@@ -77,12 +93,19 @@ export const loginUser = async (req, res) => {
         return res.status(200).json({ message: 'Enter OTP to be be verified', otp });
       }
       const token = tokenGenerator({ userId: user.id });
+<<<<<<< HEAD
       return res.status(200).json({ message: 'User Logged Successfully', token });
+=======
+      return res
+        .status(200)
+        .json({ message: 'User Logged Successfully', token });
+>>>>>>> ch(user): add authorization
     }
     return res.status(400).json({ message: ' Email or Password Incorrect' });
   });
 };
 
+<<<<<<< HEAD
 const updatePassword = async(req,res) => {
 const {email, oldPass, newPass} = req.body
  
@@ -167,6 +190,8 @@ const resetPassword = async (req, res) => {
   return res.status(200).json({ message: 'password updated successfully' });
 };
 
+=======
+>>>>>>> ch(user): add authorization
 export default {
   createUser,
   loginUser,

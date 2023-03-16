@@ -1,7 +1,9 @@
 import Joi from 'joi';
+import asyncHandler from 'express-async-handler';
+import jwt from 'jsonwebtoken';
 import models from '../database/models';
 
-const signUpValidator = async (req, res, next) => {
+const signUpValidator = asyncHandler(async (req, res, next) => {
   const schema = Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
@@ -32,15 +34,10 @@ const signUpValidator = async (req, res, next) => {
         'password.invalid': 'Password is invalid.',
       }),
   });
-  try {
-    await schema.validateAsync(req.body);
-    next();
-  } catch (error) {
-    console.log(error);
-    res.status(400).send(error.message);
-  }
-};
-const loginValidator = async (req, res, next) => {
+  await schema.validateAsync(req.body);
+  next();
+});
+const loginValidator = asyncHandler(async (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string()
       .email()
@@ -64,7 +61,7 @@ const loginValidator = async (req, res, next) => {
   } catch (error) {
     res.status(400).send(error.message);
   }
-};
+});
 
 const resetPassValidator = async (req, res, next) => {
   const schema = Joi.object({
@@ -100,8 +97,30 @@ const resetPassValidator = async (req, res, next) => {
   }
 };
 
+const authorize = (roles) => asyncHandler(async (req, res, next) => {
+  const authHeader = await req.get('Authorization');
+  if (!authHeader) {
+    return res.status(401).json({ error: 'No token provided!' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+  const role = decodedToken.role;
+  if (!roles.includes(role)) {
+    return res.status(401).json({
+      error: 'Access denied! You are not allowed to perform this operation.'
+    });
+  }
+
+  // Set the decoded token as the user property in the request object
+  req.user = decodedToken;
+  next();
+  return res.status(200);
+});
+
 export default {
   signUpValidator,
   loginValidator,
-  resetPassValidator
+  resetPassValidator,
+  authorize
 };
