@@ -40,9 +40,7 @@ const options = {
     securit: [{
       bearerAuth: []
     }],
-    servers: [{
-      url: 'http://localhost:3000'
-    }, { url: 'http://localhost:4000' }]
+    servers: [{ url: 'http://localhost:4000' }, { url: 'https://e-comm-team-amigos-bn-project.onrender.com'}]
 
   },
   apis: ['src/**/*doc.js'],
