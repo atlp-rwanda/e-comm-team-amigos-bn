@@ -67,6 +67,8 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
+#disable eslint
+.eslintignore
 # Yarn Integrity file
 .yarn-integrity
 

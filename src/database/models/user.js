@@ -1,7 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
-    'User',
+    "User",
     {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       firstName: DataTypes.STRING,
       lastName: DataTypes.STRING,
       userName: DataTypes.STRING,
@@ -17,11 +23,17 @@ module.exports = (sequelize, DataTypes) => {
       },
       email: DataTypes.STRING,
       password: DataTypes.STRING,
-      role: DataTypes.ENUM('admin', 'vendor', 'normal'),
-      status: DataTypes.ENUM('active', 'inactive'),
+      role: DataTypes.ENUM("admin", "vendor", "normal"),
+      status: DataTypes.ENUM("active", "inactive"),
       verified: DataTypes.BOOLEAN,
     },
     {}
   );
+  User.association = (models) => {
+    User.hasMany(models.Product, {
+      foriegnKey: "userId",
+      as: "user",
+    });
+  };
   return User;
 };
