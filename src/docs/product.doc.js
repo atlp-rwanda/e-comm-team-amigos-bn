@@ -48,6 +48,8 @@
  * @swagger
  * /product/create:
  *   post:
+ *     tags:
+ *       - Products
  *     summary: Add a new product
  *     security:
  *       - BearerToken: []
@@ -140,4 +142,46 @@
  *                   type: string
  *                   description: Error message
  *                   example: Product already exists, please update that product instead
+ * /product/availableProduct:
+ *   get:
+ *     tags:
+ *       - Products
+ *     description: Returns all available products
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: An array of available products
+ *         schema:
+ *           type: array
+ *       500:
+ *         description: Internal server error
+ * /product/availableProduct/{id}:
+ *   put:
+ *     tags:
+ *       - Products
+ *     summary: Update the availability status of a product
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of the product to update
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *              description: Provide email and password
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              available:
+ *                                  type: boolean
+ *     responses:
+ *       200:
+ *         description: The updated product
+ *       400:
+ *         description: Invalid product ID or availability status
+ *       500:
+ *         description: Internal server error
  */
