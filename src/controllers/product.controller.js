@@ -1,6 +1,7 @@
 import Joi from "joi";
-import jwt from "jsonwebtoken";
 import models from "../database/models";
+import jwt from "jsonwebtoken"
+
 
 export const getAllProduct = async (req, res) => {
   try {
@@ -23,6 +24,35 @@ export const getAllProduct = async (req, res) => {
     res.status(401).json({
       error: error.message,
     });
+  }
+};
+export const getAvailableProducts = async (req, res) => {
+  try {
+    const products = await models.Product.findAll({
+      where: { available: true }
+    });
+    res.status(200).json({response:products});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const updateProductAvailability = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { available } = req.body;
+
+    if (typeof available !== 'boolean') {
+      return res.status(400).json({ error: 'Invalid availability status' });
+    }
+    const updatedProduct = await models.Product.update({ available }, {
+      where: { id },
+      returning: true
+    });
+    res.json({ updatedProduct, message: 'updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 export const addProduct = async (req, res) => {
@@ -75,10 +105,12 @@ export const addProduct = async (req, res) => {
     });
     res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json( error );
   }
 };
 export default {
   addProduct,
   getAllProduct,
+  getAvailableProducts,
+  updateProductAvailability
 };
