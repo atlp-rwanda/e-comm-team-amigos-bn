@@ -171,42 +171,34 @@
  *       500:
  *         description: Internal server error.
  * /user/updatePassword:
- *      patch:
- *          tags: [Authentication]
- *          summary: This helps a registered user to update a password.
- *          description: User update password portal.
- *          parameters:
- *            - name: auth-token
- *              in: header
- *              description: Token generated during login
- *              required: true
- *              schema:
- *                type: string
- *          requestBody:
- *              description: Provide email, old password, and new password
- *              content:
- *                  application/json:
- *                      schema:
- *                          type: object
- *                          properties:
- *                              email:
- *                                  type: string
- *                              oldPass:
- *                                  type: string
- *                              newPass:
- *                                  type: string
- *
- *
- *
- *          responses:
- *                  '200':
- *                     description: Password updated Successfully
- *                  '400':
- *                     description: Invalid old Password  or Invalid email
- *                  '404':
- *                     description: User not found
- *                  '401':
- *                     description: Unauthorized
- *                  '500':
- *                     description: Internal server error
+ *      put:
+ *        tags: [Authentication]
+ *        summary: This helps a registered user to update a password.
+ *        description: User update password portal.
+ *        requestBody:
+ *            description: Provide email, old password, and new password
+ *            content:
+ *                application/json:
+ *                    schema:
+ *                        type: object
+ *                        properties:
+ *                            email:
+ *                                type: string
+ *                            oldPass:
+ *                                type: string
+ *                            newPass:
+ *                                type: string
+ *        security:
+ *         - bearerAuth: []     
+ *        responses:
+ *                200:
+ *                   description: Password updated Successfully
+ *                400:
+ *                   description: Invalid old Password  or Invalid email
+ *                404:
+ *                   description: User not found
+ *                401:
+ *                   description: Unauthorized
+ *                500:
+ *                   description: Internal server error
  */

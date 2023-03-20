@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -8,17 +7,6 @@ import tokenGenerator from "../helpers/generateToken";
 import { sendMail } from "../helpers/sendMail";
 import createOTP from "../helpers/createotp";
 import { sendResetMail } from "../helpers/sendResetPasswordEmail";
-=======
-import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-import models from '../database/models';
-import tokenGenerator from '../helpers/generateToken';
-import { sendMail } from '../helpers/sendMail';
-import createOTP from '../helpers/createotp';
-import { sendResetMail } from '../helpers/sendResetPasswordEmail';
->>>>>>> feat(user): User Password Update
 
 dotenv.config();
 const createUser = async (req, res) => {
@@ -91,7 +79,7 @@ export const loginUser = async (req, res) => {
           .json({ message: "Enter OTP to be be verified", otp });
       }
       const token = jwt.sign(
-        { userId: user.id, userEmail: user.email },
+        { userId: user.id, userEmail: user.email, role: user.role },
         process.env.SECRET_KEY,
         {
           expiresIn: "1h",
