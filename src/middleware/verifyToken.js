@@ -6,9 +6,9 @@ dotenv.config();
 
 export const verifyToken = async (req, res, next) => {
   try {
-    const authHeader = await req.get("auth-token");
+    const authHeader = await req.get('auth-token');
     if (!authHeader) {
-      return res.status(401).json({ error: "No token provided!" });
+      return res.status(401).json({ error: 'No token provided!' });
     }
 
     const decodeToken = jwt.verify(authHeader, process.env.SECRET_KEY);

@@ -13,8 +13,7 @@ const getUsers = async (req, res) => {
     });
     return res.status(200).json({ users });
   } catch (error) {
-    // return res.status(500).json({message: error});
-    console.log(error.message);
+    return res.status(500).json({ message: error });
   }
 };
 
@@ -40,7 +39,6 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    console.log(req.body);
     const user = await models.User.create(req.body);
     return res.status(201).json({ user });
   } catch (error) {
