@@ -3,15 +3,15 @@ import logger from 'morgan';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
+import passport from 'passport';
+import cookieSession from 'cookie-session';
+import http from 'http';
+import { Server } from 'socket.io';
 import specs from './docs';
 import routes from './routes';
 import db from './database/models';
 import tokenRoute from './routes/token.routes';
-import passport from 'passport';
-import cookieSession from 'cookie-session';
 
-import http from "http";
-import { Server } from 'socket.io';
 dotenv.config();
 
 const app = express();
@@ -24,10 +24,8 @@ if (process.env.NODE_ENV === 'development') {
 export const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {
   cors: {
-    origin: [
-      "http://localhost:4000",
-    ],
-    methods: ["GET", "HEAD", "OPTIONS", "PUT", "PATCH", "POST", "DELETE"],
+    origin: ['http://localhost:4000'],
+    methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE'],
   },
 });
 const { sequelize } = db;

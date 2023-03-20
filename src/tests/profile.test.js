@@ -46,7 +46,7 @@ describe('Profile Checks', () => {
         preferredCurrency: 'Frw',
         gender: 'Male',
       })
-      .set('Authorization', 'Bearer ' + user.token);
+      .set('Authorization', `Bearer ${user.token}`);
 
     expect(res.body.status).to.equal('success');
     expect(res).to.have.status(200);
@@ -57,7 +57,7 @@ describe('Profile Checks', () => {
     const res = await chai
       .request(app)
       .get('/user/profile')
-      .set('Authorization', 'Bearer ' + user.token);
+      .set('Authorization', `Bearer ${user.token}`);
 
     expect(res.body.status).to.equal('success');
     expect(res).to.have.status(200);
@@ -69,7 +69,7 @@ describe('Profile Checks', () => {
     const res = await chai
       .request(app)
       .get(`/user/${user.data.id}`)
-      .set('Authorization', 'Bearer ' + user.token);
+      .set('Authorization', `Bearer ${user.token}`);
 
     expect(res.body.status).to.equal('success');
     expect(res).to.have.status(200);

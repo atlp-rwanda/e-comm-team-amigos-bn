@@ -5,8 +5,7 @@ import app from '../app';
 chai.use(chaiHttp);
 describe('get a message', () => {
   it('test a welcome message', (done) => {
-    chai
-      .request(app)
+    chai.request(app)
       .get('/')
       .end((err, res) => {
         if (err) done(err);

@@ -1,4 +1,5 @@
 import models from '../database/models';
+
 const users = async (req, res) => {
   try {
     const users = await models.User.findAll();
@@ -83,36 +84,41 @@ const setRole = async (req, res) => {
   }
 };
 
-const updateRole = async(req,res)=>{
-  const {id} = req.params;
-  try{
-    const role = await models.Role.findOne({where:{id}});
-    if(!role){
-      return res.status(404).json({message:`Role witth ${id} doesn't exist`});
+const updateRole = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const role = await models.Role.findOne({ where: { id } });
+    if (!role) {
+      return res
+        .status(404)
+        .json({ message: `Role witth ${id} doesn't exist` });
     }
-    await role.update({name:req.body.name, description:req.body.description},{where:{id}})
-    return res.status(201).json({message:"Role updated successfully"})
-  }catch(error){
-    return res.status(500).json({error:error.message})
+    await role.update(
+      { name: req.body.name, description: req.body.description },
+      { where: { id } }
+    );
+    return res.status(201).json({ message: 'Role updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
-}
-const deleteRole = async (req,res)=>{
-  const id = req.params.id
-  try{
-    const role = await models.Role.findOne({where:{id}});
-    if(!role){
-      return res.status(404).json({message:`Role witth ${id} doesn't exist`});
+};
+const deleteRole = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const role = await models.Role.findOne({ where: { id } });
+    if (!role) {
+      return res
+        .status(404)
+        .json({ message: `Role witth ${id} doesn't exist` });
     }
-    await models.UserRole.destroy({where:{roleId:id}});
-    await models.RolePermission.destroy({where:{roleId:id}});
+    await models.UserRole.destroy({ where: { roleId: id } });
+    await models.RolePermission.destroy({ where: { roleId: id } });
     await role.destroy();
-    return res.status(200).json({message:"Role deleted successfully"});
-  }catch(error){
-    return res.status(500).json({error:error.message});
+    return res.status(200).json({ message: 'Role deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
-}
-
-
+};
 
 const userWithRole = async (req, res) => {
   const { id } = req.params;
@@ -133,7 +139,9 @@ const userWithRole = async (req, res) => {
       ],
     });
 
-    return res.status(200).json({ message: 'User with roles', response: user });
+    return res
+      .status(200)
+      .json({ message: 'User with roles', response: user });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -169,7 +177,9 @@ const setPermission = async (req, res) => {
     permissionId: req.body.permissionId,
   };
   try {
-    const rolePermission = await models.RolePermission.create(permissionData);
+    const rolePermission = await models.RolePermission.create(
+      permissionData
+    );
     return res.status(201).json({
       message: 'Permission',
       response: rolePermission,
@@ -179,34 +189,45 @@ const setPermission = async (req, res) => {
   }
 };
 
-const updatePermission = async(req,res)=>{
-  const {id} = req.params;
-  try{
-    const permission = await models.Permission.findOne({where:{id}});
-    if(!permission){
-      return res.status(404).json({message:`Role witth ${id} doesn't exist`});
+const updatePermission = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const permission = await models.Permission.findOne({ where: { id } });
+    if (!permission) {
+      return res
+        .status(404)
+        .json({ message: `Role witth ${id} doesn't exist` });
     }
-    await permission.update({name:req.body.name, description:req.body.description},{where:{id}})
-    return res.status(201).json({message:"Permission updated successfully"})
-  }catch(error){
-    return res.status(500).json({error:error.message})
+    await permission.update(
+      { name: req.body.name, description: req.body.description },
+      { where: { id } }
+    );
+    return res
+      .status(201)
+      .json({ message: 'Permission updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
-}
+};
 
-const deletePermission = async (req,res)=>{
-  const {id} = req.params
-  try{
-    const permission = await models.Permission.findOne({where:{id}});
-    if(!permission){
-      return res.status(404).json({message:`Permission witth ${id} doesn't exist`});
+const deletePermission = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const permission = await models.Permission.findOne({ where: { id } });
+    if (!permission) {
+      return res
+        .status(404)
+        .json({ message: `Permission witth ${id} doesn't exist` });
     }
-    await models.RolePermission.destroy({where:{permissionId:id}});
+    await models.RolePermission.destroy({ where: { permissionId: id } });
     await permission.destroy();
-    return res.status(200).json({message:"Permission deleted successfully"});
-  }catch(error){
-    return res.status(500).json({error:error.message});
+    return res
+      .status(200)
+      .json({ message: 'Permission deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
-}
+};
 
 export default {
   users,
@@ -221,5 +242,5 @@ export default {
   userWithRole,
   roleWithPermission,
   updatePermission,
-  deletePermission
+  deletePermission,
 };

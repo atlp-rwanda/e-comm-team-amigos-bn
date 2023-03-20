@@ -9,35 +9,36 @@ const options = {
       description: 'E-Commerce project documentation',
     },
     components: {
-        securitySchemes: {
-            bearerAuth: {
-                type: 'http',
-                scheme: 'bearer',
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          in: 'header',
+          bearerformat: 'JWT',
+        },
+        google_auth: {
+          type: 'oauth2',
+          flows: {
+            authorizationCode: {
+              authorizationUrl:
+                                'https://accounts.google.com/o/oauth2/auth',
+              tokenUrl: 'https://oauth2.googleapis.com/token',
+
+              scopes: {
+                'https://www.googleapis.com/auth/userinfo.email':
+                                    'View your email address',
+                'https://www.googleapis.com/auth/userinfo.profile':
+                                    'View your basic profile info',
+              },
+              clientSecret: {
+                type: 'apiKey',
                 in: 'header',
-                bearerformat: 'JWT',
-            },
-            google_auth: {
-              type: 'oauth2',
-              flows: {
-                authorizationCode: {
-                  authorizationUrl: 'https://accounts.google.com/o/oauth2/auth',
-                  tokenUrl: 'https://oauth2.googleapis.com/token',
-    
-                  scopes: {
-                    'https://www.googleapis.com/auth/userinfo.email': 'View your email address',
-                    'https://www.googleapis.com/auth/userinfo.profile': 'View your basic profile info',
-                  },
-    
-                  clientSecret: {
-                    type: 'apiKey',
-                    in: 'header',
-                    name: 'Authorization',
-                  },
-                },
+                name: 'Authorization',
               },
             },
-        }
-        
+          },
+        },
+      },
     },
     security: [
       {
