@@ -184,4 +184,71 @@
  *         description: Invalid product ID or availability status
  *       500:
  *         description: Internal server error
+ *
+ * /product/collection:
+ *   get:
+ *     summary: Get all items in seller collection
+ *     description: Retrieve all products that belong to a seller
+ *     tags:
+ *       - Products
+ *     security:
+ *       - BearerToken: []
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   description: The status of the response
+ *                   example: "OK"
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *                   description: The products that belong to the seller
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: The reason for the unauthorized status
+ *                   example: "Authorization header missing"
+ *       404:
+ *         description: Not Found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   description: The status of the response
+ *                   example: "Not Found"
+ *                 error:
+ *                   type: string
+ *                   description: The reason for the not found status
+ *                   example: "There is no item in Collection"
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   description: The status of the response
+ *                   example: "Bad Request"
+ *                 error:
+ *                   type: string
+ *                   description: The reason for the bad request status
+ *                   example: "Invalid token"
  */

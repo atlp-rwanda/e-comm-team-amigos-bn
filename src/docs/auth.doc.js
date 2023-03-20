@@ -65,6 +65,34 @@
  *                  500:
  *                     description: Internal server error
  *
+ * /user/otp:
+ *      post:
+ *          tags: [Authentication]
+ *          summary: This helps a user to use otp generated.
+ *          description: Enter email and otp.
+ *          requestBody:
+ *              description: Provide email and otp
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              email:
+ *                                  type: string
+ *                              otp:
+ *                                  type: string
+ *
+ *
+ *          responses:
+ *                  200:
+ *                     description: user logged in successfully!
+ *                  400:
+ *                     description: Bad Request
+ *                  404:
+ *                     description: Not Found
+ *                  500:
+ *                     description: Internal server error
+ *
  *
  * /user/verify_email/{token}:
  *   get:

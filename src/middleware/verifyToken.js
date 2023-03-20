@@ -6,7 +6,7 @@ export const verifyToken = async (req, res, next) => {
     const authHeader = await req.get('Authorization');
 
     if (!authHeader) {
-      return res.status(401).json({ error: 'No token provided!' });
+      return res.status(401).json({ error: "No token provided!" });
     }
 
     const token = authHeader.split(' ')[1];
@@ -20,7 +20,7 @@ export const verifyToken = async (req, res, next) => {
     if (decodeToken.errors || !decodeToken) {
       return res
         .status(401)
-        .json({ error: 'Sorry, we fail to authenticate you.' });
+        .json({ error: "Sorry, we fail to authenticate you." });
     }
 
     const { userId } = decodeToken;
