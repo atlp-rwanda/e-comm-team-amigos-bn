@@ -108,6 +108,41 @@ export const addProduct = async (req, res) => {
     res.status(500).json( error );
   }
 };
+
+export const searchProduct = async (req, res) => {
+  try {
+    const { name, minPrice, maxPrice, category } = req.query;
+    let where = {};
+    if (name) {
+      where.name = { [Op.iLike]: `%${name}%` };
+    }
+    if (minPrice && maxPrice) {
+      where.price = { [Op.between]: [minPrice, maxPrice] };
+    } else if (minPrice) {
+      where.price = { [Op.gte]: minPrice };
+    } else if (maxPrice) {
+      where.price = { [Op.lte]: maxPrice };
+    }
+    if (category) {
+      where.category = category;
+    }
+
+    const products = await models.Product.findAll({ where });
+    if (products.length <= 0) {
+      return res.status(404).json({
+        status: "Not Found",
+        error: "There are no products matching your search",
+      });
+    }
+    return res.status(200).json({
+      status: "Ok",
+      message: "List Of Products matching your search",
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
 export default {
   addProduct,
   getAllProduct,
