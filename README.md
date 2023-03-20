@@ -2,13 +2,28 @@
 
 # Description
 
-This branch allows a user signup 
+This branch contains different endpoints which allow users with specific privileges to perform defined role in the system.
 
 ## Documentation
 
-`POST user/create`
+`GET /users`
 
-`POST auth/login`
+`POST /role/create`
+
+`GET /roles`
+
+`POST /permission/create`
+
+`GET /permissions`
+
+`POST /role/set`
+
+`POST /permission/set`
+
+`GET /user/role`
+
+`GET /role/permission`
+
 
 ## Setup
 
@@ -26,23 +41,6 @@ DB_NAME=<your_database_name>
 
 
 ### Dependencies
-
-    bcrypt
-    callsites
-    chai-http
-    cors
-    dotenv
-    express
-    joi
-    lodash.merge
-    morgan
-    pg
-    pg-hstore
-    rimraf
-    sequelize
-    swagger-jsdoc
-    swagger-ui-express
-    uuid
 
 ### Getting Started
 
