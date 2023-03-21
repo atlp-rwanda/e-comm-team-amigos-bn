@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
       as: 'UserRoles',
     });
     User.hasMany(models.Product, {
-      foriegnKey: 'userId',
+      foreignKey: 'userId',
       as: 'user',
     });
   };
