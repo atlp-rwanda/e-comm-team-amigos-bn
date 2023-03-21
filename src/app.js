@@ -10,10 +10,13 @@ import tokenRoute from "./routes/token.routes";
 import passport from "passport";
 import cookieSession from "cookie-session";
 import productRoute from "./routes/product.routes";
+import cookieParser from 'cookie-parser';
+
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 if (process.env.NODE_ENV === "development") {
   app.use(logger("dev"));
