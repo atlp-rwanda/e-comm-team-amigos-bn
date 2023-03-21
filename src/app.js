@@ -10,6 +10,8 @@ import tokenRoute from './routes/token.routes';
 import passport from 'passport';
 import cookieSession from 'cookie-session';
 
+import http from "http";
+import { Server } from 'socket.io';
 dotenv.config();
 
 const app = express();
@@ -18,6 +20,16 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
   app.use(logger('dev'));
 }
+
+export const httpServer = http.createServer(app);
+export const io = new Server(httpServer, {
+  cors: {
+    origin: [
+      "http://localhost:4000",
+    ],
+    methods: ["GET", "HEAD", "OPTIONS", "PUT", "PATCH", "POST", "DELETE"],
+  },
+});
 const { sequelize } = db;
 sequelize.authenticate();
 app.use(express.urlencoded({ extended: true }));
