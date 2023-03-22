@@ -1,7 +1,7 @@
-import chai, { expect } from 'chai';
-import chaiHttp from 'chai-http';
-import app from '../app';
-import models from '../database/models';
+import chai, { expect } from "chai";
+import chaiHttp from "chai-http";
+import app from "../app";
+import models from "../database/models";
 
 chai.use(chaiHttp);
 
@@ -66,10 +66,10 @@ describe('Set user roles or permissions', () => {
     );
   });
 
-  it('Should return all permissions from database', async () => {
-    const res = await chai.request(app).get('/permissions').send();
+  it("Should return all permissions from database", async () => {
+    const res = await chai.request(app).get("/permissions").send();
     expect(res).to.have.status(200);
-    expect(res.body.message).to.equal('Permissions');
+    expect(res.body.message).to.equal("Permissions");
     expect(res.body.count).to.equal(res.body.response.length);
     expect(res.body.response).to.equal(res.body.response);
   });
