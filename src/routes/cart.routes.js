@@ -1,12 +1,12 @@
 import express from "express";
-import { createCart } from "../controllers/cart.controller";
+import { createCart, viewCart, cleanUpCart } from "../controllers/cart.controller";
 import { validateCartAdd } from "../validations/cart.validator";
+import {verifyToken} from '../middleware/verifyToken';
 
 const router = express.Router();
 
-router.get("/", validateCartAdd, createCart);
-
-
-
+router.post("/", validateCartAdd, createCart);
+router.get('/view-cart', verifyToken, viewCart);
+router.delete('/clean-up-cart', cleanUpCart);
 
 export default router;

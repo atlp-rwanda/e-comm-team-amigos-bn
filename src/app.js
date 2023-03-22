@@ -33,20 +33,22 @@ const { sequelize } = db
 sequelize.authenticate()
 app.use(express.urlencoded({ extended: true }))
 app.use(
-    cookieSession({
-        name: 'google-auth-session',
-        keys: ['key1', 'key2'],
-    })
-)
+  cookieSession({
+    name: "google-auth-session",
+    keys: ["key1", "key2"],
+  })
+);
 
-app.use(
-    '/cart',
-    cookieSession({
-        name: 'session',
-        keys: [process.env.SECRET_KEY],
-        maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
-    })
-)
+app.use("/cart",
+  cookieSession({
+    name: "session",
+    keys: [process.env.SECRET_KEY],
+    maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.authenticate("session"));
 
 app.use(passport.initialize())
 app.use(passport.authenticate('session'))
