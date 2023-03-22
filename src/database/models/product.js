@@ -1,8 +1,8 @@
-"use strict";
-const { Model } = require("sequelize");
+'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   const Product = sequelize.define(
-    "Product",
+    'Product',
     {
       id: {
         allowNull: false,
@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       userId: {
         type: DataTypes.UUID,
         allowNull: false,
-        references: { model: "Users", key: "id" },
+        references: { model: 'Users', key: 'id' },
       },
       name: DataTypes.STRING,
       price: DataTypes.INTEGER,
@@ -40,8 +40,8 @@ module.exports = (sequelize, DataTypes) => {
   );
   Product.association = (models) => {
     Product.belongsTo(models.User, {
-      foreignKey: "userId",
-      as: "user",
+      foreignKey: 'userId',
+      as: 'user',
     });
   };
   return Product;

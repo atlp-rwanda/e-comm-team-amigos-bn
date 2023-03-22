@@ -87,7 +87,7 @@
  *         description: User not found
  *       '500':
  *         description: Internal server error
-  * /user/forgotPassword/:
+ * /user/forgotPassword/:
  *       post:
  *           tags: [Authentication]
  *           summary: Send reset password email

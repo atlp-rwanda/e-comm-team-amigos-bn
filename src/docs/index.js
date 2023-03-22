@@ -6,13 +6,14 @@ const options = {
     info: {
       title: 'E-COMMERCE DOCUMENTATION',
       version: '1.0.0',
-      description: 'E-Commerce project documentation'
+      description: 'E-Commerce project documentation',
     },
     components: {
       securitySchemes: {
-        BearerToken: {
+        bearerAuth: {
           type: 'http',
           scheme: 'bearer',
+          in: 'header',
           bearerformat: 'JWT',
         },
         google_auth: {
@@ -23,10 +24,11 @@ const options = {
               tokenUrl: 'https://oauth2.googleapis.com/token',
 
               scopes: {
-                'https://www.googleapis.com/auth/userinfo.email': 'View your email address',
-                'https://www.googleapis.com/auth/userinfo.profile': 'View your basic profile info',
+                'https://www.googleapis.com/auth/userinfo.email':
+                  'View your email address',
+                'https://www.googleapis.com/auth/userinfo.profile':
+                  'View your basic profile info',
               },
-
               clientSecret: {
                 type: 'apiKey',
                 in: 'header',
@@ -35,15 +37,21 @@ const options = {
             },
           },
         },
-      }
+      },
     },
-    security: [{
-      BearerToken: []
-    }],
-    servers: [{
-      url: 'http://localhost:3000'
-    }, { url: 'http://localhost:4000' }]
-
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    servers: [
+      {
+        url: 'http://localhost:3000',
+      },
+      {
+        url: 'http://localhost:4000',
+      },
+    ],
   },
   apis: ['src/**/*doc.js'],
 };
