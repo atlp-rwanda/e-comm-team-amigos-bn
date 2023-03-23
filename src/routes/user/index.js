@@ -4,7 +4,7 @@ import {
   updateProfile,
   getUserProfile,
 } from '../../controllers/user';
-import { verifyToken } from '../../middleware/verifyToken';
+import { verifyToken }from '../../middleware/verifyToken';
 import { validateUserProfile } from '../../middleware/user';
 
 const router = express.Router();

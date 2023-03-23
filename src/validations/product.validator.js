@@ -1,4 +1,3 @@
-// File: validateProductInput.js
 import Joi from 'joi';
 
 const validateProductInput = (req, res, next) => {

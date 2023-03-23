@@ -79,7 +79,7 @@ export const loginUser = async (req, res) => {
           .json({ message: "Enter OTP to be be verified", otp });
       }
       const token = jwt.sign(
-        { userId: user.id, userEmail: user.email },
+        { userId: user.id, userEmail: user.email, role: user.role },
         process.env.SECRET_KEY,
         {
           expiresIn: "1h",

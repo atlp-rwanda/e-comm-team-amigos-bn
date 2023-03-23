@@ -1,5 +1,7 @@
+import jwt from 'jsonwebtoken';
 import Joi from 'joi';
 import models from '../database/models';
+import asyncHandler from 'express-async-handler';
 
 const signUpValidator = async (req, res, next) => {
   const schema = Joi.object({
@@ -103,7 +105,6 @@ const resetPassValidator = async (req, res, next) => {
     res.status(400).send(error.message);
   }
 };
-
 export default {
   signUpValidator,
   loginValidator,

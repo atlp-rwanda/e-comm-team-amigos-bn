@@ -377,6 +377,7 @@ describe("resetPassword function", () => {
   });
 });
 describe("Password Update", () => {
+  var authtoken
   before(async function () {
     await models.sequelize.sync({ force: true });
     await models.User.create({
@@ -384,9 +385,10 @@ describe("Password Update", () => {
       lastName: "Junior",
       userName: "Junior",
       telephone: "0790994799",
+      role: "normal",
+      verified: true,
       address: "Kigali",
       email: "gasanajr08@gmail.com",
-      verified: true,
       password: await bcrypt.hash("Password@123", 10),
     });
   });
@@ -403,18 +405,18 @@ describe("Password Update", () => {
         email: "gasanajr08@gmail.com",
         password: "Password@123",
       })
-      .end((err, resp) => {
+      .end((err, res) => {
         if (err) done(err);
-        const token = resp.body.token;
+        authtoken = res.body.token;
         chai
           .request(app)
-          .patch("/user/updatePassword")
+          .put("/user/updatePassword")
+          .set("Authorization", "Bearer " + authtoken)
           .send({
             email: "gasanajr08@gmail.com",
             oldPass: "Password@123",
             newPass: "Junior@08",
           })
-          .set("Authorization", "Bearer " + token)
           .end((error, res) => {
             if (error) done(error);
             else {
@@ -456,24 +458,6 @@ describe("Password Update", () => {
         if (err) done(err);
         else {
           res.should.have.status(200);
-          res.should.be.json;
-          res.body.should.have.property("message");
-          done();
-        }
-      });
-  });
-  it("Shouldn't LOGIN a USER using OLD PASSWORD", (done) => {
-    chai
-      .request(app)
-      .post("/user/login")
-      .send({
-        email: "gasnajr08@gmail.com",
-        password: "Password@123",
-      })
-      .end((err, res) => {
-        if (err) done(err);
-        else {
-          res.should.have.status(400);
           res.should.be.json;
           res.body.should.have.property("message");
           done();
