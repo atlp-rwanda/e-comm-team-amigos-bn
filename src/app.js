@@ -11,14 +11,17 @@ import specs from './docs';
 import routes from './routes';
 import db from './database/models';
 import tokenRoute from './routes/token.routes';
-
+import productRoute from "./routes/product.routes";
+import cartRoute from "./routes/cart.routes";
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-if (process.env.NODE_ENV === 'development') {
-  app.use(logger('dev'));
+app.set('trust proxy', 1); // trust first proxy
+
+if (process.env.NODE_ENV === "development") {
+  app.use(logger("dev"));
 }
 
 export const httpServer = http.createServer(app);
@@ -33,14 +36,23 @@ sequelize.authenticate();
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cookieSession({
-    name: 'google-auth-session',
-    keys: ['key1', ['key2']],
+    name: "google-auth-session",
+    keys: ["key1", "key2"],
+  })
+);
+app.use("/cart",
+  cookieSession({
+    name: "session",
+    keys: [process.env.SECRET_KEY],
+    maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
   })
 );
 app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.authenticate("session"));
 
-app.use('/token', tokenRoute);
+app.use("/cart", cartRoute);
+app.use("/token", tokenRoute);
+app.use("/", productRoute);
 
 app.use(cors());
 app.use('/', routes);

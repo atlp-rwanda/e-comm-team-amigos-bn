@@ -19,8 +19,7 @@ export async function successGoogleLogin(req, res) {
     if (!user) res.status(404).json({ user: userObj, message: 'sign up' });
     else {
       const newUser = user.dataValues;
-      delete newUser.password;
-      const token = jwt.sign(newUser, process.env.SECRET_KEY);
+      const token = jwt.sign({ userId: newUser.id, role: newUser.role, email: newUser.email }, process.env.SECRET_KEY);
       res.status(200).json({
         message: 'success',
         token,
