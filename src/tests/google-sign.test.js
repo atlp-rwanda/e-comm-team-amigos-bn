@@ -20,32 +20,33 @@ describe('TEST GOOGLE SIGN IN', () => {
         id: '100166329334870886300',
         displayName: 'Cyusa Kheven',
         name: { familyName: 'Kheven', givenName: 'Cyusa' },
-        emails: [{ value: 'cyusa.khevin100@gmail.com', verified: true }],
+        emails: [
+          { value: 'cyusa.khevin100@gmail.com', verified: true },
+        ],
         photos: [
           {
-            value:
-              'https://lh3.googleusercontent.com/a/AGNmyxaiktI_ev7JcGGlWKudRqGvogG33rU4EGInMP_DkA=s96-c',
+            value: 'https://lh3.googleusercontent.com/a/AGNmyxaiktI_ev7JcGGlWKudRqGvogG33rU4EGInMP_DkA=s96-c',
           },
         ],
         provider: 'google',
         _raw:
-          '{\n' +
-          '  "sub": "100166329334870886300",\n' +
-          '  "name": "Cyusa Kheven",\n' +
-          '  "given_name": "Cyusa",\n' +
-          '  "family_name": "Kheven",\n' +
-          '  "picture": "https://lh3.googleusercontent.com/a/AGNmyxaiktI_ev7JcGGlWKudRqGvogG33rU4EGInMP_DkA\\u003ds96-c",\n' +
-          '  "email": "cyusa.khevin100@gmail.com",\n' +
-          '  "email_verified": true,\n' +
-          '  "locale": "en-GB"\n' +
-          '}',
+                    '{\n'
+                    + '  "sub": "100166329334870886300",\n'
+                    + '  "name": "Cyusa Kheven",\n'
+                    + '  "given_name": "Cyusa",\n'
+                    + '  "family_name": "Kheven",\n'
+                    + '  "picture": "https://lh3.googleusercontent.com/a/AGNmyxaiktI_ev7JcGGlWKudRqGvogG33rU4EGInMP_DkA\\u003ds96-c",\n'
+                    + '  "email": "cyusa.khevin100@gmail.com",\n'
+                    + '  "email_verified": true,\n'
+                    + '  "locale": "en-GB"\n'
+                    + '}',
         _json: {
           sub: '100166329334870886300',
           name: 'Cyusa Kheven',
           given_name: 'Cyusa',
           family_name: 'Kheven',
           picture:
-            'https://lh3.googleusercontent.com/a/AGNmyxaiktI_ev7JcGGlWKudRqGvogG33rU4EGInMP_DkA=s96-c',
+                        'https://lh3.googleusercontent.com/a/AGNmyxaiktI_ev7JcGGlWKudRqGvogG33rU4EGInMP_DkA=s96-c',
           email: 'cyusa.khevin100@gmail.com',
           email_verified: true,
           locale: 'en-GB',
@@ -59,8 +60,7 @@ describe('TEST GOOGLE SIGN IN', () => {
     response = null;
   });
   it('Redirects to Login if user in null', (done) => {
-    chai
-      .request(app)
+    chai.request(app)
       .get('/token/auth/callback/success')
       .end((err, res) => {
         if (err) done(err);
@@ -102,8 +102,9 @@ describe('Google Auth', () => {
           message: 'success',
         })
       ).to.be.false;
-      expect(signSpy.calledWith(sinon.match.object, process.env.SECRET_KEY)).to
-        .be.true;
+      expect(
+        signSpy.calledWith(sinon.match.object, process.env.SECRET_KEY)
+      ).to.be.true;
       model.User.findOne.restore();
       jwt.sign.restore();
     });

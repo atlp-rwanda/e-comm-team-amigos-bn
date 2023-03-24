@@ -477,12 +477,12 @@ const createOTP = async (user) => {
       { otpcode: hashOtp, otpcodeexpiration: expDate },
       { where: { id: user.id } }
     );
-    return ({
+    return {
       status: 'OK',
       otp,
       email: user.email,
       otpcodeexpiration: expDate,
-    });
+    };
   } catch (err) {
     return {
       status: 'FAILED',

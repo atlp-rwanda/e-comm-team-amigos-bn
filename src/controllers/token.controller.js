@@ -6,9 +6,15 @@ export async function successGoogleLogin(req, res) {
 
   try {
     const userObj = req.user._json;
-    if (userObj.email_verified != true) return res.status(401).json({ message: 'Email not verified', error: true });
+    if (userObj.email_verified != true) {
+      return res
+        .status(401)
+        .json({ message: 'Email not verified', error: true });
+    }
 
-    const user = await model.User.findOne({ where: { email: userObj.email } });
+    const user = await model.User.findOne({
+      where: { email: userObj.email },
+    });
 
     if (!user) res.status(404).json({ user: userObj, message: 'sign up' });
     else {
@@ -18,7 +24,7 @@ export async function successGoogleLogin(req, res) {
       res.status(200).json({
         message: 'success',
         token,
-        role: user.role
+        role: user.role,
       });
     }
   } catch (err) {

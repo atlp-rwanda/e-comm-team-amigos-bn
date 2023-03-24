@@ -1,30 +1,33 @@
 module.exports = (sequelize, DataTypes) => {
-  const Chat = sequelize.define('Chat', {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+  const Chat = sequelize.define(
+    'Chat',
+    {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
+      content: DataTypes.STRING,
+      userId: {
+        type: DataTypes.UUID,
+        references: { model: 'Users', key: 'id' },
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+      },
     },
-    content: DataTypes.STRING,
-    userId: {
-      type: DataTypes.UUID,
-      references: { model: "Users", key: "id" },
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-    },
-    
-  },{});
+    {}
+  );
 
-  Chat.associate = function(models) {
+  Chat.associate = function (models) {
     Chat.belongsTo(models.User, {
       foreignKey: 'userId',
       as: 'user',
-      onDelete: 'CASCADE'
+      onDelete: 'CASCADE',
     });
   };
-  return Chat
-}
+  return Chat;
+};

@@ -8,13 +8,15 @@ export const verifyToken = async (req, res, next) => {
     const authHeader = await req.get('Authorization');
 
     if (!authHeader) {
-      return res.status(401).json({ error: "No token provided!" });
+      return res.status(401).json({ error: 'No token provided!' });
     }
 
     const token = authHeader.split(' ')[1];
 
     if (!token) {
-      return res.status(401).json({ error: 'Please provide token first.' });
+      return res
+        .status(401)
+        .json({ error: 'Please provide token first.' });
     }
 
     const decodeToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -22,7 +24,7 @@ export const verifyToken = async (req, res, next) => {
     if (decodeToken.errors || !decodeToken) {
       return res
         .status(401)
-        .json({ error: "Sorry, we fail to authenticate you." });
+        .json({ error: 'Sorry, we fail to authenticate you.' });
     }
 
     const { userId } = decodeToken;
@@ -34,10 +36,11 @@ export const verifyToken = async (req, res, next) => {
       raw: true,
     });
 
-    if (!user)
+    if (!user) {
       return res
         .status(400)
         .json({ status: 'error', message: 'User nolonger exists.' });
+    }
 
     req.user = user;
     return next();
@@ -48,14 +51,14 @@ export const verifyToken = async (req, res, next) => {
 };
 export const authorize = (roles) => async (req, res, next) => {
   try {
-    const user = req.user;
-  const role  = user.role;
-  if (!roles.includes(role)) {
-    return res.status(401).json({
-      error: 'Access denied! You are not allowed to perform this operation.'
-    });
-  }
-  next();
+    const { user } = req;
+    const { role } = user;
+    if (!roles.includes(role)) {
+      return res.status(401).json({
+        error: 'Access denied! You are not allowed to perform this operation.'
+      });
+    }
+    next();
   } catch (error) {
     return res.status(500).json({ error });
   }

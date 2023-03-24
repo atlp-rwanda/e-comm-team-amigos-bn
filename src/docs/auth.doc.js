@@ -189,7 +189,7 @@
  *                            newPass:
  *                                type: string
  *        security:
- *         - bearerAuth: []     
+ *         - bearerAuth: []
  *        responses:
  *                200:
  *                   description: Password updated Successfully

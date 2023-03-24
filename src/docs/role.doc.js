@@ -134,7 +134,7 @@
  *                     description: Not Found
  *                  500:
  *                     description: Internal server error
- * 
+ *
  * /role/update/{id}:
  *      put:
  *          tags: [Setting user roles]
@@ -147,7 +147,7 @@
  *              required: true
  *              schema:
  *                  type: string
- * 
+ *
  *          requestBody:
  *              description: Provide role information
  *              content:
@@ -171,7 +171,7 @@
  *                  500:
  *                     description: Internal server error
  *
- * 
+ *
  * /role/delete/{id}:
  *      delete:
  *          tags: [Setting user roles]
@@ -224,7 +224,7 @@
  *                  500:
  *                     description: Internal server error
  *
- * 
+ *
  * /permission/update/{id}:
  *      put:
  *          tags: [Setting user roles]
@@ -237,7 +237,7 @@
  *              required: true
  *              schema:
  *                  type: string
- * 
+ *
  *          requestBody:
  *              description: Provide permissions information
  *              content:
@@ -261,7 +261,7 @@
  *                  500:
  *                     description: Internal server error
  *
- * 
+ *
  * /permission/delete/{id}:
  *      delete:
  *          tags: [Setting user roles]
@@ -286,7 +286,7 @@
  *                  500:
  *                     description: Internal server error
  *
- * 
+ *
  * /role/permission/{id}:
  *      get:
  *          tags: [Setting user roles]

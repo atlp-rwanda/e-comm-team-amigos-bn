@@ -251,4 +251,66 @@
  *                   type: string
  *                   description: The reason for the bad request status
  *                   example: "Invalid token"
+ *
+ * /product/search:
+ *   get:
+ *     tags:
+ *       - Products
+ *     description: Return product(s) which matches with certain criteria
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - name: "name"
+ *          in: "query"
+ *          description: "Name of the product"
+ *          required: false
+ *          type: string
+ *        - name: minPrice
+ *          in: "query"
+ *          description: "Minimum price of product you want to search for"
+ *          required: false
+ *          type: integer
+ *        - name: maxPrice
+ *          in: "query"
+ *          description: "Maximum price of product you want to search for"
+ *          required: false
+ *          type: integer
+ *        - name: category
+ *          in: "query"
+ *          description: "Category of product you want to search for"
+ *          required: false
+ *          type: string
+ *     responses:
+ *        200:
+ *          description: "List of Product(s) matching with search query"
+ *          schema:
+ *            type: object
+ *            properties:
+ *              status:
+ *                type: string
+ *                example: "Ok"
+ *              message:
+ *                type: string
+ *                example: "List of products matching your search"
+ *              products:
+ *                type: array
+ *
+ *        404:
+ *          description: "No product found that match the search query"
+ *          schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                  type: string
+ *                  example: "Not Found"
+ *               message:
+ *                  type: string
+ *                  example: "There are no products matching your search"
+ *        500:
+ *          description: "Internal server error"
+ *          schema:
+ *            type: object
+ *            properties:
+ *              error:
+ *                type: string
  */
