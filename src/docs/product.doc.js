@@ -184,15 +184,12 @@
  *         description: Invalid product ID or availability status
  *       500:
  *         description: Internal server error
- *
  * /product/collection:
  *   get:
  *     summary: Get all items in seller collection
  *     description: Retrieve all products that belong to a seller
  *     tags:
  *       - Products
- *     security:
- *       - BearerToken: []
  *     responses:
  *       200:
  *         description: OK

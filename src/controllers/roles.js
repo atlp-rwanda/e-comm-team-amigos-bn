@@ -1,75 +1,79 @@
 import models from '../database/models';
 
 const users = async (req, res) => {
-  try {
-    const users = await models.User.findAll();
-    return res.status(200).json({
-      message: 'Users',
-      count: users.length,
-      response: users,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+    try {
+        const users = await models.User.findAll({
+            attributes: {
+                exclude: ['password', 'otpcode', 'otpcodeexpiration'],
+            },
+        })
+        return res.status(200).json({
+            message: 'Users',
+            count: users.length,
+            response: users,
+        })
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
+}
 
 const createRole = async (req, res) => {
-  const data = {
-    name: req.body.name,
-    description: req.body.description,
-  };
-  try {
-    const role = await models.Role.create(data);
-    return res.status(201).json({
-      message: 'Role',
-      response: role,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+    const data = {
+        name: req.body.name,
+        description: req.body.description,
+    }
+    try {
+        const role = await models.Role.create(data)
+        return res.status(201).json({
+            message: 'Role',
+            response: role,
+        })
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
+}
 
 const roles = async (req, res) => {
-  try {
-    const roles = await models.Role.findAll();
-    return res.status(200).json({
-      message: 'Roles',
-      count: roles.length,
-      response: roles,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+    try {
+        const roles = await models.Role.findAll()
+        return res.status(200).json({
+            message: 'Roles',
+            count: roles.length,
+            response: roles,
+        })
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
+}
 
 const createPermission = async (req, res) => {
-  const data = {
-    name: req.body.name,
-    description: req.body.description,
-  };
-  try {
-    const permission = await models.Permission.create(data);
-    return res.status(201).json({
-      message: 'Permission',
-      response: permission,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+    const data = {
+        name: req.body.name,
+        description: req.body.description,
+    }
+    try {
+        const permission = await models.Permission.create(data)
+        return res.status(201).json({
+            message: 'Permission',
+            response: permission,
+        })
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
+}
 
 const permissions = async (req, res) => {
-  try {
-    const permissions = await models.Permission.findAll();
-    return res.status(200).json({
-      message: 'Permissions',
-      count: permissions.length,
-      response: permissions,
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+    try {
+        const permissions = await models.Permission.findAll()
+        return res.status(200).json({
+            message: 'Permissions',
+            count: permissions.length,
+            response: permissions,
+        })
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
+}
 
 const setRole = async (req, res) => {
   const roleData = {
@@ -121,23 +125,23 @@ const deleteRole = async (req, res) => {
 };
 
 const userWithRole = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const user = await models.User.findOne({
-      where: { id },
-      include: [
-        {
-          model: models.UserRole,
-          as: 'UserRoles',
-          include: [
-            {
-              model: models.Role,
-              as: 'Role',
-            },
-          ],
-        },
-      ],
-    });
+    const { id } = req.params
+    try {
+        const user = await models.User.findOne({
+            where: { id },
+            include: [
+                {
+                    model: models.UserRole,
+                    as: 'UserRoles',
+                    include: [
+                        {
+                            model: models.Role,
+                            as: 'Role',
+                        },
+                    ],
+                },
+            ],
+        })
 
     return res
       .status(200)
