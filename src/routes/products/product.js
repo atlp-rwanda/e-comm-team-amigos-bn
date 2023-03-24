@@ -1,24 +1,27 @@
-import express from 'express';
+import validateProductInput from '../../validations/product.validator'
+import express from 'express'
 import {
-  addProduct,
-  getAllProduct,
-  getAvailableProducts,
-  updateProductAvailability,
-  getAllForSeller,
-  searchProduct,
-} from '../../controllers/product.controller';
-import validateProductInput from '../../validations/product.validator';
+    addProduct,
+    getAllProduct,
+    getProduct,
+    getAvailableProducts,
+    updateProductAvailability,
+    getAllForSeller,
+    searchProduct,
+} from '../../controllers/product.controller'
 
-const router = express.Router();
+import { verifyToken } from '../../middleware/verifyToken'
 
-router.post('/create', validateProductInput, addProduct);
-router.get('/getAllItems', getAllProduct);
-router.get('/collection', getAllForSeller);
-router.get('/availableProduct', getAvailableProducts);
-router.put('/availableProduct/:id', updateProductAvailability);
-router.get('/create', (req, res) => {
-  res.json({ message: 'You are on product page' });
-});
-router.get('/search', searchProduct);
+const router = express.Router()
 
-export default router;
+router.post('/create', validateProductInput, addProduct)
+router.get('/getAllItems', getAllProduct)
+router.get('/collection', getAllForSeller)
+
+router.get('/availableProduct', getAvailableProducts)
+
+router.put('/availableProduct/:id', updateProductAvailability)
+router.get('/:id', verifyToken, getProduct)
+router.get('/search', searchProduct)
+
+export default router
