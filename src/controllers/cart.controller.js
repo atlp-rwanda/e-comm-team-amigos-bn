@@ -3,14 +3,15 @@ let cart = [];
 let cartItems;
 export async function createCart(req, res) {
     try {
-         cart = req.session.cart || [];
-
+        const userId = req.user.userId;
+        const cart = req.session.cart || [];
         const productId = req.query.productId;
         const quantity = req.query.quantity;
 
         cart.push({ productId, quantity });
         req.session.cart = cart;
-        res.status(200).json({ message: "cart saved", cart: req.session.cart });
+        req.session.cartUserId = userId;
+        res.status(200).json({ message: "cart saved", cart: req.session.cart, cartUserId: req.session.cartUserId});
 
 
     } catch (err) {
@@ -21,6 +22,7 @@ export async function createCart(req, res) {
 
 export const viewCart = async(req,res) => {
     const cart = req.session.cart;
+
     try{
         let subTotal = 0;
         let items = 0;
@@ -48,9 +50,20 @@ export const viewCart = async(req,res) => {
     }
 }
 
-export const cleanUpCart = (req, res) => {
-  req.session.cart=[]
-  res.status(200).json({message: 'session exipired'})
+export const cleanUpCart = async(req, res) => {
+    try {
+        const userId = await req.session.cartUserId;
+        const cartUserId = req.user.userId;
+        if (userId !== cartUserId) { // check if the user is authorized to clear the cart
+            
+            return res.status(401).json({error: 'Unauthorized'}); // return error if user is not authorized
+        }
+        req.session.cart=[]
+       return res.status(200).json({message: 'cart cleared successfully'})
+    } catch (error) {
+        return res.status(500).json({error: error.message});
+    }
+  
   }
 
   
