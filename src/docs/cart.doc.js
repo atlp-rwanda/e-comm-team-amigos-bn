@@ -1,10 +1,8 @@
-
-
-
 /**
+* 
 * @openapi
 * /cart:
-*      get:
+*      post:
 *        summary: Add items/products to the shopping cart
 *        tags: [Cart]
 *        parameters:
@@ -29,6 +27,32 @@
 *                   description: Unauthorized
 *              '404':
 *                   description: Product not found
-*
+* /cart/view-cart:
+*      get:
+*          tags: [Cart]
+*          summary: This endpoint helps to view product from buyer's cart.
+*          responses:
+*                  201:
+*                     description: Cart retrieved successfully!
+*                  400:
+*                     description: Bad Request
+*                  404:
+*                     description: Not Found
+*                  500:
+*                     description: Internal server error
+* 
+* /cart/clean-up-cart:
+*      delete:
+*          tags: [Cart]
+*          summary: This endpoint helps to clean up buyer's cart.
+*          responses:
+*                  201:
+*                     description: Cart clean up successfully!
+*                  400:
+*                     description: Bad Request
+*                  404:
+*                     description: Not Found
+*                  500:
+*                     description: Internal server error
+* 
 */
-
