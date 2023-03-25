@@ -1,37 +1,37 @@
-import express from 'express'
-import logger from 'morgan'
-import dotenv from 'dotenv'
-import cors from 'cors'
-import swaggerUi from 'swagger-ui-express'
-import specs from './docs'
-import routes from './routes'
-import db from './database/models'
-import tokenRoute from './routes/token.routes'
-import passport from 'passport'
-import cookieSession from 'cookie-session'
-import cartRoute from './routes/cart.routes'
+import express from 'express';
+import logger from 'morgan';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
+import specs from './docs';
+import routes from './routes';
+import db from './database/models';
+import tokenRoute from './routes/token.routes';
+import passport from 'passport';
+import cookieSession from 'cookie-session';
+import cartRoute from './routes/cart.routes';
 
-import http from 'http'
-import { Server } from 'socket.io'
-dotenv.config()
+import http from 'http';
+import { Server } from 'socket.io';
+dotenv.config();
 
-const app = express()
-app.use(express.json())
+const app = express();
+app.use(express.json());
 
-if (process.env.NODE_ENV === 'development') {
-    app.use(logger('dev'))
-}
+// if (process.env.NODE_ENV === 'development') {
+//     app.use(logger('dev'))
+// }
 
-export const httpServer = http.createServer(app)
+export const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {
-    cors: {
-        origin: ['http://localhost:4000'],
-        methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    },
-})
-const { sequelize } = db
-sequelize.authenticate()
-app.use(express.urlencoded({ extended: true }))
+  cors: {
+    origin: ['http://localhost:4000'],
+    methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  },
+});
+const { sequelize } = db;
+sequelize.authenticate();
+app.use(express.urlencoded({ extended: true }));
 app.use(
   cookieSession({
     name: "google-auth-session",
@@ -50,18 +50,18 @@ app.use("/cart",
 app.use(passport.initialize());
 app.use(passport.authenticate("session"));
 
-app.use(passport.initialize())
-app.use(passport.authenticate('session'))
-app.use(passport.session())
+app.use(passport.initialize());
+app.use(passport.authenticate('session'));
+app.use(passport.session());
 
-app.use('/cart', cartRoute)
-app.use('/token', tokenRoute)
+app.use('/cart', cartRoute);
+app.use('/token', tokenRoute);
 
-app.use(cors())
-app.use('/', routes)
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs))
+app.use(cors());
+app.use('/', routes);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.get('/', (req, res) => {
-    res.send('Hello, There! this is Amigos ecommerce team project.')
-})
+  res.send('Hello, There! this is Amigos ecommerce team project.');
+});
 
-export default app
+export default app;
