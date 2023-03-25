@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import model from '../database/models';
+import generateToken from '../helpers/generateToken';
 
 export async function successGoogleLogin(req, res) {
   if (!req.user) return res.redirect('/token/auth/callback/failure');
@@ -18,8 +19,8 @@ export async function successGoogleLogin(req, res) {
 
     if (!user) res.status(404).json({ user: userObj, message: 'sign up' });
     else {
-      const newUser = user.dataValues;
-      const token = jwt.sign({ userId: newUser.id, role: newUser.role, email: newUser.email }, process.env.SECRET_KEY);
+      const newUser = user.toJSON();
+      const token = generateToken({ userId: newUser.id, role: newUser.role });
       res.status(200).json({
         message: 'success',
         token,

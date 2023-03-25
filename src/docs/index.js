@@ -1,4 +1,4 @@
-import swaggerJsDoc from 'swagger-jsdoc'
+import swaggerJsDoc from 'swagger-jsdoc';
 
 const options = {
     swaggerDefinition: {
@@ -52,10 +52,13 @@ const options = {
             {
                 url: 'http://localhost:4000',
             },
+            {
+                url: "https://e-comm-team-amigos-bn-project.onrender.com"
+            }
         ],
     },
     apis: ['src/**/*doc.js'],
-}
+};
 
-const specs = swaggerJsDoc(options)
-export default specs
+const specs = swaggerJsDoc(options);
+export default specs;

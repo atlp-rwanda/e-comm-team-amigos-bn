@@ -1,5 +1,5 @@
 /**
- * @openapi
+ * 
  * /token/google:
  *      get:
  *        summary: Request Google Sign In
