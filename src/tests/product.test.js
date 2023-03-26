@@ -8,6 +8,7 @@ import models from '../database/models';
 import app from '../app';
 import tokenGenerator from '../helpers/generateToken';
 chai.use(chaiHttp);
+
 let user;
 describe('get All Product', () => {
   before(async () => {
@@ -428,5 +429,69 @@ describe("Update product", function () {
     }).set("Authorization", `Bearer ${token}`);
 
     expect(res).to.have.status(401);
+  });
+});
+
+
+describe('Delete the Product', () => {
+  let user;
+  let product;
+  let token;
+  before(async () => {
+    await models.sequelize.sync({ force: true });
+    user = await models.User.create({
+      firstName: "test1",
+      lastName: "test2",
+      userName: "test3",
+      telephone: "123456789",
+      address: "kacyiru",
+      email: "test1@example.com",
+      password: await bcrypt.hash("Password@123", 10),
+      role: "vendor",
+    });
+    product = await models.Product.create({
+      id: uuidv4(),
+      userId: user.id,
+      name: "testProduct",
+      price: 40,
+      quantity: 1,
+      available: true,
+      category: "food",
+      bonus: 20,
+      images: ["image1", "image2"],
+      expiryDate: "2023-12-31T00:00:00.000Z",
+      ec: 30,
+    });
+    user = user.toJSON();
+    token = jwt.sign(
+      { userId: user.id, userRole: "vendor" },
+      process.env.SECRET_KEY
+    );
+  });
+  after(async () => {
+    await models.Product.destroy({ where: {} });
+    await models.User.destroy({ where: {} });
+  });
+  describe('DELETE /product/delete/:id', () => {
+    it('should delete a product with valid authentication and product ID', async () => {
+      const res = await chai.request(app)
+        .delete(`/product/delete/${product.id}`)
+        .set("Authorization", `Bearer ${token}`);
+      expect(res.statusCode).to.equal(200);
+      expect(res.body.message).to.have.equal('deleted successfully');
+    });
+    it('should return a 404 error with an invalid product ID', async () => {
+      const res = await chai.request(app)
+        .delete(`/product/delete/${uuidv4()}`)
+        .set("authorization", `Bearer ${token}`);
+      expect(res.statusCode).to.equal(404);
+      expect(res.body.message).to.have.equal('Product not found');
+
+    });
+    it('should return a 401 error when authentication token is missing', async () => {
+      const res = await chai.request(app)
+        .delete(`/product/delete/${product.id}`);
+      expect(res.statusCode).to.equal(401);
+    });
   });
 });

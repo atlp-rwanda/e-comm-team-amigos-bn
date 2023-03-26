@@ -9,6 +9,7 @@ import {
   getAllForSeller,
   searchProduct,
   updateProduct,
+  deleteProduct
 } from '../../controllers/product.controller';
 
 import { authorize, verifyToken } from '../../middleware/verifyToken';
@@ -26,6 +27,9 @@ router.get('/:id', verifyToken, getProduct);
 router.get('/search', searchProduct);
 
 router.patch('/:id', verifyToken, authorize(["vendor"]), validateProductUpdate, updateProduct);
+
+router.delete('/delete/:id', deleteProduct);
+
 
 
 export default router;

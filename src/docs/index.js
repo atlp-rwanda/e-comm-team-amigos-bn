@@ -47,13 +47,13 @@ const options = {
         ],
         servers: [
             {
-                url: 'http://localhost:3000',
+                url: 'https://e-comm-team-amigos-bn-project.onrender.com',
             },
             {
                 url: 'http://localhost:4000',
             },
             {
-                url: "https://e-comm-team-amigos-bn-project.onrender.com"
+                url: 'http://localhost:3000'
             }
         ],
     },

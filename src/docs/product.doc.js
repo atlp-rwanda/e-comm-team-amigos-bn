@@ -340,4 +340,23 @@
 *                description: Unauthorised! Please authenticate.
 *              '403':
 *                description: Request forbiden. You don't have enough privilege.
+* /product/delete/{id}:
+*   delete:
+*     tags:
+*       - Products
+*     summary: Delete the product from the collection
+*     parameters:
+*       - in: path
+*         name: id
+*         description: ID of the product to delete
+*         required: true
+*         schema:
+*           type: string
+*     responses:
+*       200:
+*         description: The product deleted successfully!
+*       400:
+*         description: Invalid product ID or availability status
+*       500:
+*         description: Internal server error
 */

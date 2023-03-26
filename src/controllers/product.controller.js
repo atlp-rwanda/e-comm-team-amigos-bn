@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import models from '../database/models';
 import jwt from 'jsonwebtoken';
 import { verifyUuid } from '../utils/verify_uuid';
+import {verifyToken} from '../middleware/verifyToken';
 
 export const getAllProduct = async (req, res) => {
     try {
@@ -265,6 +266,31 @@ export async function updateProduct(req, res) {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+};
+
+export const deleteProduct = async (req, res) => {
+    try {
+        await verifyToken(req, res, async () => {
+            const userId = req.user.id; 
+            const productId = req.params.id;
+
+            const product = await models.Product.findOne({
+                where: { id: productId, userId },
+            });
+
+            if (!product) {
+                return res.status(404).json({ message: "Product not found" });
+            }
+
+            await models.Product.destroy({ where: { id: productId } });
+
+            res.status(200).json({
+                message: 'deleted successfully',
+            });
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
 export default {
@@ -276,4 +302,5 @@ export default {
     getAvailableProducts,
     updateProductAvailability,
     getAllForSeller,
+    deleteProduct
 };
