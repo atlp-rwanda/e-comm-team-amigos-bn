@@ -7,7 +7,7 @@ module.exports = {
       [
         {
           id: uuidv4(),
-          userId: 'ff55c63d-636c-4fbd-8f9e-312fec767af3',
+          userId: '2847b990-7351-4253-bda1-53e48accfa1e',
           name: 'T-shirt',
           price: 5000,
           quantity: 4,

@@ -170,3 +170,81 @@ describe("View shopping cart test", function () {
         expect(res.status).to.equal(204);
     });
 });
+describe('updateCart function', () => {
+  let agent;
+  let user;
+  let productId;
+  let product;
+
+  before(async () => {
+    await models.sequelize.sync({ force: true });
+
+    user = await models.User.create({
+        firstName: "Kaneza",
+        lastName: "Erica",
+        userName: "Eriallan",
+        telephone: "0785188981",
+        address: "Kigali",
+        email: "eriman@example.com",
+        password: await bcrypt.hash("Password@123", 10),
+        role: "vendor",
+    });
+
+    product = await models.Product.create({
+            id: uuidv4(),
+            userId: user.id,
+            name: "Product 1",
+            price: 10,
+            quantity: 5,
+            available: true,
+            category: "food",
+            bonus: 20,
+            images: [
+                "https://picums.photos/200",
+                "https://picums.photos/201",
+                "https://picums.photos/202",
+                "https://picums.photos/203"
+            ],
+            expiryDate: "2023-12-31T00:00:00.000Z",
+            ec: 30
+        });
+        
+    productId = product.id;
+    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.SECRET_KEY);
+    agent=chai.request.agent(app)
+    await agent.post(`/cart/?productId=${productId}&quantity=${3}`).set("Authorization","Bearer "+token)
+
+  });
+
+
+
+  it('should update the quantity of an item in the cart', async () => {
+    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
+    const res = await agent
+    .put(`/cart/updateCart/${productId}`)
+    .send({ quantity: 3 }).set("Authorization","Bearer "+token)
+    expect(res.statusCode).to.equal(200);
+    expect(res.body.message).to.equal('Cart updated');
+
+  });
+
+  it('should return an error if the item is not found in the cart', async () => {
+    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
+    const res = await agent
+      .put(`/cart/updateCart/${productId + 1}`)
+      .send({ quantity: 3 }).set("Authorization","Bearer "+token)
+
+    expect(res.statusCode).to.equal(404);
+    expect(res.body.message).to.equal('Item not found in cart');
+  });
+
+  it('should return an error if the quantity is not a positive integer', async () => {
+    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
+    const res = await agent
+      .put(`/cart/updateCart/${productId}`)
+      .send({ quantity: -1 }).set("Authorization","Bearer "+token)
+
+    expect(res.statusCode).to.equal(400);
+    expect(res.body.message).to.equal('Invalid quantity');
+  });
+});
