@@ -50,8 +50,6 @@
 *     tags:
 *       - Products
 *     summary: Add a new product
-*     security:
-*       - BearerToken: []
 *     requestBody:
 *       required: true
 *       content:

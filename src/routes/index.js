@@ -13,7 +13,4 @@ router.use('/', role)
 router.use('/user', user)
 router.use('/product', product)
 
-router.use('/user', user)
-router.use('/product', product)
-
 export default router
