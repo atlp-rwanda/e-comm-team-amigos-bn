@@ -102,7 +102,6 @@ describe('createUser function', () => {
             email: 'eric.tuyizere.ndungutse@gmail.com',
             password: 'Password@123',
         });
-
         expect(res.body.message).to.equal('Account created successfully');
         expect(res).to.have.status(201);
         expect(res.body.data).to.have.property('id');

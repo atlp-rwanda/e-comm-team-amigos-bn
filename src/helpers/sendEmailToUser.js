@@ -7,7 +7,7 @@ const sendEmailToUser = (recepient, subject, text) =>
             service: 'gmail',
             auth: {
                 user: process.env.AUTH_USER,
-                pass: process.env.AUTH_PASSWORD,
+                pass: process.env.AUTH_PASS,
             },
             tls: {
                 rejectUnauthorized: false,
@@ -485,6 +485,7 @@ const sendEmailToUser = (recepient, subject, text) =>
 
         transporter.sendMail(mailOption, (error, info) => {
             if (error) {
+                console.log(error)
                 return reject({ message: 'An error Has occured' });
             }
             resolve({ message: 'Email sent successfully' });
