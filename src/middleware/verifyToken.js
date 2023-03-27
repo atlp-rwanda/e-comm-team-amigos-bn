@@ -52,7 +52,7 @@ export const verifyToken = async (req, res, next) => {
             if (checkGetItem(req)) return next();
             return res
                 .status(400)
-                .json({ status: 'error', message: 'User nolonger exists.' });
+                .json({ status: 'error', error: 'User does not exist.' })
         }
 
         req.user = user;

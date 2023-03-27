@@ -56,9 +56,9 @@ describe("Cart Tests", function () {
 
         const res = await chai.request(app).post(`/cart/?productId=${uuidv4()}&quantity=${1}`);
 
-        expect(res.status).to.equal(400);
+        expect(res.status).to.equal(401);
         expect(res.body).to.have.property("error");
-        expect(res.body.error).to.equal("No token in header..");
+        expect(res.body.error).to.equal("No token provided!");
     });
 
     it("Should return an error if a product does not exist", async function () {
@@ -76,9 +76,9 @@ describe("Cart Tests", function () {
 
         const res = await chai.request(app).post(`/cart/?productId=${uuidv4()}&quantity=${1}`).set("Authorization", `bearer ${token}`);
 
-        expect(res.status).to.equal(401);
+        expect(res.status).to.equal(400);
         expect(res.body).to.have.property("error");
-        expect(res.body.error).to.equal("User not authorized..");
+        expect(res.body.error).to.equal("User does not exist.");
     });
 
     it("Should return an error if quantity is less than 1", async function () {
@@ -248,3 +248,107 @@ describe('updateCart function', () => {
     expect(res.body.message).to.equal('Invalid quantity');
   });
 });
+
+describe('/DELETE clean-up-cart', () => {
+    let product;
+    let user;
+    let user1;
+    let user2;
+    let agent;
+    let token
+    let token1;
+    let token2;
+    // make sure to replace 'your_token_here' with an actual token
+    before(async function () {
+        await models.sequelize.sync({ force: true });
+
+        user = await models.User.create({
+            firstName: "Kaneza",
+            lastName: "Erica",
+            userName: "Eriallan",
+            telephone: "0785188981",
+            address: "Kigali",
+            email: "eriman@example.com",
+            password: await bcrypt.hash("Password@123", 10),
+            role: "vendor",
+        });
+        user1 = await models.User.create({
+            firstName: "Kaneza1",
+            lastName: "Erica1",
+            userName: "Eriallan1",
+            telephone: "0785188981",
+            address: "Kigali",
+            email: "eriman1@example.com",
+            password: await bcrypt.hash("Password@123", 10),
+            role: "normal",
+        });
+        user2 = await models.User.create({
+            firstName: "Kaneza1",
+            lastName: "Erica2",
+            userName: "Eriallan2",
+            telephone: "0785188981",
+            address: "Kigali",
+            email: "eriman2@example.com",
+            password: await bcrypt.hash("Password@123", 10),
+            role: "normal",
+        });
+
+        product =
+            await models.Product.create({
+                id: uuidv4(),
+                userId: user.id,
+                name: "Product 1",
+                price: 10,
+                quantity: 1,
+                available: true,
+                category: "food",
+                bonus: 20,
+                images: [
+                    "https://picums.photos/200",
+                    "https://picums.photos/201",
+                    "https://picums.photos/202",
+                    "https://picums.photos/203"
+                ],
+                expiryDate: "2023-12-31T00:00:00.000Z",
+                ec: 30
+            });
+
+            token = jwt.sign({ userId: user.id, role: user.role }, process.env.SECRET_KEY);
+            token1 = jwt.sign({ userId: user1.id, role: user1.role }, process.env.SECRET_KEY);
+            token2 = jwt.sign({ userId: user2.id, role: user2.role }, process.env.SECRET_KEY);
+            agent = chai.request.agent(app);
+            await agent.post(`/cart/?productId=${product.id}&quantity=${1}`).set("Authorization", `bearer ${token}`);
+    });
+  
+    it('should return status 401 if user is not authenticated', (done) => {
+      chai.request(app)
+        .delete('/cart/clean-up-cart')
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+  
+    it('should return status 401 if user is not authorized', (done) => {
+      chai.request(app)
+        .delete('/cart/clean-up-cart')
+        .set('Authorization', `Bearer ${token1}`)
+        .end((err, res) => {
+          res.should.have.status(401);
+          done();
+        });
+    });
+  
+    it('should clean up the cart if user is authenticated and authorized', async function () {
+      const res = await chai.request(app).delete('/cart/clean-up-cart').set('Authorization', `Bearer ${token}`);
+      expect(res.status).to.equal(200);
+      expect(res.body).to.have.property("message");
+
+      
+    });
+    it('should allow buyers who added products to cart to the one who can clear it', async function () {
+      const res = await chai.request(app).delete('/cart/clean-up-cart').set('Authorization', `Bearer ${token2}`);
+      expect(res.status).to.equal(401);
+      expect(res.body).to.have.property("error");
+    });
+  });

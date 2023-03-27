@@ -18,9 +18,9 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// if (process.env.NODE_ENV === 'development') {
-//     app.use(logger('dev'))
-// }
+ if (process.env.NODE_ENV === 'development') {
+    app.use(logger('dev'))
+ }
 
 export const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {

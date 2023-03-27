@@ -51,7 +51,7 @@
 *       - Products
 *     summary: Add a new product
 *     security:
-*       - BearerToken: []
+*       - bearerAuth: []
 *     requestBody:
 *       required: true
 *       content:
