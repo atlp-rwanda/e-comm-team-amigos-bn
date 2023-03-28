@@ -32,19 +32,19 @@ module.exports = (sequelize, DataTypes) => {
             unitPrice: DataTypes.INTEGER,
         },
         {}
-    )
+    );
 
     OrderProduct.associate = (models) => {
         OrderProduct.belongsTo(models.Order, {
             foreignKey: 'orderId',
             as: 'Order',
-        })
+        });
 
         OrderProduct.belongsTo(models.Product, {
             foreignKey: 'productId',
             as: 'Product',
-        })
-    }
+        });
+    };
 
-    return OrderProduct
-}
+    return OrderProduct;
+};
