@@ -1,40 +1,76 @@
-import chai, { expect } from "chai";
-import { v4 as uuidv4 } from "uuid";
-import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import chaiHttp from "chai-http";
-import app from "../app";
+import chai, { expect } from 'chai';
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import chaiHttp from 'chai-http';
+import app from '../app';
 import models from '../database/models';
+dotenv.config();
 
 chai.use(chaiHttp);
+const should = chai.should();
 
-
-describe('Order API', () => {
-
-describe('getOrderStatus', () => {
-let orderId;
-let token;
-let product;
-let user;
-let order;
+describe('Order Tests', () => {
+    let vendorUser, normalUser1, normalUser2, prod1, prod2;
     before(async () => {
         await models.sequelize.sync({ force: true });
-        user = await models.User.create({
-            firstName: 'Kaneza',
-            lastName: 'Erica',
-            userName: 'Eriallan',
+        await models.User.destroy({ where: {} });
+
+        vendorUser = await models.User.create({
+            id: uuidv4(),
+            firstName: 'vendor',
+            lastName: 'vendor',
+            userName: 'vendor',
             telephone: '0785188981',
             address: 'Kigali',
-            email: 'eriman@example.com',
+            email: 'vendor@example.com',
+            verified: true,
+            active: true,
+            role: 'vendor',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'normal',
-          });
-          product= await models.Product.create({
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        normalUser1 = await models.User.create({
             id: uuidv4(),
-            userId: user.id,
+            firstName: 'normal1',
+            lastName: 'normal1',
+            userName: 'normal1',
+            telephone: '0785188981',
+            address: 'Kigali',
+            email: 'normal1@example.com',
+            verified: true,
+            active: true,
+            role: 'normal',
+            password: await bcrypt.hash('Password@123', 10),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        normalUser2 = await models.User.create({
+            id: uuidv4(),
+            firstName: 'normal2',
+            lastName: 'normal2',
+            userName: 'normal2',
+            telephone: '0785188981',
+            address: 'Kigali',
+            email: 'normal2@example.com',
+            verified: true,
+            active: true,
+            role: 'normal',
+            password: await bcrypt.hash('Password@123', 10),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        // Products
+
+        prod1 = await models.Product.create({
+            id: uuidv4(),
+            userId: vendorUser.dataValues.id,
             name: 'Product 1',
-            price: 10,
+            price: 40,
             quantity: 1,
             available: true,
             category: 'food',
@@ -42,138 +78,196 @@ let order;
             images: ['image1', 'image2'],
             expiryDate: '2023-12-31T00:00:00.000Z',
             ec: 30,
-          });
-        // Start the server and get the JWT token for a buyer
-        token = jwt.sign({ userId: user.id, role: user.role }, process.env.SECRET_KEY);
-    
-        // Create a new order for the buyer
-    
-        const res= await chai
-        .request(app).post(`/orders`).send({
-           items: [{
-                product:product.id,
-                quanity:4,
-                price: 10
-            }],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
 
-        }).set("Authorization","Bearer "+token)
-          orderId= res.body.data.order.id
-    
-      });
-    after(async () => {
-        await models.Order.destroy({ where: {} })
-        await models.Product.destroy({ where: {} });
-        await models.User.destroy({ where: {} });
-      });
-    it('should return the order status for a valid order', async () => {
-        
-      const res = await chai
-        .request(app)
-        .get(`/orders/orderStatus/${orderId}`)
-        .set('Authorization', `Bearer ${token}`);
-      expect(res).to.have.status(200);
-      expect(res.body).to.have.property('status');
-      expect(res.body).to.have.property('expectedDeliveryDate');
-    });
-
-    it('should return an error for an invalid orderId', async () => {
-        const fakeId= "506f94a2-635b-4d86-8272-67d26a59c2";
-      const res = await chai
-        .request(app)
-        .get(`/orders/orderStatus/${fakeId}`)
-        .set('Authorization', `Bearer ${token}`);
-      expect(res).to.have.status(500);
-      expect(res.body).to.have.property('message');
-    });
-  });
-
-describe('updateOrderStatus', () => {
-let orderId;
-let token;
-let product;
-let user;
-let order;
-    before(async () => {
-        await models.sequelize.sync({ force: true });
-        user = await models.User.create({
-            firstName: 'Kaneza',
-            lastName: 'Erica',
-            userName: 'Eriallan',
-            telephone: '0785188981',
-            address: 'Kigali',
-            email: 'eriman@example.com',
-            password: await bcrypt.hash('Password@123', 10),
-            role: 'admin',
-          });
-          product= await models.Product.create({
+        prod2 = await models.Product.create({
             id: uuidv4(),
-            userId: user.id,
-            name: 'Product 1',
-            price: 10,
-            quantity: 5,
+            userId: vendorUser.dataValues.id,
+            name: 'Product 2',
+            price: 40,
+            quantity: 1,
             available: true,
             category: 'food',
             bonus: 20,
             images: ['image1', 'image2'],
             expiryDate: '2023-12-31T00:00:00.000Z',
             ec: 30,
-          });
-        // Start the server and get the JWT token for a buyer
-        token = jwt.sign({ userId: user.id, role: user.role }, process.env.SECRET_KEY);
+            updatedAt: new Date(),
+            updatedAt: new Date(),
+        });
+    });
 
-        // agent=chai.request.agent(app)
-        // await agent.post(`/orders/?productId=${product.id}&quantity=${3}&price=${10}`).set("Authorization","Bearer "+token)
-    
-        // Create a new order for the buyer
-        const res= await chai
-        .request(app).post(`/orders`).send({
-           items: [{
-                product:product.id,
-                quanity:4,
-                price: 10
-            }],
-
-        }).set("Authorization","Bearer "+token)
-          orderId= res.body.data.order.id
-    
-      });
-      after(async () => {
-        await models.Order.destroy({ where: {} })
-        await models.Product.destroy({ where: {} });
+    after(async () => {
         await models.User.destroy({ where: {} });
-      });
-
-    it('should update the order status for a valid order', async () => {
-      const res = await chai
-        .request(app)
-        .put(`/orders/orderStatus/${orderId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send({ status: 'shipped' });
-      expect(res).to.have.status(200);
-      expect(res.body).to.have.property('message');
-      expect(res.body).to.have.property('status', 'shipped');
-      expect(res.body).to.have.property('expectedDeliveryDate');
+        await models.Product.destroy({ where: {} });
     });
 
-    it('should return an error for an invalid order', async () => {
-        const fakeId= "206f94a2-635b-4d86-8272-67d26a59c2";
-      const res = await chai
-        .request(app)
-        .put(`/orders/orderStatus/${fakeId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send({ status: 'shipped' });
-      expect(res).to.have.status(500);
-      expect(res.body).to.have.property('message');
+    it('Chould Create an Order', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: normalUser1.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+
+        const res = await chai
+            .request(app)
+            .post('/orders')
+            .send({
+                items: [
+                    {
+                        product: prod1.dataValues.id,
+                        quantity: 4,
+                        unitProce: prod1.price,
+                    },
+                    {
+                        product: prod2.dataValues.id,
+                        quantity: 40,
+                        unitProce: prod2.price,
+                    },
+                ],
+            })
+            .set('Authorization', 'Bearer ' + token);
+
+        expect(res).to.have.status(201);
+        expect(res.body.status).to.equal('success');
+        res.body.should.have.property('data');
     });
 
-    it('should return an error for an invalid status', async () => {
-      const res = await chai
-        .request(app)
-        .put(`/orders/orderStatus/${orderId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send({ status: 'invalid' });
-      expect(res).to.have.status(400);
-      expect(res.body).to.have.property('message');
+    it('Should delete an order', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: normalUser1.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+
+        const order = await chai
+            .request(app)
+            .post('/orders')
+            .send({
+                items: [
+                    {
+                        product: prod1.dataValues.id,
+                        quantity: 4,
+                        unitProce: prod1.price,
+                    },
+                    {
+                        product: prod2.dataValues.id,
+                        quantity: 40,
+                        unitProce: prod2.price,
+                    },
+                ],
+            })
+            .set('Authorization', 'Bearer ' + token);
+
+        const { id } = order.body.data.order;
+
+        const res = await chai
+            .request(app)
+            .delete(`/orders/${id}`)
+            .set('Authorization', 'Bearer ' + token);
+
+        expect(res).to.have.status(200);
+        expect(res.body.status).to.equal('success');
+        expect(res.body.message).to.equal('Order deleted successfully.');
     });
-  });
+
+    it('Should not delete an order if user did not create it', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: normalUser1.email,
+            password: 'Password@123',
+        });
+
+        const signin2 = await chai.request(app).post('/user/login').send({
+            email: normalUser2.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+        let token2 = signin2.body.token;
+
+        const order = await chai
+            .request(app)
+            .post('/orders')
+            .send({
+                items: [
+                    {
+                        product: prod1.dataValues.id,
+                        quantity: 4,
+                        unitProce: prod1.price,
+                    },
+                    {
+                        product: prod2.dataValues.id,
+                        quantity: 40,
+                        unitProce: prod2.price,
+                    },
+                ],
+            })
+            .set('Authorization', 'Bearer ' + token);
+
+        const { id } = order.body.data.order;
+
+        const res = await chai
+            .request(app)
+            .delete(`/orders/${id}`)
+            .set('Authorization', 'Bearer ' + token2);
+
+        expect(res).to.have.status(403);
+        expect(res.body.status).to.equal('fail');
+        expect(res.body.message).to.equal(
+            'Access denied! You are not allowed to delete this order'
+        );
+    });
+
+    it('Should return all orders', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: normalUser1.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+
+        const res = await chai
+            .request(app)
+            .get(`/orders`)
+            .set('Authorization', 'Bearer ' + token);
+
+        expect(res).to.have.status(200);
+        expect(res.body.status).to.equal('success');
+        res.body.should.have.property('count');
+        res.body.should.have.property('data');
+    });
+
+    it('Should update order', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: normalUser1.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+
+        const orders = await chai
+            .request(app)
+            .get('/orders')
+            .set('Authorization', 'Bearer ' + token);
+
+        const order = await chai
+            .request(app)
+            .put(`/orders/${orders.body.data.orders[0].id}`)
+            .send({
+                items: [
+                    {
+                        product: prod1.dataValues.id,
+                        quantity: 4,
+                        unitProce: prod1.price,
+                    },
+                ],
+            })
+            .set('Authorization', 'Bearer ' + token);
+
+        expect(order.body.data.order.products.length).to.equal(1);
+    });
 });

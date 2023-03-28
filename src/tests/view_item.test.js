@@ -1,20 +1,20 @@
-import chai, { expect } from 'chai'
-import chaiHttp from 'chai-http'
-import bcrypt from 'bcryptjs'
-import { v4 as uuidv4 } from 'uuid'
-import dotenv from 'dotenv'
-import jwt from 'jsonwebtoken'
-import models from '../database/models'
-import app from '../app'
-import tokenGenerator from '../helpers/generateToken'
+import chai, { expect } from 'chai';
+import chaiHttp from 'chai-http';
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import models from '../database/models';
+import app from '../app';
+import tokenGenerator from '../helpers/generateToken';
 
-chai.use(chaiHttp)
-let userOne, userTwo, userThree, userFour
-let p1, p2, p3, p4
+chai.use(chaiHttp);
+let userOne, userTwo, userThree, userFour;
+let p1, p2, p3, p4;
 
 describe('View a Specific Product', () => {
     before(async () => {
-        await models.sequelize.sync({ force: true })
+        await models.sequelize.sync({ force: true });
         // Users
         userOne = await models.User.create({
             id: uuidv4(),
@@ -30,7 +30,7 @@ describe('View a Specific Product', () => {
             verified: true,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
+        });
 
         userTwo = await models.User.create({
             id: uuidv4(),
@@ -47,7 +47,7 @@ describe('View a Specific Product', () => {
             verified: true,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
+        });
 
         userThree = await models.User.create({
             id: uuidv4(),
@@ -64,7 +64,7 @@ describe('View a Specific Product', () => {
             verified: true,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
+        });
 
         userFour = await models.User.create({
             id: uuidv4(),
@@ -80,7 +80,7 @@ describe('View a Specific Product', () => {
             verified: true,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
+        });
 
         // Products
         p1 = await models.Product.create({
@@ -97,7 +97,7 @@ describe('View a Specific Product', () => {
             ec: 30,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
+        });
 
         p2 = await models.Product.create({
             id: uuidv4(),
@@ -113,7 +113,7 @@ describe('View a Specific Product', () => {
             ec: 30,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
+        });
 
         p3 = await models.Product.create({
             id: uuidv4(),
@@ -129,7 +129,7 @@ describe('View a Specific Product', () => {
             ec: 30,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
+        });
 
         p4 = await models.Product.create({
             id: uuidv4(),
@@ -145,95 +145,95 @@ describe('View a Specific Product', () => {
             ec: 30,
             createdAt: new Date(),
             updatedAt: new Date(),
-        })
-    })
+        });
+    });
 
     after(async () => {
-        await models.User.destroy({ where: {} })
-        await models.Product.destroy({ where: {} })
-    })
+        await models.User.destroy({ where: {} });
+        await models.Product.destroy({ where: {} });
+    });
 
     it('Should get item without a user logged in', async () => {
-        const res = await chai.request(app).get(`/product/${p1.dataValues.id}`)
+        const res = await chai.request(app).get(`/product/${p1.dataValues.id}`);
 
-        expect(res).to.have.status(200)
-        expect(res.body.status).to.equal('success')
-        expect(res.body.item.id).to.equal(p1.dataValues.id)
-    })
+        expect(res).to.have.status(200);
+        expect(res.body.status).to.equal('success');
+        expect(res.body.item.id).to.equal(p1.dataValues.id);
+    });
 
     it('Should not get item if it is not available for sale', async () => {
-        const res = await chai.request(app).get(`/product/${p2.dataValues.id}`)
+        const res = await chai.request(app).get(`/product/${p2.dataValues.id}`);
 
-        expect(res).to.have.status(404)
-        expect(res.body.status).to.equal('fail')
-        expect(res.body.message).to.equal('Product not available for sale.')
-    })
+        expect(res).to.have.status(404);
+        expect(res.body.status).to.equal('fail');
+        expect(res.body.message).to.equal('Product not available for sale.');
+    });
 
     it('Should get error if id is invalid', async () => {
-        const res = await chai.request(app).get(`/product/sdfj34re`)
+        const res = await chai.request(app).get(`/product/sdfj34re`);
 
-        expect(res).to.have.status(400)
-        expect(res.body.status).to.equal('fail')
-        expect(res.body.message).to.equal(`Invalid id (sdfj34re)`)
-    })
+        expect(res).to.have.status(400);
+        expect(res.body.status).to.equal('fail');
+        expect(res.body.message).to.equal(`Invalid id (sdfj34re)`);
+    });
 
     it('Should get item if user is normal', async () => {
-        let user, token
+        let user, token;
 
         const res = await chai.request(app).post('/user/login').send({
             email: 'normal@example.com',
             password: 'Normal@213',
-        })
-        user = res.body
-        token = user.token
+        });
+        user = res.body;
+        token = user.token;
 
         const res2 = await chai
             .request(app)
             .get(`/product/${p1.dataValues.id}`)
-            .set('Authorization', 'Bearer ' + token)
+            .set('Authorization', 'Bearer ' + token);
 
-        expect(res2).to.have.status(200)
-        expect(res2.body.status).to.equal('success')
-        expect(res2.body.item.id).to.equal(p1.dataValues.id)
-    })
+        expect(res2).to.have.status(200);
+        expect(res2.body.status).to.equal('success');
+        expect(res2.body.item.id).to.equal(p1.dataValues.id);
+    });
 
     it('Should not get item if user is vendor and not the owner', async () => {
-        let otp
+        let otp;
 
         const res = await chai.request(app).post('/user/login').send({
             email: 'wilbrord@gmail.com',
             password: 'Wilbrord@213',
-        })
+        });
 
-        otp = res.body.otp.otp
+        otp = res.body.otp.otp;
 
         // Verify OTP
         const otpCheckRes = await chai.request(app).post('/user/otp').send({
             email: 'wilbrord@gmail.com',
             otp,
-        })
+        });
 
-        const { token } = otpCheckRes.body
+        const { token } = otpCheckRes.body;
 
         const itemRes = await chai
             .request(app)
             .get(`/product/${p3.dataValues.id}`)
-            .set('Authorization', 'Bearer ' + token)
+            .set('Authorization', 'Bearer ' + token);
 
         expect(itemRes.body.message).to.equal(
             'You are not allowed to perform this operation'
-        )
-        expect(itemRes).to.have.status(403)
-        expect(itemRes.body.status).to.equal('fail')
-    })
+        );
+        expect(itemRes).to.have.status(403);
+        expect(itemRes.body.status).to.equal('fail');
+    });
 
     it('Should not get item if item not found', async () => {
         const res2 = await chai
             .request(app)
-            .get(`/product/1b4a230b-47a7-4c94-b176-a75e28111111`)
+            .get(`/product/1b4a230b-47a7-4c94-b176-a75e28111111`);
 
-        expect(res2).to.have.status(404)
-        expect(res2.body.status).to.equal('fail')
-        expect(res2.body.message).to.equal('Product not found.')
-    })
-})
+        expect(res2).to.have.status(404);
+        expect(res2.body.status).to.equal('fail');
+        expect(res2.body.message).to.equal('Product not found.');
+    });
+});
