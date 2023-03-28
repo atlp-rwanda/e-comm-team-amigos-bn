@@ -10,12 +10,16 @@ import tokenRoute from './routes/token.routes';
 import passport from 'passport';
 import cookieSession from 'cookie-session';
 import cartRoute from './routes/cart.routes';
+const socketIo = require('socket.io');
 
 import http from 'http';
 import { Server } from 'socket.io';
 dotenv.config();
 
+const server = http.createServer(app);
+const ioServer = socketIo(server);
 const app = express();
+
 app.use(express.json());
 
  if (process.env.NODE_ENV === 'development') {
@@ -46,6 +50,8 @@ app.use("/cart",
     maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
   })
 );
+
+
 
 app.use(passport.initialize());
 app.use(passport.authenticate("session"));

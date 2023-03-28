@@ -182,7 +182,7 @@ describe('updateCart function', () => {
     user = await models.User.create({
         firstName: "Kaneza",
         lastName: "Erica",
-        userName: "Eriallan",
+        userName: "Eriallan",   
         telephone: "0785188981",
         address: "Kigali",
         email: "eriman@example.com",
