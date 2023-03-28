@@ -40,7 +40,7 @@ describe('View a Specific Product', () => {
             telephone: '0780908888',
             billingAddress: 'Kigali',
             address: 'Kigali',
-            email: 'bwilbrord@gmail.com',
+            email: 'wilbrord@gmail.com',
             password: await bcrypt.hash('Wilbrord@213', 10),
             role: 'vendor',
             status: 'active',
@@ -201,7 +201,7 @@ describe('View a Specific Product', () => {
         let otp
 
         const res = await chai.request(app).post('/user/login').send({
-            email: 'bwilbrord@gmail.com',
+            email: 'wilbrord@gmail.com',
             password: 'Wilbrord@213',
         })
 
@@ -209,7 +209,7 @@ describe('View a Specific Product', () => {
 
         // Verify OTP
         const otpCheckRes = await chai.request(app).post('/user/otp').send({
-            email: 'bwilbrord@gmail.com',
+            email: 'wilbrord@gmail.com',
             otp,
         })
 

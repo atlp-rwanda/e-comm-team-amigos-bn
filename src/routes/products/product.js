@@ -18,9 +18,9 @@ import { authorize, verifyToken } from '../../middleware/verifyToken'
 
 const router = express.Router()
 
-router.post('/create', validateProductInput, addProduct)
-router.get('/getAllItems', getAllProduct)
-router.get('/collection', getAllForSeller)
+router.post('/create', validateProductInput, addProduct);
+router.get('/', getAllProduct);
+router.get('/collection', getAllForSeller);
 
 router.get('/availableProduct', getAvailableProducts)
 
