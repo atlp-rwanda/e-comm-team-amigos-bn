@@ -14,5 +14,12 @@ router.put(
   authentication.resetPassword
 );
 router.post('/otp', authentication.checkotp);
+
 router.put('/updatePassword', verifyToken, authorize(['admin', 'vendor', 'normal']), authentication.updatePassword);
+
+router.put('/disable', verifyToken, authorize(['admin']), authentication.disableUser, authentication.logout);
+
+router.put('/enable', verifyToken, authorize(['admin']), authentication.enableUser);
+
+
 export default router;

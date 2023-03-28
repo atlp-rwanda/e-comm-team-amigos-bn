@@ -5,8 +5,10 @@ import dotenv from 'dotenv';
 import models from '../database/models';
 import tokenGenerator from '../helpers/generateToken';
 import { sendMail } from '../helpers/sendMail';
+import { sendEmailToUser } from '../helpers/sendEmailToUser';
 import createOTP from '../helpers/createotp';
 import { sendResetMail } from '../helpers/sendResetPasswordEmail';
+import session from 'express-session';
 
 dotenv.config();
 const createUser = async (req, res) => {
@@ -69,6 +71,9 @@ export const loginUser = async (req, res) => {
     }
     if (user.verified === false) {
         return res.json({ message: 'You have to first verify your account' });
+    }
+    if (user.status === 'inactive') {
+        return res.status(400).json({ message: 'Your Account has been Disabled! Please contact Service manager' });
     }
     bcrypt.compare(req.body.password, user.password, async (err, data) => {
         if (err) throw err;
@@ -196,6 +201,88 @@ const resetPassword = async (req, res) => {
     return res.status(200).json({ message: 'password updated successfully' });
 };
 
+const disableUser = async (req, res) => {
+    const userEmail = req.body.email;
+    const reasons = req.body.reason;
+
+    try {
+      const user = await models.User.findOne({ where: { email: userEmail } });
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (user.isDisabled) {
+        return res.json({ message: 'User already disabled' });
+      }
+      user.isDisabled = true;
+      await user.save(); 
+      
+      const updateUser = await models.User.update(
+           {
+             status: 'inactive',
+           },
+           {
+            where: { email: userEmail },
+           }
+        );
+        if (updateUser) {
+           sendEmailToUser(
+              userEmail,
+              'Account disabled',
+              `Dear User,<br>\n\nYour account has been blocked bacause of ${reasons}.\n\nPlease contact us if you have any questions.\n\n<br>Best regards,\nThe Admin Team`,
+            );
+            return res.json({ message: 'User account disabled' });
+        }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+};
+const enableUser = async (req, res) => {
+const userEmail = req.body.email;
+    try {
+        const user = await models.User.findOne({ where: { email: userEmail } });
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (user.isDisabled = false) {
+        return res.json({ message: 'User already enabled' });
+      }
+      user.isDisabled = false;
+      await user.save(); 
+      const updateUser = await models.User.update(
+          {
+            status: 'active',
+          },
+          {
+            where: { email: userEmail },
+          }
+        );
+        if (updateUser) {
+            sendEmailToUser(
+               userEmail,
+               'Account Activation',
+               `Dear User,<br>\n\nYour account has been activated successfully!.\n\nPlease contact us if you have any questions.\n\n<br>Best regards,\nThe Admin Team`,
+             );
+             return res.json({ message: 'User account enabled' });
+        }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const logout = (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('User logged out');
+      }
+    });
+};
+
 export default {
     createUser,
     loginUser,
@@ -204,4 +291,7 @@ export default {
     resetPassword,
     forgotPassword,
     updatePassword,
+    disableUser,
+    enableUser,
+    logout,
 };
