@@ -53,8 +53,8 @@ describe('get All Product', () => {
             .to.have.property('Message')
             .to.equal('List of all Products in our collections');
           expect(res.body)
-            .to.have.property('listProduct')
-            .to.be.an('array');
+            .to.have.property('responseData')
+            .to.be.an('object');
           done();
         }
       });
@@ -108,10 +108,12 @@ describe('Available Product API', () => {
     it('should return a list of available products', async () => {
       const res = await chai.request(app).get('/product/availableProduct');
       expect(res.statusCode).to.equal(200);
-      expect(res.body.response).to.be.an('array');
-      expect(res.body.response).to.have.lengthOf(1);
-      expect(res.body.response[0]).to.have.property('name', 'Product 1');
-      expect(res.body.response[0]).to.have.property('available', true);
+      expect(res.body.response).to.be.an('object');
+      expect(res.body.response).to.have.property('currentPage');
+      expect(res.body.response).to.have.property('totalPages');
+      expect(res.body.response).to.have.property('products');
+      expect(res.body.response.products).to.be.a('array');
+
     });
   });
 

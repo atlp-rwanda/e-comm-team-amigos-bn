@@ -1,16 +1,39 @@
 import models from '../database/models';
 
+const PAGE_SIZE = 5; // Number of items per page
+
 const users = async (req, res) => {
+  const { page } = req.query; 
+
+  const currentPage = parseInt(page) || 1;
+
+  const offset = (currentPage - 1) * PAGE_SIZE;
+  const limit = PAGE_SIZE;
     try {
         const users = await models.User.findAll({
             attributes: {
                 exclude: ['password', 'otpcode', 'otpcodeexpiration'],
             },
-        })
+            offset: offset,
+            limit: limit
+        });
+        // Calculate total number of Users and pages
+        const totalCount = await models.User.count();
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+        // Generate pagination links for previous and next pages
+        const prevPage = currentPage > 1 ? currentPage - 1 : null;
+        const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+        const responseData = {
+          currentPage: currentPage,
+          totalPages: totalPages,
+          previousPage: prevPage,
+          nextPage: nextPage,
+          users: users 
+          };
         return res.status(200).json({
             message: 'Users',
             count: users.length,
-            response: users,
+            response: responseData,
         })
     } catch (error) {
         return res.status(500).json({ error: error.message })
@@ -34,12 +57,34 @@ const createRole = async (req, res) => {
 }
 
 const roles = async (req, res) => {
+  const { page } = req.query; 
+
+  const currentPage = parseInt(page) || 1;
+
+  const offset = (currentPage - 1) * PAGE_SIZE;
+  const limit = PAGE_SIZE;
     try {
-        const roles = await models.Role.findAll()
+        const roles = await models.Role.findAll({
+          offset: offset,
+          limit: limit
+        })
+        // Calculate total number of Roles and pages
+        const totalCount = await models.Role.count();
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+        // Generate pagination links for previous and next pages
+        const prevPage = currentPage > 1 ? currentPage - 1 : null;
+        const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+        const responseData = {
+          currentPage: currentPage,
+          totalPages: totalPages,
+          previousPage: prevPage,
+          nextPage: nextPage,
+          roles: roles
+          };
         return res.status(200).json({
             message: 'Roles',
             count: roles.length,
-            response: roles,
+            response: responseData,
         })
     } catch (error) {
         return res.status(500).json({ error: error.message })
@@ -63,12 +108,34 @@ const createPermission = async (req, res) => {
 }
 
 const permissions = async (req, res) => {
+  const { page } = req.query; 
+
+  const currentPage = parseInt(page) || 1;
+
+  const offset = (currentPage - 1) * PAGE_SIZE;
+  const limit = PAGE_SIZE;
     try {
-        const permissions = await models.Permission.findAll()
+        const permissions = await models.Permission.findAll({
+          offset: offset,
+          limit: limit
+        })
+        // Calculate total number of Permissions and pages
+        const totalCount = await models.Permission.count();
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+        // Generate pagination links for previous and next pages
+        const prevPage = currentPage > 1 ? currentPage - 1 : null;
+        const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+        const responseData = {
+          currentPage: currentPage,
+          totalPages: totalPages,
+          previousPage: prevPage,
+          nextPage: nextPage,
+          permissions: permissions 
+          };
         return res.status(200).json({
             message: 'Permissions',
             count: permissions.length,
-            response: permissions,
+            response: responseData,
         })
     } catch (error) {
         return res.status(500).json({ error: error.message })

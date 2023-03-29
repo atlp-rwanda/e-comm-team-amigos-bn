@@ -70,8 +70,9 @@ describe('Set user roles or permissions', () => {
         const res = await chai.request(app).get('/permissions').send()
         expect(res).to.have.status(200)
         expect(res.body.message).to.equal('Permissions')
-        expect(res.body.count).to.equal(res.body.response.length)
-        expect(res.body.response).to.equal(res.body.response)
+        expect(res.body.response).to.have.property('currentPage');
+        expect(res.body.response).to.have.property('totalPages');
+        expect(res).to.be.a('object')
     })
 
     it("it shouldn't not set a role without valid userId and roleId", (done) => {

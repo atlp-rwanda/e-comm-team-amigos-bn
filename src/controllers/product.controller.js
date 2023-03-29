@@ -5,10 +5,21 @@ import jwt from 'jsonwebtoken';
 import { verifyUuid } from '../utils/verify_uuid';
 import {verifyToken} from '../middleware/verifyToken';
 
+const PAGE_SIZE = 5; // Number of products per page
 export const getAllProduct = async (req, res) => {
+    const { page } = req.query; // Current page number
+
+    // Convert page parameter to integer or use 1 as default
+    const currentPage = parseInt(page) || 1;
+
+    // Calculate offset and limit for the current page
+    const offset = (currentPage - 1) * PAGE_SIZE;
+    const limit = PAGE_SIZE;
     try {
         const listProduct = await models.Product.findAll({
             include: models.User,
+            limit: limit,
+            offset: offset
         });
         if (listProduct.length <= 0) {
             res.status(404).json({
@@ -16,10 +27,24 @@ export const getAllProduct = async (req, res) => {
                 error: 'There is no product in Stock',
             });
         } else {
+            // Calculate total number of products and pages
+            const totalCount = await models.Product.count();
+            const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+                // Generate pagination links for previous and next pages
+            const prevPage = currentPage > 1 ? currentPage - 1 : null;
+            const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+
+            const responseData = {
+                currentPage: currentPage,
+                totalPages: totalPages,
+                previousPage: prevPage,
+                nextPage: nextPage,
+                listProduct: listProduct 
+              };
             res.json({
                 Status: 'OK',
                 Message: 'List of all Products in our collections',
-                listProduct,
+                responseData,
             }).status(200);
         }
     } catch (error) {
@@ -30,11 +55,34 @@ export const getAllProduct = async (req, res) => {
 };
 
 export const getAvailableProducts = async (req, res) => {
+    const { page } = req.query; // Current page number
+
+    // Convert page parameter to integer or use 1 as default
+    const currentPage = parseInt(page) || 1;
+
+    // Calculate offset and limit for the current page
+    const offset = (currentPage - 1) * PAGE_SIZE;
+    const limit = PAGE_SIZE;
     try {
         const products = await models.Product.findAll({
             where: { available: true },
+            offset: offset,
+            limit: limit
         });
-        res.status(200).json({ response: products });
+          // Calculate total number of products and pages
+        const totalCount = await models.Product.count();
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+         // Generate pagination links for previous and next pages
+        const prevPage = currentPage > 1 ? currentPage - 1 : null;
+        const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+        const responseData = {
+            currentPage: currentPage,
+            totalPages: totalPages,
+            previousPage: prevPage,
+            nextPage: nextPage,
+            products: products
+          };
+        res.status(200).json({ response: responseData });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -120,6 +168,14 @@ export const addProduct = async (req, res) => {
     }
 };
 export const getAllForSeller = async (req, res) => {
+    const { page } = req.query; // Current page number
+
+    // Convert page parameter to integer or use 1 as default
+    const currentPage = parseInt(page) || 1;
+
+    // Calculate offset and limit for the current page
+    const offset = (currentPage - 1) * PAGE_SIZE;
+    const limit = PAGE_SIZE;
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
@@ -134,11 +190,26 @@ export const getAllForSeller = async (req, res) => {
             where: {
                 userId: sellerId,
             },
+            offset: offset,
+            limit: limit
         });
         if (product.length > 0) {
+        // Calculate total number of products and pages
+        const totalCount = await models.Product.count();
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+         // Generate pagination links for previous and next pages
+        const prevPage = currentPage > 1 ? currentPage - 1 : null;
+        const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+            const responseData = {
+                currentPage: currentPage,
+                totalPages: totalPages,
+                previousPage: prevPage,
+                nextPage: nextPage,
+                product: product 
+              };
             res.status(200).json({
                 status: 'OK',
-                items: product,
+                items: responseData,
             });
         }
         res.status(404).json({
@@ -153,6 +224,14 @@ export const getAllForSeller = async (req, res) => {
     }
 };
 export const searchProduct = async (req, res) => {
+    const { page } = req.query; // Current page number
+
+    // Convert page parameter to integer or use 1 as default
+    const currentPage = parseInt(page) || 1;
+
+    // Calculate offset and limit for the current page
+    const offset = (currentPage - 1) * PAGE_SIZE;
+    const limit = PAGE_SIZE;
     try {
         const { name, minPrice, maxPrice, category } = req.query;
         const where = {};
@@ -173,6 +252,8 @@ export const searchProduct = async (req, res) => {
         const products = await models.Product.findAll({
             where,
             attributes: { exclude: ['userId', 'createdAt', 'updatedAt'] },
+            offset: offset,
+            limit: limit
         });
         if (products.length <= 0) {
             return res.status(404).json({
@@ -180,10 +261,23 @@ export const searchProduct = async (req, res) => {
                 error: 'There are no products matching your search',
             });
         }
+        // Calculate total number of products and pages
+        const totalCount = await models.Product.count();
+        const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+         // Generate pagination links for previous and next pages
+        const prevPage = currentPage > 1 ? currentPage - 1 : null;
+        const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+        const responseData = {
+            currentPage: currentPage,
+            totalPages: totalPages,
+            previousPage: prevPage,
+            nextPage: nextPage,
+            products: products
+          };
         return res.status(200).json({
             status: 'Ok',
             message: 'List Of Products matching your search',
-            products,
+            responseData,
         });
     } catch (error) {
         res.status(500).json({ error });
