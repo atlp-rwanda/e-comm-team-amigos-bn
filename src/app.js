@@ -1,6 +1,7 @@
 import express from 'express';
 import logger from 'morgan';
 import dotenv from 'dotenv';
+import cron from 'node-cron';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import specs from './docs';
@@ -14,6 +15,7 @@ const socketIo = require('socket.io');
 
 import http from 'http';
 import { Server } from 'socket.io';
+import { checkExpiredProducts } from './controllers/product.controller';
 dotenv.config();
 
 const server = http.createServer(app);
@@ -22,9 +24,13 @@ const app = express();
 
 app.use(express.json());
 
-if (process.env.NODE_ENV === 'development') {
-    app.use(logger('dev'));
-}
+cron.schedule('0 0 * * *', () => {
+  checkExpiredProducts(); // Call your function to check for expired products
+});
+
+ if (process.env.NODE_ENV === 'development') {
+    app.use(logger('dev'))
+ }
 
 export const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {

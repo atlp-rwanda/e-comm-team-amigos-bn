@@ -2,9 +2,49 @@ import Joi from 'joi';
 import { Op } from 'sequelize';
 import models from '../database/models';
 import jwt from 'jsonwebtoken';
+import EventEmitter from 'events';
 import { verifyUuid } from '../utils/verify_uuid';
-import { verifyToken } from '../middleware/verifyToken';
 import { transformUserRoles } from '../helpers/transformUserRoles';
+import {verifyToken} from '../middleware/verifyToken';
+import dotenv from 'dotenv';
+import { Product } from '../database/models';
+import { expiryNot }from '../helpers/createotp'
+
+const eventEmitter = new EventEmitter();
+
+
+export const checkExpiredProducts = async (req, res) =>{
+    let expiredProducts = []
+   
+  try {
+    const products = await Product.findAll({}); // Retrieve all products from the database
+  products.forEach((product) => {
+    
+    if (product.expiryDate < new Date()) {   
+        expiredProducts.push(product); 
+     eventEmitter.emit('productExpired', product.id);
+    }
+});
+expiredProducts.forEach((product) => {
+    expiryNot(product);
+})
+
+return res.status(200).json({message: 'Email sent successfully'});
+
+  } catch (error) {
+    res.status(500).json({
+        error: error.message
+    });
+  }
+  
+}
+eventEmitter.on('productExpired', async (productId) => {
+    // Mark the product as expired
+    const product = await Product.findByPk(productId);
+    await product.update({ available: false });
+  
+    await product.save(); 
+  });
 
 const PAGE_SIZE = 5; // Number of products per page
 export const getAllProduct = async (req, res) => {

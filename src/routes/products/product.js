@@ -3,15 +3,16 @@ import validateProductInput, {
 } from '../../validations/product.validator';
 import express from 'express';
 import {
-    addProduct,
-    getAllProduct,
-    getProduct,
-    getAvailableProducts,
-    updateProductAvailability,
-    getAllForSeller,
-    searchProduct,
-    updateProduct,
-    deleteProduct,
+  addProduct,
+  getAllProduct,
+  getProduct,
+  getAvailableProducts,
+  updateProductAvailability,
+  getAllForSeller,
+  checkExpiredProducts,
+  searchProduct,
+  updateProduct,
+  deleteProduct
 } from '../../controllers/product.controller';
 
 import { authorize, verifyToken } from '../../middleware/verifyToken';
@@ -27,6 +28,7 @@ router.post(
 );
 router.get('/', getAllProduct);
 router.get('/collection', getAllForSeller);
+router.get('/check-expired-products', checkExpiredProducts);
 
 router.get('/availableProduct', getAvailableProducts);
 
