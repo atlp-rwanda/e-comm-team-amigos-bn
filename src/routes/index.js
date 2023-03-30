@@ -1,4 +1,3 @@
-
 import express from 'express'
 import auth from './auth'
 import role from './roles'
@@ -7,7 +6,7 @@ import product from './products/product'
 import chatRouter from './chat.route'
 import wishlist  from './wishlist';
 import orderRoutes from './order.routes';
-
+import review from './Review/review'
 const router = express.Router()
 
 router.use('/user', auth)
@@ -17,4 +16,5 @@ router.use('/product', product)
 router.use('/wishlist', wishlist)
 router.use('/', role)
 router.use('/orders', orderRoutes);
+router.use('/reviews', review)
 export default router
