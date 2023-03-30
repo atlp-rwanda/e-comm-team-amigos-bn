@@ -37,6 +37,11 @@ module.exports = (sequelize, DataTypes) => {
         Product.belongsTo(models.User, {
             foreignKey: 'userId',
         })
+
+        Product.hasOne(models.OrderProduct, {
+            foreignKey: 'productId',
+            as: 'Order',
+        })
     }
     return Product
 }
