@@ -462,3 +462,277 @@ describe('Password Update', () => {
       });
   });
 });
+
+
+describe('disableUser', () => {
+  let user;
+  before(async function () {
+    user = await models.sequelize.sync({ force: true });
+    await models.User.create({
+      firstName: 'Eric',
+      lastName: 'Ndungutse',
+      userName: 'eric_dnungutse',
+      telephone: '0785283007',
+      address: 'Muhanga',
+      email: 'dav.ndungutse@gmail.com',
+      password: await bcrypt.hash('Password@123', 10),
+      role: 'admin',
+      status: 'active',
+      verified: 'true',
+    });
+    await models.User.create({
+      firstName: 'serge',
+      lastName: 'eva',
+      userName: 'eva',
+      telephone: '1456789987',
+      address: 'kk',
+      email: 'rwibuserge@gmail.com',
+      password: await bcrypt.hash('Serge@12345', 10),
+      role: 'normal',
+      status: 'active',
+      verified: 'true',
+    });
+  });
+
+  it('should disable a user account', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'dav.ndungutse@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/disable')
+          .send({
+            email: 'rwibuserge@gmail.com',
+            reason: 'be active',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('message');
+            done();
+          });
+      });
+  });
+
+  it('should return an error message if user is not found', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'dav.ndungutse@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/disable')
+          .send({
+            email: 'serge@gmail.com',
+            reason: 'be active',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(404);
+            res.should.be.json;
+            done();
+          });
+      });
+  });
+
+  it('should return a message if user account is already disabled', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'dav.ndungutse@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/disable')
+          .send({
+            email: 'rwibuserge@gmail.com',
+            reason: 'be active',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('message');
+            done();
+          });
+      });
+  });
+
+  it('should return "Server error" when there is a server erro', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'serge@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/disable')
+          .send({
+            email: 'rwibuserge@gmail.com',
+            reason: 'be active',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(500);
+            res.should.be.json;
+            done();
+          });
+      });
+  });
+
+});
+
+describe('enableUser', () => {
+  let user;
+  before(async function () {
+    user = await models.sequelize.sync({ force: true });
+    await models.User.create({
+      firstName: 'Eric',
+      lastName: 'Ndungutse',
+      userName: 'eric_dnungutse',
+      telephone: '0785283007',
+      address: 'Muhanga',
+      email: 'dav.ndungutse@gmail.com',
+      password: await bcrypt.hash('Password@123', 10),
+      role: 'admin',
+      status: 'active',
+      verified: 'true',
+    });
+    await models.User.create({
+      firstName: 'serge',
+      lastName: 'eva',
+      userName: 'eva',
+      telephone: '1456789987',
+      address: 'kk',
+      email: 'rwibuserge@gmail.com',
+      password: await bcrypt.hash('Serge@12345', 10),
+      role: 'normal',
+      status: 'active',
+      verified: 'true',
+    });
+  });
+
+  it('should enable a user account', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'dav.ndungutse@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/enable')
+          .send({
+            email: 'rwibuserge@gmail.com',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('message');
+            done();
+          });
+      });
+  });
+
+  it('should return an error message if user is not found', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'dav.ndungutse@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/enable')
+          .send({
+            email: 'serge@gmail.com',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(404);
+            res.should.be.json;
+            done();
+          });
+      });
+  });
+
+  it('should return a message if user account is already enabled', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'dav.ndungutse@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/enable')
+          .send({
+            email: 'rwibuserge@gmail.com',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.have.property('message');
+            done();
+          });
+      });
+  });
+
+  it('should return "Server error" when there is a server erro', (done) => {
+    chai.request(app)
+      .post('/user/login')
+      .send({
+        email: 'serge@gmail.com',
+        password: 'Password@123',
+      })
+      .end((err, resp) => {
+        if (err) done(err);
+        const token = resp.body.token;
+        chai.request(app)
+          .put('/user/enable')
+          .send({
+            email: 'rwibuserge@gmail.com',
+            reason: 'be active',
+          })
+          .set('Authorization', 'Bearer ' + token)
+          .end((error, res) => {
+            if (error) done(error);
+            res.should.have.status(500);
+            res.should.be.json;
+            done();
+          });
+      });
+  });
+
+});

@@ -1,4 +1,4 @@
-/**
+ /**
  * @openapi
  *
  * /user/create:
@@ -201,4 +201,56 @@
  *                   description: Unauthorized
  *                500:
  *                   description: Internal server error
+ * /user/disable:
+ *      put:
+ *        summary: Disable user account
+ *        tags: [Authentication]
+ *        description: EMAIL of the Account to be disabled
+ *        requestBody:
+ *            required:  true
+ *            content:
+ *                application/json:
+ *                    schema:
+ *                       type: object
+ *                       properties:
+ *                           email:
+ *                               type: string
+ *                           reason:
+ *                               type: string
+ *        responses:
+ *              200:
+ *                   description: Account disabled successfuly               
+ *              400:
+ *                   description: Bad request
+ *              401:
+ *                   description: Unauthorized
+ *              404:
+ *                   description: Account not found
+ *              500:
+ *                  description: Internal server error
+ * /user/enable:
+ *      put:
+ *        summary: Enable user account
+ *        tags: [Authentication]
+ *        description: EMAIL of the Account to be enabled
+ *        requestBody:
+ *            required:  true
+ *            content:
+ *                application/json:
+ *                    schema:
+ *                       type: object
+ *                       properties: 
+ *                           email:
+ *                               type: string
+ *        responses:
+ *              200:
+ *                   description: Account enabled successfuly               
+ *              400:
+ *                   description: Bad request
+ *              401:
+ *                   description: Unauthorized
+ *              404:
+ *                   description: Account not found
+ *              500:
+ *                  description: Internal server error
  */
