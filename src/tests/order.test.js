@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import chaiHttp from 'chai-http';
 import app from '../app';
 import models from '../database/models';
@@ -209,6 +210,37 @@ describe('Order Tests', () => {
         expect(res).to.have.status(200);
         expect(res.body.status).to.equal('success');
         expect(res.body.message).to.equal('Order deleted successfully.');
+    });
+
+    it('should return the order status for a valid order', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: customerUser1.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+
+        const order = await chai
+            .request(app)
+            .post('/orders')
+            .send({
+                items: [
+                    {
+                        product: product2.id,
+                        quantity: 4,
+                        unitProce: product2.price,
+                    },
+                ],
+            })
+            .set('Authorization', 'Bearer ' + token);
+
+        const res = await chai
+            .request(app)
+            .get(`/orders/orderStatus/${order.body.data.order.id}`)
+            .set('Authorization', `Bearer ${token}`);
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.property('status');
+        expect(res.body).to.have.property('expectedDeliveryDate');
     });
 
     it('Should not delete an order if user did not create it', async () => {

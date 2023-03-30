@@ -290,7 +290,7 @@ const disableUser = async (req, res) => {
                 'Account disabled',
                 `Dear User,<br>\n\nYour account has been blocked bacause of ${reasons}.\n\nPlease contact us if you have any questions.\n\n<br>Best regards,\nThe Admin Team`
             );
-            return res.json({ message: 'User account disabled' });
+            return res.status(200).json({ message: 'User account disabled' });
         }
     } catch (err) {
         console.error(err);

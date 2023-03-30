@@ -47,7 +47,7 @@ describe('Profile Checks', () => {
             userName: 'Manzi212',
             telephone: '0785188981',
             address: 'Kiyovu',
-            email: 'evaristeee@gmail.com',
+            email: 'evaristeee@example.com',
             password: 'Password@123',
         });
 

@@ -24,7 +24,7 @@ describe('createUser function', () => {
             userName: 'Eriallan',
             telephone: '0785188981',
             address: 'Kigali',
-            email: 'dav.ndungutse@gmail.com',
+            email: 'dav.ndungutse@example.com',
             password: await bcrypt.hash('Password@123', 10),
         });
 
@@ -69,7 +69,7 @@ describe('createUser function', () => {
             userName: 'Manzi212',
             telephone: '0785188981',
             address: 'Kiyovu',
-            email: 'eric.tuyizere.ndungutse@gmail.com',
+            email: 'eric.tuyizere.ndungutse@example.com',
             password: 'Password@123',
         });
 
@@ -82,7 +82,7 @@ describe('createUser function', () => {
         expect(res.body.data.telephone).to.equal('0785188981');
         expect(res.body.data.address).to.equal('Kiyovu');
         expect(res.body.data.email).to.equal(
-            'eric.tuyizere.ndungutse@gmail.com'
+            'eric.tuyizere.ndungutse@example.com'
         );
         expect(res.body).to.have.property('token');
     });
@@ -94,7 +94,7 @@ describe('createUser function', () => {
             userName: 'Manzi212',
             telephone: '0785188981',
             address: 'Kiyovu',
-            email: 'eric.tuyizere.ndungutse@gmail.com',
+            email: 'eric.tuyizere.ndungutse@example.com',
             password: 'Password@123',
         });
         expect(res).to.have.status(400);
@@ -120,7 +120,7 @@ describe('email verification function', () => {
     before(async () => {
         await models.sequelize.sync({ force: true });
         user = await models.User.create({
-            email: 'kananura221023924@gmail.com',
+            email: 'kananura221023924@example.com',
             password: 'password',
         });
         token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
@@ -156,7 +156,7 @@ describe('email verification function', () => {
 
     it('should verify the user s email and return a success message', async () => {
         const user = await models.User.create({
-            email: 'kananura221023924@gmail.com',
+            email: 'kananura221023924@example.com',
             password: 'password',
         });
         const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
@@ -174,7 +174,7 @@ describe('email verification function', () => {
 
     it('should return an error if the token is invalid', async () => {
         const user = await models.User.create({
-            email: 'kananura221023924@gmail.com',
+            email: 'kananura221023924@example.com',
             password: 'password',
         });
         const secretKey = 'different_secret_key';
@@ -270,7 +270,7 @@ describe('User Login', () => {
         chai.request(app)
             .post('/user/login')
             .send({
-                email: 'evarist@gmail.com',
+                email: 'evarist@example.com',
                 password: 'Password@123',
             })
             .end((err, res) => {
@@ -406,6 +406,7 @@ describe('forgotPassword function', () => {
             .request(app)
             .post('/user/forgotPassword')
             .send({ email: 'eriman@example.com' });
+
         expect(res).to.have.status(200);
         expect(res.body.message).to.equal('email sent successfully');
     });

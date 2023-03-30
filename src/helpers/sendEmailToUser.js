@@ -1,23 +1,24 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-const sendEmailToUser = (recepient, subject, text) => new Promise((resolve, reject) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.AUTH_USER,
-      pass: process.env.AUTH_PASSWORD,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
-  const mailOption = {
-    from: 'rwibuserge@icloud.com',
-    to: recepient,
-    subject,
-    text: 'Hello, \n\n' + 'This is the message body.',
-    html: `<!doctype html>
+const sendEmailToUser = (recepient, subject, text) =>
+    new Promise((resolve, reject) => {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.AUTH_USER,
+                pass: process.env.AUTH_PASSWORD,
+            },
+            tls: {
+                rejectUnauthorized: false,
+            },
+        });
+        const mailOption = {
+            from: 'rwibuserge@icloud.com',
+            to: recepient,
+            subject,
+            text: 'Hello, \n\n' + 'This is the message body.',
+            html: `<!doctype html>
       <html lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       
       <head>
@@ -480,13 +481,13 @@ const sendEmailToUser = (recepient, subject, text) => new Promise((resolve, reje
       </body>
       
       </html>`,
-  };
+        };
 
-  transporter.sendMail(mailOption, (error, info) => {
-    if (error) {
-      return reject({ message: 'An error Has occured' });
-    }
-    resolve({ message: 'Email sent successfully' });
-  });
-});
+        transporter.sendMail(mailOption, (error, info) => {
+            if (error) {
+                return reject({ message: 'An error Has occured' });
+            }
+            resolve({ message: 'Email sent successfully' });
+        });
+    });
 module.exports = { sendEmailToUser };
