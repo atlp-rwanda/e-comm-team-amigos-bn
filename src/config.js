@@ -20,7 +20,8 @@ module.exports = {
         logging: false,
     },
     staging: {
-        use_env_variable: 'DATABASE_URL_STAGING',
+        use_env_variable: 'RENDER_DB',
+        dialect: 'postgres',
         logging: false,
     },
-}
+};

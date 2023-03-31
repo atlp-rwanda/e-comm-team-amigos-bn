@@ -13,6 +13,11 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
   sequelize = new Sequelize(
+    // "postgres://iqqtmcgu:sVKzevR9PgZwU9VsApG_KtkUzvTUzwF-@floppy.db.elephantsql.com/iqqtmcgu",
+    // {
+    // dialect: 'postgres',
+    // logging: false,
+    // }
     config.database,
     config.username,
     config.password,
