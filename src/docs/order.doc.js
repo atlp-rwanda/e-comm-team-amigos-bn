@@ -242,4 +242,30 @@
  *        description: The specified order does not exist
  *      500:
  *        description: Internal server error
- */
+ * /orders/admin:
+ *   get:
+ *      summary: Admin should Get All Orders
+ *      tags: [Order]
+ *      description: Grants Admins a right to view all orders.
+ *      responses:
+ *         200:
+ *          description: Returned orders
+ *          content:
+ *           application/json:
+ *            schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *               count:
+ *               orders:
+ *         400:
+ *          description: Invalid request
+ *         401:
+ *          description: Unauthorized access or missing authorization header
+ *         404:
+ *          description: Order not found
+ *         403:
+ *          description: Forbidden access
+ *         500:
+ *          description: Internal server error
+*/

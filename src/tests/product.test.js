@@ -667,93 +667,109 @@ describe('addProduct function', () => {
         );
     });
 });
+
 describe('checkExpiredProducts', () => {
-  let user;
-  let product1;
-  let product2;
+    let user;
+    let product1;
+    let product2;
+    let product3;
 
-  before(async () => {
-    await models.sequelize.sync({ force: true });
-    user = await models.User.create({
-      firstName: 'Kaneza',
-      lastName: 'Erica',
-      userName: 'Eriallan',
-      telephone: '0785188981',
-      address: 'Kigali',
-      email: 'eriman@example.com',
-      password: await bcrypt.hash('Password@123', 10),
-      role: 'vendor',
+    before(async () => {
+        await models.sequelize.sync({ force: true });
+        user = await models.User.create({
+            firstName: 'Kaneza',
+            lastName: 'Erica',
+            userName: 'Eriallan',
+            telephone: '0785188981',
+            address: 'Kigali',
+            email: 'eriman@example.com',
+            password: await bcrypt.hash('Password@123', 10),
+            role: 'vendor',
+        });
+        product1 = await models.Product.create({
+            id: uuidv4(),
+            userId: user.id,
+            name: 'Product 1',
+            price: 10,
+            quantity: 1,
+            available: true,
+            category: 'food',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2023-12-31T00:00:00.000Z',
+            ec: 30,
+        });
+        product2 = await models.Product.create({
+            id: uuidv4(),
+            userId: user.id,
+            name: 'Product 2',
+            price: 10,
+            quantity: 1,
+            available: true,
+            category: 'food',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2022-12-31T00:00:00.000Z',
+            ec: 30,
+        });
+        product3 = await models.Product.create({
+            id: uuidv4(),
+            userId: user.id,
+            name: 'Product 2',
+            price: 10,
+            quantity: 1,
+            available: true,
+            category: 'food',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2022-12-31T00:00:00.000Z',
+            ec: 30,
+        });
     });
-    product1 = await models.Product.create({
-      id: uuidv4(),
-      userId: user.id,
-      name: 'Product 1',
-      price: 10,
-      quantity: 1,
-      available: true,
-      category: 'food',
-      bonus: 20,
-      images: ['image1', 'image2'],
-      expiryDate: '2023-12-31T00:00:00.000Z',
-      ec: 30,
+
+    after(async () => {
+        await models.Product.destroy({ where: {} });
+        await models.User.destroy({ where: {} });
     });
-    product2 = await models.Product.create({
-      id: uuidv4(),
-      userId: user.id,
-      name: 'Product 2',
-      price: 10,
-      quantity: 1,
-      available: true,
-      category: 'food',
-      bonus: 20,
-      images: ['image1', 'image2'],
-      expiryDate: '2022-12-31T00:00:00.000Z',
-      ec: 30,
+
+    it('should not mark unexpired products as unavailable', async () => {
+        const response = await chai
+            .request(app)
+            .get('/product/check-expired-products')
+            .send();
+
+        expect(response.status).to.equal(200);
+
+        const updatedProduct = await models.Product.findByPk(product1.id);
+        expect(updatedProduct.available).to.equal(true);
+        const updatedProduct3 = await models.Product.findByPk(product3.id);
+        console.log(updatedProduct3)
+        expect(updatedProduct3.available).to.equal(false);
     });
-  });
+    it('should return an empty array if there are no expired products', async () => {
+        // Set the expiry date for both products to a future date
+        await product1.update({ expiryDate: '2024-12-31T00:00:00.000Z' });
+        await product2.update({ expiryDate: '2024-12-31T00:00:00.000Z' });
 
-  after(async () => {
-    await models.Product.destroy({ where: {} });
-    await models.User.destroy({ where: {} });
-  });
+        const response = await chai
+            .request(app)
+            .get('/product/check-expired-products')
+            .send();
 
-  it('should not mark unexpired products as unavailable', async () => {
-    const response = await chai
-      .request(app)
-      .get('/product/check-expired-products')
-      .send();
+        expect(response.status).to.equal(200);
+    });
 
-    expect(response.status).to.equal(200);
+    it('should mark all expired products as unavailable', async () => {
+        const response = await chai
+            .request(app)
+            .get('/product/check-expired-products')
+            .send();
 
-    const updatedProduct = await models.Product.findByPk(product1.id);
-    expect(updatedProduct.available).to.equal(true);
-    const updatedProduct2 = await models.Product.findByPk(product2.id);
-    expect(updatedProduct2.available).to.equal(false);
-  });
-  it('should return an empty array if there are no expired products', async () => {
-    // Set the expiry date for both products to a future date
-    await product1.update({ expiryDate: '2024-12-31T00:00:00.000Z' });
-    await product2.update({ expiryDate: '2024-12-31T00:00:00.000Z' });
+        expect(response.status).to.equal(200);
 
-    const response = await chai
-      .request(app)
-      .get('/product/check-expired-products')
-      .send();
-
-    expect(response.status).to.equal(200);
-  });
-
-  it('should mark all expired products as unavailable', async () => {
-    const response = await chai
-      .request(app)
-      .get('/product/check-expired-products')
-      .send();
-
-    expect(response.status).to.equal(200);
-
-    const updatedProduct1 = await models.Product.findByPk(product1.id);
-    const updatedProduct2 = await models.Product.findByPk(product2.id);
-    expect(updatedProduct1.available).to.equal(true);
-    expect(updatedProduct2.available).to.equal(false);
-  });
+        const updatedProduct1 = await models.Product.findByPk(product1.id);
+        const updatedProduct2 = await models.Product.findByPk(product2.id);
+        expect(updatedProduct1.available).to.equal(true);
+        expect(updatedProduct2.available).to.equal(false);
+    });
 });

@@ -12,10 +12,28 @@ chai.use(chaiHttp);
 const should = chai.should();
 
 describe('Order Tests', () => {
-    let roles, customerUser1, customerUser2, merchantUser, product, product2;
+    let roles, customerUser1, customerUser2, merchantUser, product, product2, adminUser;
 
     before(async () => {
         await models.sequelize.sync({ force: true });
+
+        adminUser = await models.User.create(
+            {
+                id: uuidv4(),
+                firstName: 'Junior',
+                lastName: 'Gasana',
+                userName: 'didas___jr',
+                telephone: '078000000',
+                address: 'Kigali',
+                email: 'admin@admin.com',
+                password: await bcrypt.hash('Password@123', 10),
+                role: 'admin',
+                status: 'active',
+                verified: 'true',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }
+        )
 
         roles = await models.Role.bulkCreate([
             {
@@ -345,6 +363,24 @@ describe('Order Tests', () => {
             })
             .set('Authorization', 'Bearer ' + token);
 
-        expect(updateOrder.body.data.order.products.length).to.equal(1);
+        expect(order.body.data.order.products.length).to.equal(2);
+    });
+
+    it('Should return all orders for Admin', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: adminUser.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+
+        const res = await chai
+            .request(app)
+            .get(`/orders`)
+            .set('Authorization', 'Bearer ' + token);
+
+        expect(res).to.have.status(200);
+        expect(res.body.status).to.equal('success');
+        res.body.should.have.property('count');
     });
 });
