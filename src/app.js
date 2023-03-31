@@ -22,39 +22,40 @@ const app = express();
 
 app.use(express.json());
 
- if (process.env.NODE_ENV === 'development') {
-    app.use(logger('dev'))
- }
+if (process.env.NODE_ENV === 'development') {
+    app.use(logger('dev'));
+}
 
 export const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {
-  cors: {
-    origin: ['http://localhost:4000'],
-    methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  },
+    cors: {
+        origin: ['http://localhost:4000'],
+        methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    },
 });
 const { sequelize } = db;
 sequelize.authenticate();
 app.use(express.urlencoded({ extended: true }));
 app.use(
-  cookieSession({
-    name: "google-auth-session",
-    keys: ["key1", "key2"],
-  })
+    cookieSession({
+        name: 'google-auth-session',
+        keys: ['key1', 'key2'],
+    })
 );
 
-app.use("/cart",
-  cookieSession({
-    name: "session",
-    keys: [process.env.SECRET_KEY],
-    maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
-  })
+app.use(
+    '/cart',
+    cookieSession({
+        name: 'session',
+        keys: [process.env.SECRET_KEY],
+        maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+    })
 );
 
 
 
 app.use(passport.initialize());
-app.use(passport.authenticate("session"));
+app.use(passport.authenticate('session'));
 
 app.use(passport.initialize());
 app.use(passport.authenticate('session'));
@@ -67,7 +68,16 @@ app.use(cors());
 app.use('/', routes);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.get('/', (req, res) => {
-  res.send('Hello, There! this is Amigos ecommerce team project.');
+    res.send('Hello, There! this is Amigos ecommerce team project.');
+});
+
+app.use((err, req, res, next) => {
+    console.log('***ERROR***', err);
+
+    res.status(500).json({
+        status: 'error',
+        message: 'Internal Server Error',
+    });
 });
 
 export default app;

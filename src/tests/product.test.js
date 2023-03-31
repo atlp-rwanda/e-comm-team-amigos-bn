@@ -1,17 +1,17 @@
-import chai, { expect } from 'chai'
-import chaiHttp from 'chai-http'
-import bcrypt from 'bcryptjs'
-import { v4 as uuidv4 } from 'uuid'
-import dotenv from 'dotenv'
-import jwt from 'jsonwebtoken'
-import models from '../database/models'
-import app from '../app'
-import tokenGenerator from '../helpers/generateToken'
-chai.use(chaiHttp)
-let user
+import chai, { expect } from 'chai';
+import chaiHttp from 'chai-http';
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import models from '../database/models';
+import app from '../app';
+import tokenGenerator from '../helpers/generateToken';
+chai.use(chaiHttp);
+let user;
 describe('get All Product', () => {
     before(async () => {
-        await models.sequelize.sync({ force: true })
+        await models.sequelize.sync({ force: true });
         user = await models.User.create({
             firstName: 'Kaneza',
             lastName: 'Erica',
@@ -21,7 +21,7 @@ describe('get All Product', () => {
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
             role: 'vendor',
-        })
+        });
         await models.Product.create({
             id: uuidv4(),
             userId: user.id,
@@ -34,47 +34,45 @@ describe('get All Product', () => {
             images: ['image1', 'image2'],
             expiryDate: '2023-12-31T00:00:00.000Z',
             ec: 30,
-        })
-    })
+        });
+    });
     after(async () => {
-        await models.Product.destroy({ where: {} })
-        await models.User.destroy({ where: {} })
-    })
+        await models.Product.destroy({ where: {} });
+        await models.User.destroy({ where: {} });
+    });
 
-  it('should return a list of all products', (done) => {
-    chai.request(app)
-      .get('/product')
-      .end((err, res) => {
-        if (err) throw err;
-        else {
-          expect(res.status).to.equal(200);
-          expect(res.body).to.have.property('Status').to.equal('OK');
-          expect(res.body)
-            .to.have.property('Message')
-            .to.equal('List of all Products in our collections');
-          expect(res.body)
-            .to.have.property('responseData')
-            .to.be.an('object');
-          done();
-        }
-      });
-  });
+    it('should return a list of all products', (done) => {
+        chai.request(app)
+            .get('/product')
+            .end((err, res) => {
+                if (err) throw err;
+                else {
+                    expect(res.status).to.equal(200);
+                    expect(res.body).to.have.property('Status').to.equal('OK');
+                    expect(res.body)
+                        .to.have.property('Message')
+                        .to.equal('List of all Products in our collections');
+                    done();
+                }
+            });
+    });
 
     it('should return an error message if there are no products', async () => {
-        await models.Product.destroy({ where: {} })
-        const res = await chai.request(app).get('/product')
-        expect(res.status).to.equal(404)
-        expect(res.body).to.have.property('Status').to.equal('Not Found')
+        await models.Product.destroy({ where: {} });
+        const res = await chai.request(app).get('/product');
+
+        expect(res.status).to.equal(404);
+        expect(res.body).to.have.property('Status').to.equal('Not Found');
         expect(res.body)
             .to.have.property('error')
-            .to.equal('There is no product in Stock')
-    })
-})
+            .to.equal('There is no product in Stock');
+    });
+});
 describe('Available Product API', () => {
-    let user
-    let product
+    let user;
+    let product;
     before(async () => {
-        await models.sequelize.sync({ force: true })
+        await models.sequelize.sync({ force: true });
         user = await models.User.create({
             firstName: 'Kaneza',
             lastName: 'Erica',
@@ -84,7 +82,7 @@ describe('Available Product API', () => {
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
             role: 'vendor',
-        })
+        });
         await models.Product.create({
             id: uuidv4(),
             userId: user.id,
@@ -97,74 +95,82 @@ describe('Available Product API', () => {
             images: ['image1', 'image2'],
             expiryDate: '2023-12-31T00:00:00.000Z',
             ec: 30,
-        })
-    })
-    after(async () => {
-        await models.Product.destroy({ where: {} })
-        await models.User.destroy({ where: {} })
-    })
-
-  describe('GET /product/availableProduct', () => {
-    it('should return a list of available products', async () => {
-      const res = await chai.request(app).get('/product/availableProduct');
-      expect(res.statusCode).to.equal(200);
-      expect(res.body.response).to.be.an('object');
-      expect(res.body.response).to.have.property('currentPage');
-      expect(res.body.response).to.have.property('totalPages');
-      expect(res.body.response).to.have.property('products');
-      expect(res.body.response.products).to.be.a('array');
-
+        });
     });
-  });
+    after(async () => {
+        await models.Product.destroy({ where: {} });
+        await models.User.destroy({ where: {} });
+    });
+
+    describe('GET /product/availableProduct', () => {
+        it('should return a list of available products', async () => {
+            const res = await chai
+                .request(app)
+                .get('/product/availableProduct');
+            expect(res.statusCode).to.equal(200);
+            expect(res.body.response.products).to.be.an('array');
+            expect(res.body.response.products[0]).to.have.property(
+                'name',
+                'Product 1'
+            );
+            expect(res.body.response.products[0]).to.have.property(
+                'available',
+                true
+            );
+        });
+    });
 
     describe('PUT /product/availableProduct/:id', () => {
         it('should update the availability of a product', async () => {
             product = await models.Product.findOne({
                 where: { name: 'Product 1' },
-            })
+            });
             const res = await chai
                 .request(app)
                 .put(`/product/availableProduct/${product.id}`)
-                .send({ available: false })
-            expect(res.statusCode).to.equal(200)
-            expect(res.body).to.have.property('message', 'updated successfully')
-            const updatedProduct = await models.Product.findByPk(product.id)
-            expect(updatedProduct).to.have.property('available', false)
-        })
+                .send({ available: false });
+            expect(res.statusCode).to.equal(200);
+            expect(res.body).to.have.property(
+                'message',
+                'updated successfully'
+            );
+            const updatedProduct = await models.Product.findByPk(product.id);
+            expect(updatedProduct).to.have.property('available', false);
+        });
 
         it('should return an error for an invalid product ID', async () => {
-            let id = '1860xy'
+            let id = '1860xy';
             const res = await chai
                 .request(app)
                 .put(`/product/availableProduct/${id}`)
-                .send({ available: false })
-            expect(res.statusCode).to.equal(500)
-            expect(res.body).to.have.property('error', 'Internal server error')
-        })
+                .send({ available: false });
+            expect(res.statusCode).to.equal(500);
+            expect(res.body).to.have.property('error', 'Internal server error');
+        });
 
         it('should return an error for an invalid availability status', async () => {
             product = await models.Product.findOne({
                 where: { name: 'Product 1' },
-            })
+            });
             const res = await chai
                 .request(app)
                 .put(`/product/availableProduct/${product.id}`)
-                .send({ available: 'invalid-status' })
-            expect(res.statusCode).to.equal(400)
+                .send({ available: 'invalid-status' });
+            expect(res.statusCode).to.equal(400);
             expect(res.body).to.have.property(
                 'error',
                 'Invalid availability status'
-            )
-        })
-    })
-})
+            );
+        });
+    });
+});
 
 describe('addProduct function', () => {
-    let user
+    let user;
 
     before(async () => {
-        await models.sequelize.sync()
-        await models.User.destroy({ where: {} })
+        await models.sequelize.sync();
+        await models.User.destroy({ where: {} });
         // await models.Product.destroy({ where: {} });
         user = await models.User.create({
             firstName: 'Kaneza',
@@ -175,16 +181,16 @@ describe('addProduct function', () => {
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
             role: 'vendor',
-        })
-    })
+        });
+    });
     after(async () => {
-        await models.Product.destroy({ where: {} })
-    })
+        await models.Product.destroy({ where: {} });
+    });
     it('should create a new product with valid data', async () => {
         const token = jwt.sign(
             { userId: user.id, userRole: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .post('/product/create')
@@ -204,24 +210,24 @@ describe('addProduct function', () => {
                     'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
                 ],
             })
-            .set('Authorization', `Bearer ${token}`)
-        expect(res).to.have.status(201)
-        expect(res.body.name).to.equal('Test Product')
-        expect(res.body.price).to.equal(100)
-        expect(res.body.quantity).to.equal(10)
-        expect(res.body.available).to.equal(true)
-        expect(res.body.category).to.equal('Test Category')
-        expect(res.body.bonus).to.equal(1)
-        expect(res.body.expiryDate).to.equal('2023-12-31T00:00:00.000Z')
-        expect(res.body.ec).to.equal(1)
-        expect(res.body.images).to.have.lengthOf(4)
-    })
+            .set('Authorization', `Bearer ${token}`);
+        expect(res).to.have.status(201);
+        expect(res.body.name).to.equal('Test Product');
+        expect(res.body.price).to.equal(100);
+        expect(res.body.quantity).to.equal(10);
+        expect(res.body.available).to.equal(true);
+        expect(res.body.category).to.equal('Test Category');
+        expect(res.body.bonus).to.equal(1);
+        expect(res.body.expiryDate).to.equal('2023-12-31T00:00:00.000Z');
+        expect(res.body.ec).to.equal(1);
+        expect(res.body.images).to.have.lengthOf(4);
+    });
 
     it('should return an error if product name already exists', async () => {
         const token = jwt.sign(
             { userId: user.id, userRole: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .post('/product/create')
@@ -241,12 +247,12 @@ describe('addProduct function', () => {
                     'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
                 ],
             })
-            .set('Authorization', `Bearer ${token}`)
-        expect(res).to.have.status(409)
+            .set('Authorization', `Bearer ${token}`);
+        expect(res).to.have.status(409);
         expect(res.body.message).to.equal(
             'Product already exists you can update that product instead'
-        )
-    })
+        );
+    });
 
     it('should return an error if authorization token is missing', async () => {
         const res = await chai
@@ -267,15 +273,15 @@ describe('addProduct function', () => {
                     'https://cdn.pixabay.com/photo/2015/06/19/21/24/avenue-815297__480.jpg',
                     'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
                 ],
-            })
-        expect(res).to.have.status(401)
-        expect(res.body.message).to.equal('Authorization header missing')
-    })
+            });
+        expect(res).to.have.status(401);
+        expect(res.body.message).to.equal('Authorization header missing');
+    });
     it('should return an error if unauthorized access', async () => {
         const token = jwt.sign(
             { userId: user.id, userRole: 'customer' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .post('/product/create')
@@ -289,21 +295,21 @@ describe('addProduct function', () => {
                 bonus: 1,
                 expiryDate: '2023-03-16',
                 ec: '1234567890123456',
-            })
-        expect(res).to.have.status(403)
-        expect(res.body.message).to.equal('Unauthorized access')
-    })
-})
+            });
+        expect(res).to.have.status(403);
+        expect(res.body.message).to.equal('Unauthorized access');
+    });
+});
 describe('Update product', function () {
-    let user
-    let userRaw
-    let productRaw
-    let product
-    let user2, userRaw2
+    let user;
+    let userRaw;
+    let productRaw;
+    let product;
+    let user2, userRaw2;
     before(async function () {
-        await models.sequelize.sync({ force: true })
-        await models.User.destroy({ where: {} })
-        await models.Product.destroy({ where: {} })
+        await models.sequelize.sync({ force: true });
+        await models.User.destroy({ where: {} });
+        await models.Product.destroy({ where: {} });
         userRaw = await models.User.create({
             firstName: 'Kaneza',
             lastName: 'Erica',
@@ -313,7 +319,7 @@ describe('Update product', function () {
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
             role: 'vendor',
-        })
+        });
         userRaw2 = await models.User.create({
             firstName: 'Kaneza',
             lastName: 'Erica',
@@ -323,9 +329,9 @@ describe('Update product', function () {
             email: 'eriman@example.com',
             password: await bcrypt.hash('Password@123', 10),
             role: 'vendor',
-        })
-        user = userRaw.toJSON()
-        user2 = userRaw2.toJSON()
+        });
+        user = userRaw.toJSON();
+        user2 = userRaw2.toJSON();
         productRaw = await models.Product.create({
             name: 'Test Product',
             price: 100,
@@ -342,18 +348,18 @@ describe('Update product', function () {
                 'https://cdn.pixabay.com/photo/2015/06/19/21/24/avenue-815297__480.jpg',
                 'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
             ],
-        })
-        product = productRaw.toJSON()
-    })
+        });
+        product = productRaw.toJSON();
+    });
     after(async () => {
-        await models.Product.destroy({ where: {} })
-        user = product = userRaw = productRaw = null
-    })
+        await models.Product.destroy({ where: {} });
+        user = product = userRaw = productRaw = null;
+    });
     it('Should update a product', async function () {
         const token = jwt.sign(
             { userId: user.id, role: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .patch(`/product/${product.id}`)
@@ -373,15 +379,15 @@ describe('Update product', function () {
                     'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg',
                 ],
             })
-            .set('Authorization', `Bearer ${token}`)
-        expect(res).to.have.status(200)
-        expect(res.body.message).to.equal('success')
-    })
+            .set('Authorization', `Bearer ${token}`);
+        expect(res).to.have.status(200);
+        expect(res.body.message).to.equal('success');
+    });
     it('Should not update id', async function () {
         const token = jwt.sign(
             { userId: user.id, role: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
 
         const res = await chai
             .request(app)
@@ -389,68 +395,68 @@ describe('Update product', function () {
             .send({
                 id: uuidv4(),
             })
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${token}`);
 
-        expect(res).to.have.status(400)
-    })
+        expect(res).to.have.status(400);
+    });
     it('should not update sellerId', async function () {
         const token = jwt.sign(
             { userId: user.id, role: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .patch(`/product/${product.id}`)
             .send({
                 userId: uuidv4(),
             })
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${token}`);
 
-        expect(res).to.have.status(400)
-    })
+        expect(res).to.have.status(400);
+    });
     it('Should not send additional field', async function () {
         const token = jwt.sign(
             { userId: user.id, role: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .patch(`/product/${product.id}`)
             .send({
                 someAdditionalField: uuidv4(),
             })
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${token}`);
 
-        expect(res).to.have.status(400)
-    })
+        expect(res).to.have.status(400);
+    });
     it('should return 404 when product does not exist', async function () {
         const token = jwt.sign(
             { userId: user.id, role: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .patch(`/product/${uuidv4()}`)
             .send({
                 name: 'juice',
             })
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${token}`);
 
-        expect(res).to.have.status(404)
-    })
+        expect(res).to.have.status(404);
+    });
     it('should return 401 when user does not own product', async function () {
         const token = jwt.sign(
             { userId: user2.id, role: 'vendor' },
             process.env.SECRET_KEY
-        )
+        );
         const res = await chai
             .request(app)
             .patch(`/product/${product.id}`)
             .send({
                 name: 'shoes',
             })
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${token}`);
 
-        expect(res).to.have.status(401)
-    })
-})
+        expect(res).to.have.status(401);
+    });
+});

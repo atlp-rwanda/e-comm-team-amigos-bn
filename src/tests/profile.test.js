@@ -1,19 +1,19 @@
-import chai, { expect } from 'chai'
-import chaiHttp from 'chai-http'
-import bcrypt from 'bcryptjs'
-import { v4 as uuidv4 } from 'uuid'
-import dotenv from 'dotenv'
-import app from '../app'
-import models from '../database/models'
+import chai, { expect } from 'chai';
+import chaiHttp from 'chai-http';
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+import app from '../app';
+import models from '../database/models';
 
-dotenv.config()
-chai.use(chaiHttp)
+dotenv.config();
+chai.use(chaiHttp);
 
 describe('Profile Checks', () => {
-    let user
+    let user;
 
     before(async () => {
-        await models.sequelize.sync({ force: true })
+        await models.sequelize.sync({ force: true });
         const res = await chai.request(app).post('/user/create').send({
             firstName: 'Manzi',
             lastName: 'Evariste',
@@ -22,14 +22,14 @@ describe('Profile Checks', () => {
             address: 'Kiyovu',
             email: 'evaristeee@gmail.com',
             password: 'Password@123',
-        })
+        });
 
-        user = res.body
-    })
+        user = res.body;
+    });
 
     after(async () => {
-        await models.User.destroy({ where: {} })
-    })
+        await models.User.destroy({ where: {} });
+    });
 
     it('should update user profile', async () => {
         const res = await chai
@@ -46,34 +46,34 @@ describe('Profile Checks', () => {
                 preferredCurrency: 'Frw',
                 gender: 'Male',
             })
-            .set('Authorization', 'Bearer ' + user.token)
+            .set('Authorization', 'Bearer ' + user.token);
 
-        expect(res.body.status).to.equal('success')
-        expect(res).to.have.status(200)
-        expect(res.body).to.have.property('profile')
-    })
+        expect(res.body.status).to.equal('success');
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.property('profile');
+    });
 
     it('should get my profile', async () => {
         const res = await chai
             .request(app)
             .get('/user/profile')
-            .set('Authorization', 'Bearer ' + user.token)
+            .set('Authorization', 'Bearer ' + user.token);
 
-        expect(res.body.status).to.equal('success')
-        expect(res).to.have.status(200)
-        expect(res.body).to.have.property('profile')
-        expect(res.body.profile.telephone).to.equal('250785439850')
-    })
+        expect(res.body.status).to.equal('success');
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.property('profile');
+        expect(res.body.profile.telephone).to.equal('250785439850');
+    });
 
     it('should get user profile', async () => {
         const res = await chai
             .request(app)
             .get(`/user/${user.data.id}`)
-            .set('Authorization', 'Bearer ' + user.token)
+            .set('Authorization', 'Bearer ' + user.token);
 
-        expect(res.body.status).to.equal('success')
-        expect(res).to.have.status(200)
-        expect(res.body).to.have.property('user')
-        expect(res.body.user.telephone).to.equal('250785439850')
-    })
-})
+        expect(res.body.status).to.equal('success');
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.property('user');
+        expect(res.body.user.telephone).to.equal('250785439850');
+    });
+});

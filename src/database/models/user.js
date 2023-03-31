@@ -39,22 +39,23 @@ module.exports = (sequelize, DataTypes) => {
             verified: { type: DataTypes.BOOLEAN, defaultValue: 'false' },
         },
         {}
-    )
+    );
 
     User.associate = (models) => {
         User.hasMany(models.UserRole, {
             foreignKey: 'userId',
             as: 'UserRoles',
-        })
+        });
+
         User.hasMany(models.Product, {
             foreignKey: 'userId',
             as: 'user',
-        })
+        });
         User.hasMany(models.Order, {
             foreignKey: 'userId',
             as: 'orders',
-        })
-    }
+        });
+    };
 
-    return User
-}
+    return User;
+};
