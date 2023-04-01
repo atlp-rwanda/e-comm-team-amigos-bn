@@ -6,7 +6,7 @@ import models from '../database/models';
 import tokenGenerator from '../helpers/generateToken';
 import { sendMail } from '../helpers/sendMail';
 import { sendEmailToUser } from '../helpers/sendEmailToUser';
-import createOTP from '../helpers/createotp';
+import { createOTP } from '../helpers/createotp';
 import { sendResetMail } from '../helpers/sendResetPasswordEmail';
 import { transformUserRoles } from '../helpers/transformUserRoles';
 

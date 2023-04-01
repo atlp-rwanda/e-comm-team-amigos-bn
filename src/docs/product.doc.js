@@ -155,6 +155,20 @@
  *           type: array
  *       500:
  *         description: Internal server error
+ * /product/check-expired-products:
+ *   get:
+ *     tags:
+ *       - Products
+ *     description: Checks for expired products and changes their status
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Email sent successfully
+ *         schema:
+ *           type: json
+ *       500:
+ *         description: Internal server error
  * /product/availableProduct/{id}:
  *   put:
  *     tags:

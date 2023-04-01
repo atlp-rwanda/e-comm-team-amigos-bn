@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const createOTP = async (user) => {
+export const createOTP = async (user) => {
   try {
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -491,4 +491,39 @@ const createOTP = async (user) => {
   }
 };
 
-export default createOTP;
+export const expiryNot = async (product) =>{
+  
+  try {
+    let userId = product.userId;
+    let vendor = await models.User.findByPk(userId, {
+            raw: true,
+        })
+    if (!vendor) {
+      return res.json({ error: 'Vendor Not Found' });
+    }
+
+    const mailOption = {
+      from: process.env.AUTH_USER,
+      to: vendor.email,
+      subject: 'Your product has expired',
+      text: `Dear ${vendor.firstName}, your product "${product.name}" has expired. Please take appropriate action.`
+    };
+    transporter.sendMail(mailOption, (error) => {
+      if (error) {
+        return {
+          status: 'FAILED',
+          message: error,
+        };
+      }
+      return {
+        status: 'OK',
+        email: mailOption.html,
+      };
+    });
+  } catch (err) {
+    return {
+      status: 'FAILED',
+      message: err.message,
+    };
+  }
+};
