@@ -12,7 +12,7 @@ const checkout = async (req, res) => {
         const order = await models.Order.create({
             userId: req.user.id,
             status: 'pending',
-            expected_delivery_date: deliveryInfo.expected_delivery_date,
+            deliveryInfo: deliveryInfo,
         });
 
         const orderProducts = await Promise.all(

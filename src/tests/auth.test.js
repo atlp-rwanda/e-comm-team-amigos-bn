@@ -25,7 +25,7 @@ describe('createUser function', () => {
             userName: 'Eriallan',
             telephone: '0785188981',
             address: 'Kigali',
-            email: 'dav.ndungutse@gmail.com',
+            email: 'gasana@example.com',
             password: await bcrypt.hash('Password@123', 10),
         });
 

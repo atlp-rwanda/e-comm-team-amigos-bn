@@ -151,7 +151,7 @@ describe('Order Tests', () => {
         await models.Order.destroy({ where: {} });
     });
 
-    it('Chould Create an Order', async () => {
+    it('Should Create and Checkout an Order', async () => {
         const signin = await chai.request(app).post('/user/login').send({
             email: customerUser1.email,
             password: 'Password@123',
@@ -161,21 +161,27 @@ describe('Order Tests', () => {
 
         const res = await chai
             .request(app)
-            .post('/orders')
-            .send({
-                items: [
-                    {
-                        product: product.id,
-                        quantity: 4,
-                        unitProce: product.price,
-                    },
-                ],
-            })
+            .post('/checkout')
+            .send(
+                {
+                    "products": [
+                        {
+                            "productId": product.id,
+                            "quantity": 1
+                        }
+                    ],
+                    "deliveryInfo": {
+                        "address": "123 Main St",
+                        "city": "New York",
+                        "state": "NY",
+                        "zip": "10001",
+                    }
+                })
             .set('Authorization', 'Bearer ' + token);
 
-        expect(res).to.have.status(201);
-        expect(res.body.status).to.equal('success');
-        res.body.should.have.property('data');
+        expect(res).to.have.status(200);
+        res.body.should.have.property('orderId');
+        res.body.should.have.property('orderProducts');
     });
 
     it('Should delete an order', async () => {

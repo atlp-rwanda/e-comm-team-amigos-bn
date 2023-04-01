@@ -17,7 +17,7 @@ const signUpValidator = asyncHandler(async (req, res, next) => {
           where: { email: req.body.email },
         });
         if (user) {
-          res.status(400).json({
+          return res.status(400).json({
             error: 'Email address already in use',
           });
         }

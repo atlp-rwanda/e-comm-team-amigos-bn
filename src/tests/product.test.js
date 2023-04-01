@@ -691,6 +691,7 @@ describe('checkExpiredProducts', () => {
     let user;
     let product1;
     let product2;
+    let product3;
 
     before(async () => {
         await models.sequelize.sync({ force: true });
@@ -730,6 +731,19 @@ describe('checkExpiredProducts', () => {
             expiryDate: '2022-12-31T00:00:00.000Z',
             ec: 30,
         });
+        product3 = await models.Product.create({
+            id: uuidv4(),
+            userId: user.id,
+            name: 'Product 2',
+            price: 10,
+            quantity: 1,
+            available: true,
+            category: 'food',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2022-12-31T00:00:00.000Z',
+            ec: 30,
+        });
     });
 
     after(async () => {
@@ -747,8 +761,9 @@ describe('checkExpiredProducts', () => {
 
         const updatedProduct = await models.Product.findByPk(product1.id);
         expect(updatedProduct.available).to.equal(true);
-        const updatedProduct2 = await models.Product.findByPk(product2.id);
-        expect(updatedProduct2.available).to.equal(false);
+        const updatedProduct3 = await models.Product.findByPk(product3.id);
+        console.log(updatedProduct3)
+        expect(updatedProduct3.available).to.equal(false);
     });
     it('should return an empty array if there are no expired products', async () => {
         // Set the expiry date for both products to a future date
@@ -777,3 +792,4 @@ describe('checkExpiredProducts', () => {
         expect(updatedProduct2.available).to.equal(false);
     });
 });
+

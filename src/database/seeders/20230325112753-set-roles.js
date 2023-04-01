@@ -10,7 +10,7 @@ module.exports = {
                     // Merchant
                     id: uuidv4(),
 
-                    userId: '3fc975ce-3521-4e16-960c-763d2a41623c',
+                    userId: '4e2e0539-5dd8-435a-bdd2-cd78854c08ce',
                     roleId: 'a1ab5eb5-1f4f-4666-8a32-ff00a8d3649c',
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -18,15 +18,7 @@ module.exports = {
                 {
                     // Merchant
                     id: uuidv4(),
-                    userId: '0ac6d1e1-7c4b-468e-9ba2-aae705944274',
-                    roleId: 'a1ab5eb5-1f4f-4666-8a32-ff00a8d3649c',
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-                {
-                    // Merchant
-                    id: uuidv4(),
-                    userId: 'b314eebe-92e9-409d-b190-cc78cf85730c',
+                    userId: '9742df02-baea-4a75-a786-c0139c11547e',
                     roleId: 'a1ab5eb5-1f4f-4666-8a32-ff00a8d3649c',
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -35,7 +27,7 @@ module.exports = {
                 {
                     // Customer
                     id: uuidv4(),
-                    userId: 'b2e06e7f-3f51-4f33-9e74-ef7d04850f5e',
+                    userId: '9d460cd7-8f3b-493f-8a47-66fa112e7f36',
                     roleId: '462bd3ff-92a6-421c-b62c-e3bb08f84feb',
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -44,7 +36,7 @@ module.exports = {
                 {
                     // Admin
                     id: uuidv4(),
-                    userId: '3c14472f-7be1-47b3-8598-6f2ca4f73880',
+                    userId: 'e9b8ab7e-78fe-4dc8-80c0-2f7b16173c04',
                     roleId: 'ee44bc28-096b-42fc-b9fe-31299de56b00',
                     createdAt: new Date(),
                     updatedAt: new Date(),

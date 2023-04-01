@@ -6,7 +6,7 @@ module.exports = {
             [
                 {
                     id: uuidv4(),
-                    userId: '3fc975ce-3521-4e16-960c-763d2a41623c',
+                    userId: '4e2e0539-5dd8-435a-bdd2-cd78854c08ce',
                     name: 'Product 1',
                     price: 10,
                     quantity: 1,
@@ -22,7 +22,7 @@ module.exports = {
 
                 {
                     id: uuidv4(),
-                    userId: '3fc975ce-3521-4e16-960c-763d2a41623c',
+                    userId: '4e2e0539-5dd8-435a-bdd2-cd78854c08ce',
                     name: 'Product 1.2',
                     price: 0,
                     quantity: 1,
@@ -38,7 +38,7 @@ module.exports = {
 
                 {
                     id: uuidv4(),
-                    userId: '0ac6d1e1-7c4b-468e-9ba2-aae705944274',
+                    userId: '4e2e0539-5dd8-435a-bdd2-cd78854c08ce',
                     name: 'Product 2',
                     price: 100,
                     quantity: 2,
@@ -54,7 +54,7 @@ module.exports = {
 
                 {
                     id: uuidv4(),
-                    userId: '0ac6d1e1-7c4b-468e-9ba2-aae705944274',
+                    userId: '4e2e0539-5dd8-435a-bdd2-cd78854c08ce',
                     name: 'Product 2.1',
                     price: 100,
                     quantity: 0,
