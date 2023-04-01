@@ -10,7 +10,6 @@ import tokenGenerator from '../helpers/generateToken';
 chai.use(chaiHttp);
 let user;
 
-
 describe('get All Product', () => {
     before(async () => {
         await models.sequelize.sync({ force: true });
@@ -76,7 +75,6 @@ describe('get All Product', () => {
             .to.equal('There is no product in Stock');
     });
 });
-
 
 describe('Available Product API', () => {
     let user;
@@ -325,9 +323,7 @@ describe('GET /product/availableProduct', () => {
         await models.Product.destroy({ where: {} });
     });
     it('should return a list of available products', async () => {
-        const res = await chai
-            .request(app)
-            .get('/product/availableProduct');
+        const res = await chai.request(app).get('/product/availableProduct');
         expect(res.statusCode).to.equal(200);
         expect(res.body.response).to.be.an('object');
         expect(res.body.response).to.have.property('currentPage');
@@ -426,7 +422,6 @@ describe('PUT /product/availableProduct/:id', () => {
     });
 
     it('should update the availability of a product', async () => {
-        console.log(product.id);
         const res = await chai
             .request(app)
             .put(`/product/availableProduct/${product.id}`)
@@ -461,7 +456,6 @@ describe('PUT /product/availableProduct/:id', () => {
         );
     });
 });
-
 
 describe('addProduct function', () => {
     let merchantUser, roles, customerUser;
@@ -763,7 +757,6 @@ describe('checkExpiredProducts', () => {
         const updatedProduct = await models.Product.findByPk(product1.id);
         expect(updatedProduct.available).to.equal(true);
         const updatedProduct3 = await models.Product.findByPk(product3.id);
-        console.log(updatedProduct3)
         expect(updatedProduct3.available).to.equal(false);
     });
     it('should return an empty array if there are no expired products', async () => {
@@ -793,4 +786,3 @@ describe('checkExpiredProducts', () => {
         expect(updatedProduct2.available).to.equal(false);
     });
 });
-

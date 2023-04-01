@@ -334,13 +334,8 @@ const enableUser = async (req, res) => {
 };
 
 const logout = (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error(err);
-        } else {
-            console.log('User logged out');
-        }
-    });
+    res.setHeader('Authorization', '');
+    res.status(200).json({ message: 'User logged out successfully' });
 };
 
 export default {
