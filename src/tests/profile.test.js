@@ -14,13 +14,40 @@ describe('Profile Checks', () => {
 
     before(async () => {
         await models.sequelize.sync({ force: true });
+        await models.Role.destroy({ where: {} });
+        await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
         const res = await chai.request(app).post('/user/create').send({
             firstName: 'Manzi',
             lastName: 'Evariste',
             userName: 'Manzi212',
             telephone: '0785188981',
             address: 'Kiyovu',
-            email: 'evaristeee@gmail.com',
+            email: 'evaristeee@example.com',
             password: 'Password@123',
         });
 

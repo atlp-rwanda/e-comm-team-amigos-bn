@@ -1,5 +1,12 @@
+import jwt from 'jsonwebtoken';
+import socketIo from 'socket.io';
+import http from 'http';
+import app from '../app';
 import models from '../database/models';
 import asyncHandler from 'express-async-handler';
+
+const ioServer = socketIo(server);
+const server = http.createServer(app);
 
 exports.createOrder = asyncHandler(async (req, res, next) => {
     let orderProducts;
@@ -138,3 +145,76 @@ exports.deleteOrder = asyncHandler(async (req, res, next) => {
         message: 'Order deleted successfully.',
     });
 });
+
+// Retrieve order status information
+exports.getOrderStatus = async (req, res, next) => {
+    try {
+        const { orderId } = req.params;
+
+        // Retrieve the order status information from the database
+        const order = await models.Order.findOne({
+            where: {
+                id: orderId,
+            },
+            attributes: ['id', 'status', 'expected_delivery_date'],
+        });
+
+        if (!order) {
+            return res.status(404).send({ message: 'Order not found' });
+        }
+
+        // Send the order status information to the frontend
+        res.status(200).json({
+            status: order.status,
+            expectedDeliveryDate: order.expected_delivery_date,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};
+
+// Update order status
+exports.updateOrderStatus = async (req, res, next) => {
+    try {
+        // Check if the requesting user/token is an admin
+
+        const { orderId } = req.params;
+
+        const order = await models.Order.findOne({
+            where: { id: orderId },
+            attributes: ['id', 'status', 'expected_delivery_date'],
+        });
+
+        if (!order) {
+            return res.status(404).send({ message: 'Order not found' });
+        }
+        const validStatuses = ['pending', 'processing', 'shipped', 'delivered'];
+        if (!validStatuses.includes(req.body.status)) {
+            return res.status(400).json({ message: 'Invalid order status' });
+        }
+        // Update the order status in the database
+        order.status = req.body.status;
+        await order.save();
+
+        // Emit an event to notify clients that the order status has been updated
+        ioServer.emit('orderStatusUpdated', {
+            orderId: order.id,
+            status: order.status,
+            expectedDeliveryDate: order.expected_delivery_date,
+        });
+
+        return res.json({
+            message: 'status updated ',
+            status: order.status,
+            expectedDeliveryDate: order.expected_delivery_date,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+};

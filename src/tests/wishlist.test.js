@@ -9,8 +9,6 @@ import app from '../app';
 
 chai.use(chaiHttp);
 
-let user;
-
 describe('addToWishlist', () => {
     let user;
     let product;
@@ -25,7 +23,6 @@ describe('addToWishlist', () => {
             address: 'kacyiru',
             email: 'test1@example.com',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'normal',
         });
         product = await models.Product.create({
             id: uuidv4(),
@@ -41,10 +38,8 @@ describe('addToWishlist', () => {
             ec: 30,
         });
         user = user.toJSON();
-        token = jwt.sign(
-            { userId: user.id, userRole: 'vendor' },
-            process.env.SECRET_KEY
-        );
+
+        token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
     });
 
     it('should add product to wishlist', async () => {
@@ -95,7 +90,6 @@ describe('removeFromWishlist', () => {
             address: 'kacyiru',
             email: 'test1@example.com',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'normal',
         });
         user = user.toJSON();
         product = await models.Product.create({
@@ -113,10 +107,7 @@ describe('removeFromWishlist', () => {
         });
         product = product.toJSON();
 
-        token = jwt.sign(
-            { userId: user.id, userRole: 'vendor' },
-            process.env.SECRET_KEY
-        );
+        token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
     });
 
     it('should first add product to wishlist', async () => {

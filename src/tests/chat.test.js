@@ -4,6 +4,7 @@ import models from '../database/models';
 import app from '../app';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 chai.use(chaiHttp);
@@ -13,6 +14,7 @@ describe('Chat Feature', () => {
     before(async function () {
         await models.sequelize.sync({ force: true });
         await models.User.create({
+            id: uuidv4(),
             firstName: 'Didas',
             lastName: 'Junior',
             userName: 'Junior',
@@ -27,17 +29,11 @@ describe('Chat Feature', () => {
         await models.User.destroy({ where: {} });
     });
 
-    it('Should Get All CHATS', (done) => {
-        chai.request(app)
-            .get('/chat')
-            .end((error, res) => {
-                if (error) done(error);
-                else {
-                    res.should.have.status(200);
-                    res.should.be.json;
-                    res.body.should.have.property('Chats');
-                    done();
-                }
-            });
+    it('Should Get All CHATS', async () => {
+        const res = await chai.request(app).get('/chat');
+
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.have.property('Chats');
     });
 });

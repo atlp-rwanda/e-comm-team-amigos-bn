@@ -10,11 +10,44 @@ import tokenGenerator from '../helpers/generateToken';
 
 chai.use(chaiHttp);
 let userOne, userTwo, userThree, userFour;
-let p1, p2, p3, p4;
+let p1, p2, p3, p4, roles;
 
 describe('View a Specific Product', () => {
     before(async () => {
         await models.sequelize.sync({ force: true });
+        await models.Role.destroy({ where: {} });
+        await models.UserRole.destroy({ where: {} });
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Merchant',
+                description:
+                    'As a merchant I should be to create, publish, and sell my product',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                id: uuidv4(),
+                name: 'Customer',
+                description:
+                    'As a customer I should be able to vist all listed product and buy a products',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+        roles = JSON.parse(JSON.stringify(roles));
+
+        const merchantRole = roles.find((role) => role.name === 'Merchant');
+        const customerRole = roles.find((role) => role.name === 'Customer');
+        const adminRole = roles.find((role) => role.name === 'Admin');
         // Users
         userOne = await models.User.create({
             id: uuidv4(),
@@ -23,9 +56,8 @@ describe('View a Specific Product', () => {
             userName: 'eric_dnungutse',
             telephone: '0785283007',
             address: 'Muhanga',
-            email: 'dav.ndungutse@gmail.com',
+            email: 'dav.ndungutse@example.com',
             password: await bcrypt.hash('Password@123', 10),
-            role: 'admin',
             status: 'active',
             verified: true,
             createdAt: new Date(),
@@ -40,9 +72,8 @@ describe('View a Specific Product', () => {
             telephone: '0780908888',
             billingAddress: 'Kigali',
             address: 'Kigali',
-            email: 'wilbrord@gmail.com',
+            email: 'bwilbrord@example.com',
             password: await bcrypt.hash('Wilbrord@213', 10),
-            role: 'vendor',
             status: 'active',
             verified: true,
             createdAt: new Date(),
@@ -57,9 +88,8 @@ describe('View a Specific Product', () => {
             billingAddress: 'Kigali',
             telephone: '0780909788',
             address: 'Kigali',
-            email: 'jimmyd@gmail.com',
+            email: 'jimmyd@example.com',
             password: await bcrypt.hash('Wilbrord@213', 10),
-            role: 'vendor',
             status: 'active',
             verified: true,
             createdAt: new Date(),
@@ -75,12 +105,50 @@ describe('View a Specific Product', () => {
             address: 'Kigali',
             email: 'normal@example.com',
             password: await bcrypt.hash('Normal@213', 10),
-            role: 'normal',
             status: 'active',
             verified: true,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
+
+        // UserRoles
+        await models.UserRole.bulkCreate([
+            {
+                // Merchant
+                id: uuidv4(),
+
+                userId: userTwo.id,
+                roleId: merchantRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+            {
+                // Merchant
+                id: uuidv4(),
+                userId: userThree.id,
+                roleId: merchantRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+
+            {
+                // Customer
+                id: uuidv4(),
+                userId: userFour.id,
+                roleId: customerRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+
+            {
+                // Admin
+                id: uuidv4(),
+                userId: userOne.id,
+                roleId: adminRole.id,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
 
         // Products
         p1 = await models.Product.create({
@@ -197,11 +265,11 @@ describe('View a Specific Product', () => {
         expect(res2.body.item.id).to.equal(p1.dataValues.id);
     });
 
-    it('Should not get item if user is vendor and not the owner', async () => {
+    it('Should not get item if user is Merchant and not the owner', async () => {
         let otp;
 
         const res = await chai.request(app).post('/user/login').send({
-            email: 'wilbrord@gmail.com',
+            email: 'bwilbrord@example.com',
             password: 'Wilbrord@213',
         });
 
@@ -209,7 +277,7 @@ describe('View a Specific Product', () => {
 
         // Verify OTP
         const otpCheckRes = await chai.request(app).post('/user/otp').send({
-            email: 'wilbrord@gmail.com',
+            email: 'bwilbrord@example.com',
             otp,
         });
 

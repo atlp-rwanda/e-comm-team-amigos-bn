@@ -22,16 +22,14 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DATE,
                 allownull: true,
             },
+            preferredCurrency: DataTypes.ENUM('Frw', 'USD'),
+
             preferredLanguage: DataTypes.STRING,
             email: { type: DataTypes.STRING, allowNull: false },
             password: { type: DataTypes.STRING, allowNull: false },
             birthdate: DataTypes.DATE,
             preferredCurrency: DataTypes.ENUM('Frw', 'USD'),
             gender: DataTypes.ENUM('Male', 'Female'),
-            role: {
-                type: DataTypes.ENUM('admin', 'vendor', 'normal'),
-                defaultValue: 'normal',
-            },
             status: {
                 type: DataTypes.ENUM('active', 'inactive'),
                 defaultValue: 'active',

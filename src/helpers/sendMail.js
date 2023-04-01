@@ -2,19 +2,19 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 function sendMail(recepient, subject, text, url) {
-  return new Promise((resolve, reject) => {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.AUTH_USER,
-        pass: process.env.AUTH_PASSWORD,
-      },
-    });
-    const mailOption = {
-      from: 'kananuraabdulkhaliq59@gmail.com',
-      to: recepient,
-      subject,
-      html: `<!doctype html>
+    return new Promise((resolve, reject) => {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.AUTH_USER,
+                pass: process.env.AUTH_PASS,
+            },
+        });
+        const mailOption = {
+            from: 'kananuraabdulkhaliq59@gmail.com',
+            to: recepient,
+            subject,
+            html: `<!doctype html>
       <html lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       
       <head>
@@ -480,14 +480,14 @@ function sendMail(recepient, subject, text, url) {
       </body>
       
       </html>`,
-    };
+        };
 
-    transporter.sendMail(mailOption, (error, info) => {
-      if (error) {
-        return reject({ message: 'An error Has occured' });
-      }
-      resolve({ message: 'Email sent successfully' });
+        transporter.sendMail(mailOption, (error, info) => {
+            if (error) {
+                return reject({ message: 'An error Has occured' });
+            }
+            resolve({ message: 'Email sent successfully' });
+        });
     });
-  });
 }
 module.exports = { sendMail };
