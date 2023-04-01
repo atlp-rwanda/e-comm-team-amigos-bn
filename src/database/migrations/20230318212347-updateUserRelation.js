@@ -1,21 +1,32 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-    up(queryInterface, Sequelize) {
-        return Promise.all([
-            queryInterface.addColumn('Users', 'preferredCurrency', {
-                type: Sequelize.STRING,
-            }),
+  up(queryInterface, Sequelize) {
+    return Promise.all([
+      queryInterface.addColumn('Users', 'preferredCurrency', {
+        type: Sequelize.STRING,
+      }),
+      queryInterface.addColumn('Users', 'deliveryInfo', {
+        type: Sequelize.JSONB,
+        allowNull: true,
+      }),
 
-            queryInterface.addColumn('Users', 'gender', {
-                type: Sequelize.STRING,
-            }),
-        ])
-    },
+      queryInterface.addColumn('Users', 'paymentInfo', {
+        type: Sequelize.JSONB,
+        allowNull: true,
+      }),
 
-    down(queryInterface, Sequelize) {
-        return Promise.all([
-            queryInterface.removeColumn('Users', 'preferredCurrency'),
-            queryInterface.removeColumn('Users', 'gender'),
-        ])
-    },
+      queryInterface.addColumn('Users', 'gender', {
+        type: Sequelize.STRING,
+      }),
+    ])
+  },
+
+  down(queryInterface, Sequelize) {
+    return Promise.all([
+      queryInterface.removeColumn('Users', 'preferredCurrency'),
+      queryInterface.removeColumn('Users', 'gender'),
+      queryInterface.removeColumn('Users', 'deliveryInfo'),
+      queryInterface.removeColumn('Users', 'paymentInfo'),
+    ])
+  },
 }
