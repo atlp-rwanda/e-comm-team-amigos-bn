@@ -737,6 +737,9 @@ describe('checkExpiredProducts', () => {
     });
 
     it('should not mark unexpired products as unavailable', async () => {
+        // Set the expiry date for both products to a future date
+        await product1.update({ expiryDate: '2024-12-31T00:00:00.000Z' });
+        await product2.update({ expiryDate: '2024-12-31T00:00:00.000Z' });
         const response = await chai
             .request(app)
             .get('/product/check-expired-products')
@@ -763,6 +766,9 @@ describe('checkExpiredProducts', () => {
     });
 
     it('should mark all expired products as unavailable', async () => {
+        // Set the expiry date for both products to a future date
+        await product1.update({ expiryDate: '2024-12-31T00:00:00.000Z' });
+        await product2.update({ expiryDate: '2022-12-31T00:00:00.000Z' });
         const response = await chai
             .request(app)
             .get('/product/check-expired-products')
@@ -772,6 +778,7 @@ describe('checkExpiredProducts', () => {
 
         const updatedProduct1 = await models.Product.findByPk(product1.id);
         const updatedProduct2 = await models.Product.findByPk(product2.id);
+        console.log(updatedProduct2)
         expect(updatedProduct1.available).to.equal(true);
         expect(updatedProduct2.available).to.equal(false);
     });
