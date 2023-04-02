@@ -8,6 +8,7 @@ import wishlist from './wishlist';
 import orderRoutes from './order.routes';
 import review from './Review/review';
 import users from './admin';
+import newsletterRoutes from "./newsletter.routes";
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use('/', role);
 router.use('/orders', orderRoutes);
 router.use('/reviews', review);
 router.use('/users', users);
+router.use("/newsletter", newsletterRoutes);
 
 export default router;
