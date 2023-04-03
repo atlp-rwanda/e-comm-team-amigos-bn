@@ -5,6 +5,7 @@ import {
     deleteOrder,
     getOrders,
     updateOrder,
+    adminGetOrders,
     getOrderStatus,
     updateOrderStatus,
 } from '../controllers/order.controller';
@@ -34,5 +35,6 @@ router.put(
     authorize(['Admin']),
     updateOrderStatus
 );
+router.get('/admin', verifyToken, authorize(['admin']), adminGetOrders);
 
 module.exports = router;

@@ -687,6 +687,7 @@ describe('addProduct function', () => {
         );
     });
 });
+
 describe('checkExpiredProducts', () => {
     let user;
     let product1;
