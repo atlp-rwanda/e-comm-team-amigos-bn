@@ -274,7 +274,6 @@ describe('View a Specific Product', () => {
         });
 
         otp = res.body.otp.otp;
-
         // Verify OTP
         const otpCheckRes = await chai.request(app).post('/user/otp').send({
             email: 'bwilbrord@example.com',

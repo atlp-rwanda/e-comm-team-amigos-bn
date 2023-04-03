@@ -11,7 +11,7 @@ function sendMail(recepient, subject, text, url) {
             },
         });
         const mailOption = {
-            from: 'kananuraabdulkhaliq59@gmail.com',
+            from: process.env.AUTH_USER,
             to: recepient,
             subject,
             html: `<!doctype html>

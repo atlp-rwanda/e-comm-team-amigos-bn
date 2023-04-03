@@ -14,7 +14,7 @@ const sendEmailToUser = (recepient, subject, text) =>
             },
         });
         const mailOption = {
-            from: 'rwibuserge@icloud.com',
+            from: process.env.AUTH_USER,
             to: recepient,
             subject,
             text: 'Hello, \n\n' + 'This is the message body.',
@@ -485,7 +485,7 @@ const sendEmailToUser = (recepient, subject, text) =>
 
         transporter.sendMail(mailOption, (error, info) => {
             if (error) {
-                console.log(error)
+                console.log(error);
                 return reject({ message: 'An error Has occured' });
             }
             resolve({ message: 'Email sent successfully' });

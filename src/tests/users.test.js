@@ -6,8 +6,6 @@ import models, { User } from '../database/models';
 import app from '../app';
 chai.use(chaiHttp);
 
-let userId;
-let token;
 describe('Manage Users By Admin', () => {
     let roles, customerUser, adminUser, token;
 
