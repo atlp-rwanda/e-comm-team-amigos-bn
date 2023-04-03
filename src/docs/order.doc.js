@@ -97,7 +97,7 @@
  *         description: The specified order does not exist
  *       500:
  *         description: Internal server error
- * /orders:
+ * /checkout:
  *   post:
  *     summary: Create order
  *     tags: [Order]
@@ -110,9 +110,12 @@
  *           schema:
  *             type: object
  *             properties:
- *               items:
+ *               products:
  *                 type: array
  *                 example: [{"product":"328987-3284932-3248023j", "quantity": 50, "unitPrice": 200}, {"product":"328fy7gy987-67f76g8-3248023j", "quantity": 2, "unitPrice": 500}]
+ *               deliveryInfo:
+ *                 type: object
+ *                 example: {"address":"Kk520st", "city": "Kigali", "state": "NY", "zip": "10001"}  
  *
  *     responses:
  *       200:
