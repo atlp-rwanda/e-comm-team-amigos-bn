@@ -11,6 +11,7 @@ import tokenRoute from './routes/token.routes';
 import passport from 'passport';
 import cookieSession from 'cookie-session';
 import cartRoute from './routes/cart.routes';
+import webhook from './routes/webhook';
 const socketIo = require('socket.io');
 
 import http from 'http';
@@ -30,7 +31,7 @@ cron.schedule('0 0 * * *', () => {
 
  if (process.env.NODE_ENV === 'development') {
     app.use(logger('dev'))
- }
+}
 
 export const httpServer = http.createServer(app);
 export const io = new Server(httpServer, {
@@ -39,8 +40,7 @@ export const io = new Server(httpServer, {
         methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE'],
     },
 });
-const { sequelize } = db;
-sequelize.authenticate();
+
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cookieSession({
@@ -67,6 +67,7 @@ app.use('/token', tokenRoute);
 
 app.use(cors());
 app.use('/', routes);
+app.use('/',webhook);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.get('/', (req, res) => {
     res.send('Hello, There! this is Amigos ecommerce team project.');

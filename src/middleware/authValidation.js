@@ -47,6 +47,7 @@ const signUpValidator = asyncHandler(async (req, res, next) => {
     res.status(400).json(error.message);
   }
 });
+
 const loginValidator = async (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
@@ -69,7 +70,7 @@ const loginValidator = async (req, res, next) => {
     await schema.validateAsync(req.body);
     next();
   } catch (error) {
-    res.status(400).send(error.message);
+    return res.status(400).send(error.message);
   }
 };
 
@@ -107,7 +108,7 @@ const resetPassValidator = async (req, res, next) => {
     await schema.validateAsync(req.body);
     next();
   } catch (error) {
-    res.status(400).send(error.message);
+    return res.status(400).send(error.message);
   }
 };
 export default {

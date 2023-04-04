@@ -9,8 +9,9 @@ import orderRoutes from './order.routes';
 import review from './Review/review';
 import users from './admin';
 import checkoutRouter from './checkout.route';
+import payment from './payment'
 
-const router = express.Router();
+const router = express.Router()
 
 router.use('/user', auth);
 router.use('/chat', chatRouter);
@@ -23,4 +24,6 @@ router.use('/reviews', review);
 router.use('/users', users);
 router.use('/checkout', checkoutRouter)
 
-export default router;
+router.use('/', payment)
+
+export default router

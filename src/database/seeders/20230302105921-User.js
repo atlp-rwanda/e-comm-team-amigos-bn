@@ -15,7 +15,6 @@ module.exports = {
                     address: 'Muhanga',
                     email: 'dav.ndungutse@example.com',
                     password: await bcrypt.hash('Password@12345', 10),
-                    role: 'admin',
                     status: 'active',
                     verified: 'true',
                     createdAt: new Date(),
@@ -31,7 +30,6 @@ module.exports = {
                     address: 'Kigali',
                     email: 'bwilbrord@example.com',
                     password: await bcrypt.hash('Password@12345', 10),
-                    role: 'vendor',
                     status: 'active',
                     verified: 'true',
                     createdAt: new Date(),
@@ -48,7 +46,6 @@ module.exports = {
                     address: 'Kigali',
                     email: 'jimmyd@example.com',
                     password: await bcrypt.hash('Password@12345', 10),
-                    role: 'vendor',
                     status: 'active',
                     verified: 'true',
                     createdAt: new Date(),
@@ -63,17 +60,11 @@ module.exports = {
                     address: 'Kigali',
                     email: 'normal@example.com',
                     password: await bcrypt.hash('Password@12345', 10),
-                    role: 'normal',
                     status: 'active',
                     verified: 'true',
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
-
-
-
-                
-
                 {
                     id: uuidv4(),
                     firstName: 'Normal2',
@@ -83,7 +74,6 @@ module.exports = {
                     address: 'Kigali',
                     email: 'normal2@example.com',
                     password: await bcrypt.hash('Password@12345', 10),
-                    role: 'normal',
                     status: 'active',
                     verified: 'true',
                     createdAt: new Date(),
