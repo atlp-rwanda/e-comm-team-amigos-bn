@@ -42,13 +42,10 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
 });
 
 exports.getOrders = asyncHandler(async (req, res, next) => {
-    let filter = {};
-    const userId = req.user.id;
-    const userRole = req.user.role;
-    if (userRole === 'normal') filter = { where: { userId } };
+ 
 
     const orders = await models.Order.findAll({
-        ...filter,
+        where:{userId:req.user.id},
         include: [
             {
                 model: models.OrderProduct,

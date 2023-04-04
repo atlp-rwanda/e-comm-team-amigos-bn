@@ -76,6 +76,7 @@ describe('get All Product', () => {
     });
 });
 
+
 describe('Available Product API', () => {
     let user;
     let product;
@@ -109,7 +110,7 @@ describe('Available Product API', () => {
         await models.Product.destroy({ where: {} });
         await models.User.destroy({ where: {} });
     });
-});
+
 
 describe('GET /product/availableProduct', () => {
     let userOne, userTwo, userThree, userFour;
@@ -333,19 +334,7 @@ describe('GET /product/availableProduct', () => {
     });
 });
 
-after(async () => {
-    await models.User.destroy({ where: {} });
-    await models.Product.destroy({ where: {} });
-});
-it('should return a list of available products', async () => {
-    const res = await chai.request(app).get('/product/availableProduct');
-    expect(res.statusCode).to.equal(200);
-    expect(res.body.response).to.be.an('object');
-    expect(res.body.response).to.have.property('currentPage');
-    expect(res.body.response).to.have.property('totalPages');
-    expect(res.body.response).to.have.property('products');
-    expect(res.body.response.products).to.be.a('array');
-});
+
 
 describe('PUT /product/availableProduct/:id', () => {
     let roles, user, product;
@@ -403,6 +392,7 @@ describe('PUT /product/availableProduct/:id', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
         });
+    
 
         product = await models.Product.create({
             id: uuidv4(),
@@ -455,6 +445,7 @@ describe('PUT /product/availableProduct/:id', () => {
             'Invalid availability status'
         );
     });
+});
 });
 
 describe('addProduct function', () => {
@@ -567,7 +558,6 @@ describe('addProduct function', () => {
         });
 
         token = checkOtp.body.token;
-
         const res = await chai
             .request(app)
             .post('/product/create')
@@ -786,3 +776,201 @@ describe('checkExpiredProducts', () => {
         expect(updatedProduct2.available).to.equal(false);
     });
 });
+
+describe('Admin should be able to do CRUD for Product ', () => {
+    let roles
+    let adminUser
+    let merchantUser
+    let product
+    before(async () => {
+        await models.sequelize.sync({ force: true });
+
+        roles = await models.Role.bulkCreate([
+            {
+                id: uuidv4(),
+                name: 'Admin',
+                description:
+                    'As an admin I should be able to monitor sytem grant and revoke other users permissions',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
+        ]);
+
+        roles = JSON.parse(JSON.stringify(roles));
+
+        const adminRole = roles.find((role) => role.name === 'Admin');
+        const merchantRole = roles.find((role) => role.name === 'Merchant');
+
+        adminUser = await models.User.create({
+            firstName: 'Didas',
+            lastName: 'Junior',
+            userName: 'Junior',
+            telephone: '0790994799',
+            address: 'Kigali',
+            email: 'gasanajr@example.com',
+            verified: true,
+            active: true,
+            password: await bcrypt.hash('Password@123', 10),
+        });
+
+        merchantUser = await models.User.create({
+            firstName: 'Didas',
+            lastName: 'Junior',
+            userName: 'Junior',
+            telephone: '0790994799',
+            address: 'Kigali',
+            email: 'gasanajr08@example.com',
+            verified: true,
+            active: true,
+            password: await bcrypt.hash('Password@123', 10),
+        });
+
+        // UserRoles
+        await models.UserRole.create({
+            // Admin
+            id: uuidv4(),
+            userId: adminUser.id,
+            roleId: adminRole.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        // UserRoles
+
+       product= await models.Product.create({
+            id: uuidv4(),
+            userId: merchantUser.id,
+            name: 'Product 1',
+            price: 10,
+            quantity: 1,
+            available: true,
+            category: 'food',
+            bonus: 20,
+            images: ['image1', 'image2'],
+            expiryDate: '2023-12-31T00:00:00.000Z',
+            ec: 30,
+        });
+    });
+    after(async () => {
+        await models.Product.destroy({ where: {} })
+        await models.User.destroy({ where: {} });
+    });
+  
+    describe('GET admin/product', () => {
+      it('should return all product ', async () => {
+        const signin = await chai.request(app).post('/user/login').send({
+            email: adminUser.email,
+            password: 'Password@123',
+        });
+
+        let token = signin.body.token;
+        const res = await chai
+          .request(app)
+          .get(`/admin/product`)
+
+          .set('Authorization', `Bearer ${token}`);
+
+        expect(res).to.have.status(200);
+        expect(res.body.responseData).to.have.property('listProduct');
+      });
+    })
+    describe('GET admin/product/:id', () => {
+        it('should return  product by id ', async () => {
+          const signin = await chai.request(app).post('/user/login').send({
+              email: adminUser.email,
+              password: 'Password@123',
+          });
+  
+          let token = signin.body.token;
+          const res = await chai
+            .request(app)
+            .get(`/admin/product/${product.id}`)
+  
+            .set('Authorization', `Bearer ${token}`);
+  
+          expect(res).to.have.status(200);
+          expect(res.body.item.id).to.equal(product.id);
+        });
+      })
+
+    describe('Update admin/product/:id', () => {
+        it('should update  product ', async () => {
+          const signin = await chai.request(app).post('/user/login').send({
+              email: adminUser.email,
+              password: 'Password@123',
+          });
+  
+          let token = signin.body.token;
+          const res = await chai
+            .request(app)
+            .patch(`/admin/product/${product.id}`)
+            .send({
+                name: 'Product 2',
+                price: 10,
+                quantity: 2,
+                available: true,
+                category: 'food',
+                bonus: 20,
+                images: ['image1', 'image2','image3','image4'],
+                expiryDate: '2023-12-31T00:00:00.000Z',
+                ec: 30,
+            })
+            .set('Authorization', `Bearer ${token}`);
+  
+          expect(res).to.have.status(200);
+          expect(res.body.data.name).to.equal('Product 2');
+        });
+      })
+    describe('delete admin/product/:id', () => {
+        it('should delete product ', async () => {
+          const signin = await chai.request(app).post('/user/login').send({
+              email: adminUser.email,
+              password: 'Password@123',
+          });
+  
+          let token = signin.body.token;
+          const res = await chai
+            .request(app)
+            .delete(`/admin/product/${product.id}`)
+            .set('Authorization', `Bearer ${token}`);
+  
+          expect(res).to.have.status(200);
+          expect(res.body.message).to.equal('deleted successfully');
+        });
+      })
+
+      describe('post admin/product/:sellerId', () => {
+        it('should create product ', async () => {
+          const signin = await chai.request(app).post('/user/login').send({
+              email: adminUser.email,
+              password: 'Password@123',
+          });
+  
+          let token = signin.body.token;
+          const res = await chai
+            .request(app)
+            .post(`/admin/product/create/${merchantUser.id}`)
+            .send({
+                name: 'Product 3',
+                price: 10,
+                quantity: 3,
+                available: true,
+                category: 'food',
+                bonus: 20,
+                images: ['https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg',
+                'https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014__480.jpg',
+                'https://cdn.pixabay.com/photo/2015/06/19/21/24/avenue-815297__480.jpg',
+               'https://images.pexels.com/photos/598917/pexels-photo-598917.jpeg'],
+                expiryDate: '2023-12-31T00:00:00.000Z',
+                ec: 30,
+            })
+            .set('Authorization', `Bearer ${token}`);
+  
+          expect(res).to.have.status(201);
+          expect(res.body.name).to.equal('Product 3');
+        });
+      })
+    });
+
+
+   

@@ -141,6 +141,7 @@
  *         description: Forbidden access
  *       500:
  *         description: Internal server error
+ * /orders:
  *   get:
  *      summary: Get Orders
  *      tags: [Order]
