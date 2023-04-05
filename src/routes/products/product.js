@@ -3,19 +3,19 @@ import validateProductInput, {
 } from '../../validations/product.validator';
 import express from 'express';
 import {
-  addProduct,
-  getAllProduct,
-  getProduct,
-  getAvailableProducts,
-  updateProductAvailability,
-  getAllForSeller,
-  checkExpiredProducts,
-  searchProduct,
-  updateProduct,
-  deleteProduct
+    addProduct,
+    getAllProduct,
+    getProduct,
+    getAvailableProducts,
+    updateProductAvailability,
+    getAllForSeller,
+    checkExpiredProducts,
+    searchProduct,
+    updateProduct,
+    deleteProduct,
 } from '../../controllers/product.controller';
-
 import { authorize, verifyToken } from '../../middleware/verifyToken';
+import { getSalesStats } from '../../controllers/statistics.controller';
 
 const router = express.Router();
 
@@ -43,7 +43,12 @@ router.patch(
     validateProductUpdate,
     updateProduct
 );
-
-router.delete('/delete/:id', verifyToken, authorize(['Merchant']), deleteProduct);
+router.delete(
+    '/delete/:id',
+    verifyToken,
+    authorize(['Merchant']),
+    deleteProduct
+);
+router.get('/sales/stats', verifyToken,authorize(['Merchant']), getSalesStats);
 
 export default router;
