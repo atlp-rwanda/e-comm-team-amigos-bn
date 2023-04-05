@@ -7,9 +7,10 @@ import chatRouter from './chat.route';
 import wishlist from './wishlist';
 import orderRoutes from './order.routes';
 import review from './Review/review';
-import users from './admin';
 import checkoutRouter from './checkout.route';
 import payment from './payment'
+import users from './admin/index';
+import products from './admin/product'
 
 const router = express.Router()
 
@@ -23,6 +24,7 @@ router.use('/orders', orderRoutes);
 router.use('/reviews', review);
 router.use('/users', users);
 router.use('/checkout', checkoutRouter)
+router.use('/admin/product', products);
 
 router.use('/', payment)
 

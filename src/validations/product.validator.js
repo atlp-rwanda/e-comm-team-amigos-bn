@@ -1,6 +1,7 @@
 // File: validateProductInput.js
 import Joi from "joi";
 import models from "./../database/models";
+import { transformUserRoles } from "../helpers/transformUserRoles";
 
 const validateProductInput = (req, res, next) => {
   try {
@@ -68,9 +69,10 @@ export async function validateProductUpdate(req, res, next) {
 
     if (!product) return res.status(404).json({ message: "Product not found!" });
 
-    const productObj = product.toJSON();
+    const userRoles = transformUserRoles(req.user.UserRoles) 
 
-    if (productObj.userId != req.user.id) return res.status(401).json({ message: "Cannot update a product outside of your collection!" });
+    const productObj = product.toJSON();
+    if (productObj.userId !== req.user.id && !(userRoles.includes("Admin"))) return res.status(401).json({ message: "Cannot update a product outside of your collection!" });
 
     next();
 

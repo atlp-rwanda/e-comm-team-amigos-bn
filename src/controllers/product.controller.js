@@ -402,10 +402,11 @@ export const deleteProduct = async (req, res) => {
         const userId = req.user.id;
         const productId = req.params.id;
 
-        const product = await models.Product.findOne({
-            where: { id: productId, userId },
-        });
+        const userRoles = transformUserRoles(req.user.UserRoles) 
 
+        const product = await models.Product.findOne({
+            where: { id: productId, ...(!userRoles.includes('Admin') && userId)},
+        });
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
@@ -420,6 +421,49 @@ export const deleteProduct = async (req, res) => {
     }
 };
 
+export const addProductByAdmin = async (req, res) => {
+    try {
+        const {
+            name,
+            price,
+            quantity,
+            available,
+            category,
+            bonus,
+            expiryDate,
+            ec,
+        } = req.body;
+        const images = req.body.images || [];
+
+        const existingProduct = await models.Product.findOne({
+            where: { name },
+        });
+        if (existingProduct) {
+            return res.status(409).json({
+                message:
+                    'Product already exists you can update that product instead',
+            });
+        }
+        const { sellerId } = req.params;
+        const product = await models.Product.create({
+            userId: sellerId, // set vendor ID as the user ID for the product
+            name,
+            price,
+            quantity,
+            available,
+            category,
+            bonus,
+            images,
+            expiryDate,
+            ec,
+        });
+        res.status(201).json(product);
+    } catch (error) {
+        res.status(500).json({ status: 'fail', message: error.message });
+    }
+};
+
+
 export default {
     addProduct,
     getAllProduct,
@@ -430,4 +474,5 @@ export default {
     updateProductAvailability,
     getAllForSeller,
     deleteProduct,
+    addProductByAdmin
 };

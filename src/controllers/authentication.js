@@ -41,7 +41,7 @@ const createUser = async (req, res) => {
             updatedAt: new Date(),
         });
 
-        await sendMail(
+         sendMail(
             user.email,
             'Email Verification',
             'you can now verify your account',

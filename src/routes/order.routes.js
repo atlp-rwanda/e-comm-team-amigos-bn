@@ -35,6 +35,6 @@ router.put(
     authorize(['Admin']),
     updateOrderStatus
 );
-router.get('/admin', verifyToken, authorize(['admin']), adminGetOrders);
+router.get('/admin', verifyToken, authorize(['Admin']), adminGetOrders);
 
 module.exports = router;
