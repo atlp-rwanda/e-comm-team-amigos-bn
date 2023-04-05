@@ -8,6 +8,7 @@ import wishlist from './wishlist';
 import orderRoutes from './order.routes';
 import review from './Review/review';
 import users from './admin';
+import notificationRoutes from './notifications.routes';
 
 const router = express.Router();
 
@@ -20,5 +21,12 @@ router.use('/', role);
 router.use('/orders', orderRoutes);
 router.use('/reviews', review);
 router.use('/users', users);
+router.use('/notifications', notificationRoutes);
+router.get('/notifications', (req, res) => {
+    res.render('index');
+});
+router.get('/firebase-messaging-sw.js', (req, res) =>
+    res.sendFile(process.cwd() + '/public/firebase-messaging-sw.js')
+);
 
 export default router;

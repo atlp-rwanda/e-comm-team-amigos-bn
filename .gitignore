@@ -108,3 +108,6 @@ dist
 .tern-port
 
 .DS_Store
+
+# Firebase Admin SDK certificate
+e-comm-team-amig-1678127873989-firebase-adminsdk.json

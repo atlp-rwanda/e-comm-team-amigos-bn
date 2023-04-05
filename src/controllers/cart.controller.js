@@ -1,3 +1,4 @@
+import { sendNotification } from '../utils/firebase.admin.util';
 import models from './../database/models';
 let cart = [];
 let cartItems;
@@ -11,6 +12,11 @@ export async function createCart(req, res) {
         cart.push({ productId, quantity });
         req.session.cart = cart;
         req.session.cartUserId = userId;
+        sendNotification(userId, {
+            title: 'Ecomm: discount',
+            body: 'Notification Body',
+            productId,
+        });
         res.status(200).json({
             message: 'cart saved',
             cart: req.session.cart,

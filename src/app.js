@@ -36,6 +36,9 @@ export const io = new Server(httpServer, {
 const { sequelize } = db;
 sequelize.authenticate();
 app.use(express.urlencoded({ extended: true }));
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.use('/static', express.static('public'));
 app.use(
     cookieSession({
         name: 'google-auth-session',

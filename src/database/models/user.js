@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
             userName: DataTypes.STRING,
             telephone: DataTypes.STRING,
             billingAddress: DataTypes.STRING,
+            fcmToken: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
             otpcode: {
                 type: DataTypes.STRING,
                 allownull: true,
