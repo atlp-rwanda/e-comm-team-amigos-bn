@@ -817,3 +817,38 @@ describe('disableUser/enable User', () => {
             });
     });
 });
+describe('logoutUser function', () => {
+    let token;
+    before(async () => {
+        await models.sequelize.sync({ force: true });
+        await models.User.destroy({ where: {} });
+        await models.User.create({
+            firstName: 'Kaneza',
+            lastName: 'Erica',
+            userName: 'Eriallan',
+            telephone: '0785188981',
+            verified: true,
+            address: 'Kigali',
+            email: 'dav.ndungutse@example.com',
+            password: await bcrypt.hash('Password@123', 10),
+        });
+
+        const res = await chai.request(app).post('/user/login').send({
+            email: 'dav.ndungutse@example.com',
+            password: 'Password@123',
+        });
+        token = res.body.token;
+    });
+
+    after(async () => {
+        await models.User.destroy({ where: {} });
+    });
+
+    it('should logout the current user', async () => {
+        const res = await chai
+            .request(app)
+            .get('/user/logout')
+            .set('Authorization', `Bearer ${token}`);
+        expect(res).to.have.status(200);
+    });
+});

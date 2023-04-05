@@ -6,6 +6,7 @@ import { authorize, verifyToken } from '../../middleware/verifyToken';
 const router = express.Router();
 router.post('/create', validate.signUpValidator, authentication.createUser);
 router.post('/login', validate.loginValidator, loginUser);
+router.get('/logout', verifyToken, authentication.logout);
 router.get('/verify_email/:token', authentication.emailVerification);
 router.post('/forgotPassword', authentication.forgotPassword);
 router.put(

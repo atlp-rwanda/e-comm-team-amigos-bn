@@ -1,4 +1,4 @@
- /**
+/**
  * @openapi
  *
  * /user/create:
@@ -219,7 +219,7 @@
  *                               type: string
  *        responses:
  *              200:
- *                   description: Account disabled successfuly               
+ *                   description: Account disabled successfuly
  *              400:
  *                   description: Bad request
  *              401:
@@ -239,12 +239,12 @@
  *                application/json:
  *                    schema:
  *                       type: object
- *                       properties: 
+ *                       properties:
  *                           email:
  *                               type: string
  *        responses:
  *              200:
- *                   description: Account enabled successfuly               
+ *                   description: Account enabled successfuly
  *              400:
  *                   description: Bad request
  *              401:
@@ -253,4 +253,17 @@
  *                   description: Account not found
  *              500:
  *                  description: Internal server error
+ * /user/logout:
+ *      get:
+ *       summary:  Logs out the current user.
+ *       responses:
+ *         '200':
+ *           description:  User logged out successfully.
+ *         '500':
+ *           description: Internal Sever error
+ *       security:
+ *        - bearerAuth: []
+ *       tags:
+ *        - Authentication
+ *
  */
