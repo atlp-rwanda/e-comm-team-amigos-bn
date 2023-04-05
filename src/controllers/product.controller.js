@@ -1,32 +1,32 @@
-import Joi from 'joi';
 import { Op } from 'sequelize';
 import models from '../database/models';
 import jwt from 'jsonwebtoken';
 import EventEmitter from 'events';
 import { verifyUuid } from '../utils/verify_uuid';
 import { transformUserRoles } from '../helpers/transformUserRoles';
-import { verifyToken } from '../middleware/verifyToken';
-import dotenv from 'dotenv';
 import { Product } from '../database/models';
-import { expiryNot } from '../helpers/createotp'
+import { expiryNot } from '../helpers/createotp';
+import { sendingNotification } from '../utils/firebase.admin.util';
+
+const productEvents = new EventEmitter();
 
 export const checkExpiredProducts = async (req, res) => {
-  try {
-    const expiredProducts = await Product.findAll({
-      where: { expiryDate: { [Op.lt]: new Date() } }
-    });
-
-    await Promise.all(expiredProducts.map(async (product) => {
-      await product.update({ available: false });
-      await expiryNot(product);
-    }));
-
-    res.status(200).json({ message: 'Email sent successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  }
-};
+    try {
+      const expiredProducts = await Product.findAll({
+        where: { expiryDate: { [Op.lt]: new Date() } }
+      });
+  
+      await Promise.all(expiredProducts.map(async (product) => {
+        await product.update({ available: false });
+        await expiryNot(product);
+      }));
+  
+      res.status(200).json({ message: 'Email sent successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  };
 
 const PAGE_SIZE = 5; // Number of products per page
 export const getAllProduct = async (req, res) => {
@@ -110,6 +110,7 @@ export const getAvailableProducts = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
 export const updateProductAvailability = async (req, res) => {
     try {
         const { id } = req.params;
@@ -132,6 +133,7 @@ export const updateProductAvailability = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 export const addProduct = async (req, res) => {
     try {
         const {
@@ -166,11 +168,13 @@ export const addProduct = async (req, res) => {
             expiryDate,
             ec,
         });
+        productEvents.emit('added', product, req.user.id);
         res.status(201).json(product);
     } catch (error) {
         res.status(500).json({ status: 'fail', message: error.message });
     }
 };
+
 export const getAllForSeller = async (req, res) => {
     const { page } = req.query; // Current page number
 
@@ -227,6 +231,7 @@ export const getAllForSeller = async (req, res) => {
         });
     }
 };
+
 export const searchProduct = async (req, res) => {
     const { page } = req.query; // Current page number
 
@@ -340,6 +345,7 @@ export const getProduct = async (req, res) => {
         });
     }
 };
+
 export async function updateProduct(req, res) {
     try {
         const {
@@ -355,7 +361,6 @@ export async function updateProduct(req, res) {
         } = req.body;
         const id = req.params.id;
         const product = await models.Product.findByPk(id);
-
         product.name = name || product.name;
         product.price = price || product.price;
         product.quantity = quantity || product.quantity;
@@ -372,7 +377,7 @@ export async function updateProduct(req, res) {
             return res
                 .status(400)
                 .json({ error: 'could not update this product!' });
-
+        productEvents.emit('updated', product, req.user.id);
         res.status(200).json({ message: 'success', data: newProduct.toJSON() });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -394,7 +399,7 @@ export const deleteProduct = async (req, res) => {
         }
 
         await models.Product.destroy({ where: { id: productId } });
-
+        productEvents.emit('deleted', product, userId);
         res.status(200).json({
             message: 'deleted successfully',
         });
@@ -445,6 +450,33 @@ export const addProductByAdmin = async (req, res) => {
     }
 };
 
+// Listen for the "added" event
+productEvents.on('added', (product, userId) => {
+sendingNotification(userId, {
+    title: 'Added product',
+    body: 'Hi, you have added product to amigos e-store',
+    productId: product.id
+});
+});
+
+// Listen for the "added" event
+productEvents.on('update', (product, userId) => {
+    sendingNotification(userId, {
+        title: 'Updated product',
+        body: 'Hi, you have updated product from amigos store',
+        productId: product.id
+    });
+});
+
+
+// Listen for the "removed" event
+productEvents.on('deleted', (product, userId) => {
+    sendingNotification(userId, {
+        title: 'Deleted product',
+        body: 'Hi, you have updated product from amigos store',
+        productId: product.id
+    });
+});
 
 export default {
     addProduct,
