@@ -12,28 +12,32 @@ chai.use(chaiHttp);
 const should = chai.should();
 
 describe('Order Tests', () => {
-    let roles, customerUser1, customerUser2, merchantUser, product, product2, adminUser;
+    let roles,
+        customerUser1,
+        customerUser2,
+        merchantUser,
+        product,
+        product2,
+        adminUser;
 
     before(async () => {
         await models.sequelize.sync({ force: true });
 
-        adminUser = await models.User.create(
-            {
-                id: uuidv4(),
-                firstName: 'Junior',
-                lastName: 'Gasana',
-                userName: 'didas___jr',
-                telephone: '078000000',
-                address: 'Kigali',
-                email: 'admin@admin.com',
-                password: await bcrypt.hash('Password@123', 10),
-                role: 'admin',
-                status: 'active',
-                verified: 'true',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            }
-        )
+        adminUser = await models.User.create({
+            id: uuidv4(),
+            firstName: 'Junior',
+            lastName: 'Gasana',
+            userName: 'didas___jr',
+            telephone: '078000000',
+            address: 'Kigali',
+            email: 'admin@admin.com',
+            password: await bcrypt.hash('Password@123', 10),
+            role: 'admin',
+            status: 'active',
+            verified: 'true',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
 
         roles = await models.Role.bulkCreate([
             {
@@ -180,21 +184,20 @@ describe('Order Tests', () => {
         const res = await chai
             .request(app)
             .post('/checkout')
-            .send(
-                {
-                    "products": [
-                        {
-                            "productId": product.id,
-                            "quantity": 1
-                        }
-                    ],
-                    "deliveryInfo": {
-                        "address": "123 Main St",
-                        "city": "New York",
-                        "state": "NY",
-                        "zip": "10001",
-                    }
-                })
+            .send({
+                products: [
+                    {
+                        productId: product.id,
+                        quantity: 1,
+                    },
+                ],
+                deliveryInfo: {
+                    address: '123 Main St',
+                    city: 'New York',
+                    state: 'NY',
+                    zip: '10001',
+                },
+            })
             .set('Authorization', 'Bearer ' + token);
 
         expect(res).to.have.status(200);
@@ -212,7 +215,7 @@ describe('Order Tests', () => {
 
         const order = await chai
             .request(app)
-            .post('/orders')
+            .post('/order')
             .send({
                 items: [
                     {
@@ -228,7 +231,7 @@ describe('Order Tests', () => {
 
         const res = await chai
             .request(app)
-            .delete(`/orders/${id}`)
+            .delete(`/order/${id}`)
             .set('Authorization', 'Bearer ' + token);
 
         expect(res).to.have.status(200);
@@ -246,7 +249,7 @@ describe('Order Tests', () => {
 
         const order = await chai
             .request(app)
-            .post('/orders')
+            .post('/order')
             .send({
                 items: [
                     {
@@ -260,7 +263,7 @@ describe('Order Tests', () => {
 
         const res = await chai
             .request(app)
-            .get(`/orders/orderStatus/${order.body.data.order.id}`)
+            .get(`/order/orderStatus/${order.body.data.order.id}`)
             .set('Authorization', `Bearer ${token}`);
         expect(res).to.have.status(200);
         expect(res.body).to.have.property('status');
@@ -283,7 +286,7 @@ describe('Order Tests', () => {
 
         const order = await chai
             .request(app)
-            .post('/orders')
+            .post('/order')
             .send({
                 items: [
                     {
@@ -299,7 +302,7 @@ describe('Order Tests', () => {
 
         const res = await chai
             .request(app)
-            .delete(`/orders/${id}`)
+            .delete(`/order/${id}`)
             .set('Authorization', 'Bearer ' + token2);
 
         expect(res).to.have.status(403);
@@ -319,7 +322,7 @@ describe('Order Tests', () => {
 
         const res = await chai
             .request(app)
-            .get(`/orders`)
+            .get(`/order`)
             .set('Authorization', 'Bearer ' + token);
 
         expect(res).to.have.status(200);
@@ -338,7 +341,7 @@ describe('Order Tests', () => {
 
         const order = await chai
             .request(app)
-            .post('/orders')
+            .post('/order')
             .send({
                 items: [
                     {
@@ -357,7 +360,7 @@ describe('Order Tests', () => {
 
         const updateOrder = await chai
             .request(app)
-            .put(`/orders/${order.body.data.order.id}`)
+            .put(`/order/${order.body.data.order.id}`)
             .send({
                 items: [
                     {
@@ -382,7 +385,7 @@ describe('Order Tests', () => {
 
         const res = await chai
             .request(app)
-            .get(`/orders`)
+            .get(`/order`)
             .set('Authorization', 'Bearer ' + token);
 
         expect(res).to.have.status(200);
