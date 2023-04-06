@@ -115,7 +115,7 @@
  *                 example: [{"product":"328987-3284932-3248023j", "quantity": 50, "unitPrice": 200}, {"product":"328fy7gy987-67f76g8-3248023j", "quantity": 2, "unitPrice": 500}]
  *               deliveryInfo:
  *                 type: object
- *                 example: {"address":"Kk520st", "city": "Kigali", "state": "NY", "zip": "10001"}  
+ *                 example: {"address":"Kk520st", "city": "Kigali", "state": "NY", "zip": "10001"}
  *
  *     responses:
  *       200:
@@ -141,7 +141,7 @@
  *         description: Forbidden access
  *       500:
  *         description: Internal server error
- * /orders:
+ * /order:
  *   get:
  *      summary: Get Orders
  *      tags: [Order]
@@ -158,7 +158,7 @@
  *               count:
  *               orders:
  *
- * /orders/{id}:
+ * /order/{id}:
  *  delete:
  *   summary: Delete order by ID
  *   tags: [Order]
@@ -246,7 +246,7 @@
  *        description: The specified order does not exist
  *      500:
  *        description: Internal server error
- * /orders/admin:
+ * /order/admin:
  *   get:
  *      summary: Admin should Get All Orders
  *      tags: [Order]
@@ -272,4 +272,4 @@
  *          description: Forbidden access
  *         500:
  *          description: Internal server error
-*/
+ */
