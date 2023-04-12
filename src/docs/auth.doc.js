@@ -267,3 +267,78 @@
  *        - Authentication
  *
  */
+/**
+ * @swagger
+ * /user/createPassword:
+ *   put:
+ *     summary: Update user password
+ *     tags: [Authentication]
+ *     description: Update user password in the database
+ *     requestBody:
+ *            required:  true
+ *            content:
+ *                application/json:
+ *                    schema:
+ *                       type: object
+ *                       properties:
+ *                            email:
+ *                                type: string
+ *                            oldpassword:
+ *                                type: string
+ *                            newpassword:
+ *                                type: string
+ *     responses:
+ *       '200':
+ *         description: Password updated successfully
+ *         schema:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: string
+ *             message:
+ *               type: string
+ *             updatedUser:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 firstName:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                 updatedAt:
+ *                   type: string
+ *       '400':
+ *         description: Bad request
+ *         schema:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: string
+ *               example: fail
+ *             message:
+ *               type: string
+ *       '401':
+ *         description: Incorrect email or password
+ *         schema:
+ *           type: object
+ *           properties:
+ *             error:
+ *               type: string
+ *               example: incorrect email or password
+ *       '404':
+ *         description: User does not exist
+ *         schema:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: string
+ *               example: Not Found
+ *             error:
+ *               type: string
+ *               example: User does not exist
+ */
