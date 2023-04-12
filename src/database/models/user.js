@@ -35,6 +35,13 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: 'active',
             },
             verified: { type: DataTypes.BOOLEAN, defaultValue: 'false' },
+            passwordResetTime: {
+                allowNull: true,
+                type: DataTypes.DATE,
+                defaultValue: new Date(
+                    Date.now() + 60 * 24 * 60 * 60 * 1000
+                ).toISOString(),
+            },
         },
         {}
     );

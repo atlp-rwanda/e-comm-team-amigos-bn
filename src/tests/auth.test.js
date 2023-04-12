@@ -11,10 +11,8 @@ import tokenGenerator from '../helpers/generateToken';
 dotenv.config();
 chai.use(chaiHttp);
 const should = chai.should();
-
 describe('createUser function', () => {
     let roles;
-
 
     before(async () => {
         await models.sequelize.sync({ force: true });
@@ -299,15 +297,15 @@ describe('User Login', () => {
         chai.request(app)
             .post('/user/login')
             .send({
-                email: 'evarist@example.com',
-                password: 'Password@123',
+                email: 'tests123@example.com',
+                password: 'Paswo1829$133',
             })
             .end((err, res) => {
                 if (err) done(err);
                 else {
-                    res.should.have.status(400);
+                    res.should.have.status(404);
                     res.should.be.json;
-                    res.body.should.have.property('message');
+                    res.body.should.have.property('error');
                     done();
                 }
             });
@@ -328,7 +326,7 @@ describe('check OTP for USER with role MERCHANT to LOGIN', () => {
             address: 'Kigali',
             verified: true,
             password: await bcrypt.hash('Password@123', 10),
-            email: 'bwilbrord@example.com',
+            email: 'wilbrord@example.com',
         });
 
         await models.Role.destroy({ where: {} });
@@ -380,7 +378,7 @@ describe('check OTP for USER with role MERCHANT to LOGIN', () => {
         chai.request(app)
             .post('/user/login')
             .send({
-                email: 'bwilbrord@example.com',
+                email: 'wilbrord@example.com',
                 password: 'Password@123',
             })
             .end((err, res) => {
@@ -397,7 +395,7 @@ describe('check OTP for USER with role MERCHANT to LOGIN', () => {
         chai.request(app)
             .post('/user/otp')
             .send({
-                email: 'bwilbrord@example.com',
+                email: 'wilbrord@example.com',
                 otp,
             })
             .end((err, res) => {
@@ -850,5 +848,106 @@ describe('logoutUser function', () => {
             .get('/user/logout')
             .set('Authorization', `Bearer ${token}`);
         expect(res).to.have.status(200);
+    });
+});
+
+describe('Password Reset', () => {
+    const currentDate = new Date();
+    const futureDate = new Date(
+        currentDate.getTime() - 60 * 24 * 60 * 60 * 1000
+    );
+    let user;
+    before(async function () {
+        await models.sequelize.sync({ force: true });
+        user = await models.User.create({
+            firstName: 'Didas',
+            lastName: 'Junior',
+            userName: 'Junior',
+            telephone: '0790994799',
+            address: 'Kigali',
+            email: 'testuser@example.com',
+            verified: true,
+            password: await bcrypt.hash('Password@123', 10),
+            passwordResetTime: futureDate,
+        });
+    });
+
+    after(async function () {
+        await models.User.destroy({ where: {} });
+    });
+
+    describe('Create new Password when expired', () => {
+        it('should notifier user that the password is expired', (done) => {
+            chai.request(app)
+                .post('/user/login')
+                .send({
+                    email: 'testuser@example.com',
+                    password: 'Password@123',
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.body.should.be.a('object');
+                    res.body.should.have
+                        .property('error')
+                        .eql('Update your password it has been expired');
+                    done();
+                });
+        });
+        it('should update the password for a user with valid credentials', (done) => {
+            chai.request(app)
+                .put('/user/createPassword')
+                .send({
+                    email: 'testuser@example.com',
+                    oldpassword: 'Password@123',
+                    newpassword: 'Password@12387',
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('status').eql('OK');
+                    res.body.should.have
+                        .property('Message')
+                        .eql('Password successifully Updated');
+                    res.body.should.have.property('updatedUser');
+                    done();
+                });
+        });
+
+        it('should return an error for a user with invalid old password', (done) => {
+            chai.request(app)
+                .put('/user/createPassword')
+                .send({
+                    email: 'testuser@example.com',
+                    oldpassword: 'wrongpassword',
+                    newpassword: 'newtestpassword',
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.be.a('object');
+                    res.body.should.have
+                        .property('error')
+                        .eql('incorrect email or password');
+                    done();
+                });
+        });
+
+        it('should return an error for a non-existing user', (done) => {
+            chai.request(app)
+                .put('/user/createPassword')
+                .send({
+                    email: 'nonexistinguser@example.com',
+                    oldpassword: 'testpassword',
+                    newpassword: 'newtestpassword',
+                })
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('status').eql('Not Found');
+                    res.body.should.have
+                        .property('error')
+                        .eql('User does not exist');
+                    done();
+                });
+        });
     });
 });

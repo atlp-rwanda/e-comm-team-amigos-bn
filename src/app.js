@@ -17,6 +17,7 @@ const socketIo = require('socket.io');
 import http from 'http';
 import { Server } from 'socket.io';
 import { checkExpiredProducts } from './controllers/product.controller';
+import { checkExpiredPassword } from './middleware/checkExpiredPassword';
 dotenv.config();
 
 const server = http.createServer(app);
@@ -26,11 +27,12 @@ const app = express();
 app.use(express.json());
 
 cron.schedule('0 0 * * *', () => {
-  checkExpiredProducts(); // Call your function to check for expired products
+    checkExpiredProducts(); // Call your function to check for expired products
 });
 
- if (process.env.NODE_ENV === 'development') {
-    app.use(logger('dev'))
+console.log('Cron job started');
+if (process.env.NODE_ENV === 'development') {
+    app.use(logger('dev'));
 }
 
 export const httpServer = http.createServer(app);

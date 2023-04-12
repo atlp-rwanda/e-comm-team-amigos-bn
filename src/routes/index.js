@@ -12,6 +12,8 @@ import payment from './payment';
 import users from './admin/index';
 import products from './admin/product';
 import newsletterRoutes from './newsletter.routes';
+import dbBackup from './dbBackup';
+
 
 const router = express.Router();
 
@@ -27,6 +29,8 @@ router.use('/users', users);
 router.use('/checkout', checkoutRouter);
 router.use('/admin/product', products);
 router.use('/newsletter', newsletterRoutes);
+router.use('/database', dbBackup);
+
 
 router.use('/', payment);
 

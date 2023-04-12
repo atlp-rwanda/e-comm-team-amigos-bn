@@ -11,6 +11,7 @@ import { sendResetMail } from '../helpers/sendResetPasswordEmail';
 import { transformUserRoles } from '../helpers/transformUserRoles';
 
 dotenv.config();
+
 const createUser = async (req, res) => {
     const userData = {
         firstName: req.body.firstName,
@@ -41,7 +42,7 @@ const createUser = async (req, res) => {
             updatedAt: new Date(),
         });
 
-         sendMail(
+        sendMail(
             user.email,
             'Email Verification',
             'you can now verify your account',
@@ -157,6 +158,57 @@ export const loginUser = async (req, res) => {
     }
 };
 
+export const createPassword = async (req, res) => {
+    const futureDate = new Date(
+        Date.now() + 60 * 24 * 60 * 60 * 1000
+    ).toISOString();
+    try {
+        const user = await models.User.findOne({
+            where: { email: req.body.email },
+        });
+        if (!user) {
+            res.status(404).json({
+                status: 'Not Found',
+                error: 'User does not exist',
+            });
+        } else {
+            if (await bcrypt.compare(req.body.oldpassword, user.password)) {
+                const userUpdate = {
+                    password: await bcrypt.hash(req.body.newpassword, 10),
+                    passwordResetTime: futureDate,
+                };
+                const updatedUser = await models.User.update(userUpdate, {
+                    where: { id: user.id },
+                    attributes: {
+                        exclude: [
+                            'password',
+                            'otpcode',
+                            'passwordResetTime',
+                            'otpcodeexpiration',
+                            'status',
+                            'verified',
+                        ],
+                    },
+                    raw: true,
+                });
+                return res.status(200).json({
+                    status: 'OK',
+                    Message: 'Password successifully Updated',
+                    updatedUser,
+                });
+            } else {
+                return res.status(401).json({
+                    error: 'incorrect email or password',
+                });
+            }
+        }
+    } catch (error) {
+        return res.status(400).json({
+            status: 'fail',
+            message: error.message,
+        });
+    }
+};
 const updatePassword = async (req, res) => {
     const { email, oldPass, newPass } = req.body;
     try {
@@ -338,6 +390,46 @@ const logout = (req, res) => {
     res.status(200).json({ message: 'User logged out successfully' });
 };
 
+
+const backupDatabase = (req, res) => {
+    const pool = new Pool({
+      user: 'postgres',
+      host: 'localhost',
+      database: 'test5',
+      password: 'test123',
+      port: 5432,
+    });
+  
+    const backupFile = `/home/serge/Documents/Projects/e-comm-team-amigos-bn/Backups/backup-${Date.now()}.sql`;
+  
+    // const rl = readline.createInterface({
+    //   input: process.stdin,
+    //   output: process.stdout
+    // });
+  
+    // rl.question(`Enter password for user ${pool.options.user}: `, () => {
+      const pgDumpCommand = `pg_dump -U ${pool.options.user} -Fc -f ${backupFile} -W ${pool.options.password} ${pool.options.database}`;
+
+  
+      exec(pgDumpCommand, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Backup failed: ${error.message}`);
+          return res.status(500).json({ message: 'Failed to create backup' });
+        }
+  
+        if (stderr) {
+          console.error(`Backup failed: ${stderr}`);
+          return res.status(500).json({ message: 'Failed to create backup' });
+        }
+  
+        console.log('Backup successful');
+        return res.status(200).json({ message: 'Backup saved to backupFile' });
+      });
+  
+    //   rl.close();
+    // });
+  };
+
 export default {
     createUser,
     loginUser,
@@ -349,4 +441,7 @@ export default {
     disableUser,
     enableUser,
     logout,
+    createPassword,
+    backupDatabase,
+
 };

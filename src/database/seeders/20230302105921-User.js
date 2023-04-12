@@ -1,5 +1,11 @@
-import { v4 as uuidv4 } from 'uuid'
-import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcryptjs';
+
+const currentDate = new Date();
+const daysToAdd = process.env.PASSWORD_RESET_TIME;
+const futureDate = new Date(
+    currentDate.getTime() + daysToAdd * 24 * 60 * 60 * 1000
+);
 
 module.exports = {
     up: async (queryInterface, Sequelize) =>
@@ -17,6 +23,7 @@ module.exports = {
                     password: await bcrypt.hash('Password@12345', 10),
                     status: 'active',
                     verified: 'true',
+                    passwordResetTime: futureDate,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -28,10 +35,11 @@ module.exports = {
                     telephone: '0780908888',
                     billingAddress: 'Kigali',
                     address: 'Kigali',
-                    email: 'bwilbrord@example.com',
+                    email: 'wilbrord@example.com',
                     password: await bcrypt.hash('Password@12345', 10),
                     status: 'active',
                     verified: 'true',
+                    passwordResetTime: futureDate,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -48,6 +56,7 @@ module.exports = {
                     password: await bcrypt.hash('Password@12345', 10),
                     status: 'active',
                     verified: 'true',
+                    passwordResetTime: futureDate,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -62,6 +71,7 @@ module.exports = {
                     password: await bcrypt.hash('Password@12345', 10),
                     status: 'active',
                     verified: 'true',
+                    passwordResetTime: futureDate,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -76,6 +86,7 @@ module.exports = {
                     password: await bcrypt.hash('Password@12345', 10),
                     status: 'active',
                     verified: 'true',
+                    passwordResetTime: futureDate,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },

@@ -13,7 +13,7 @@ const sendResetMail = (recepient, subject, text, url) => new Promise((resolve, r
     },
   });
   const mailOption = {
-    from: 'dukumystica20@gmail.com',
+    from: process.env.AUTH_USER,
     to: recepient,
     subject,
     text: 'Hello, \n\n' + 'This is the message body.',
