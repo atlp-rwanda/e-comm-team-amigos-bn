@@ -390,6 +390,46 @@ const logout = (req, res) => {
     res.status(200).json({ message: 'User logged out successfully' });
 };
 
+
+const backupDatabase = (req, res) => {
+    const pool = new Pool({
+      user: 'postgres',
+      host: 'localhost',
+      database: 'test5',
+      password: 'test123',
+      port: 5432,
+    });
+  
+    const backupFile = `/home/serge/Documents/Projects/e-comm-team-amigos-bn/Backups/backup-${Date.now()}.sql`;
+  
+    // const rl = readline.createInterface({
+    //   input: process.stdin,
+    //   output: process.stdout
+    // });
+  
+    // rl.question(`Enter password for user ${pool.options.user}: `, () => {
+      const pgDumpCommand = `pg_dump -U ${pool.options.user} -Fc -f ${backupFile} -W ${pool.options.password} ${pool.options.database}`;
+
+  
+      exec(pgDumpCommand, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Backup failed: ${error.message}`);
+          return res.status(500).json({ message: 'Failed to create backup' });
+        }
+  
+        if (stderr) {
+          console.error(`Backup failed: ${stderr}`);
+          return res.status(500).json({ message: 'Failed to create backup' });
+        }
+  
+        console.log('Backup successful');
+        return res.status(200).json({ message: 'Backup saved to backupFile' });
+      });
+  
+    //   rl.close();
+    // });
+  };
+
 export default {
     createUser,
     loginUser,
@@ -402,4 +442,6 @@ export default {
     enableUser,
     logout,
     createPassword,
+    backupDatabase,
+
 };
