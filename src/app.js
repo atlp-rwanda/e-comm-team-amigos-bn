@@ -43,6 +43,10 @@ export const io = new Server(httpServer, {
     },
 });
 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+app.use('/static', express.static('public'));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cookieSession({
@@ -73,15 +77,6 @@ app.use('/',webhook);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.get('/', (req, res) => {
     res.send('Hello, There! this is Amigos ecommerce team project.');
-});
-
-app.use((err, req, res, next) => {
-    console.log('***ERROR***', err.message);
-
-    res.status(500).json({
-        status: 'error',
-        message: 'Internal Server Error',
-    });
 });
 
 export default app;
