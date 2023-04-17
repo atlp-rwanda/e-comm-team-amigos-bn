@@ -112,7 +112,7 @@
  *             properties:
  *               products:
  *                 type: array
- *                 example: [{"product":"328987-3284932-3248023j", "quantity": 50, "unitPrice": 200}, {"product":"328fy7gy987-67f76g8-3248023j", "quantity": 2, "unitPrice": 500}]
+ *                 example: [{"productId": "248d527b-31fe-4ad0-900a-e0dccc5cc321",  "quantity": 50 }]
  *               deliveryInfo:
  *                 type: object
  *                 example: {"address":"Kk520st", "city": "Kigali", "state": "NY", "zip": "10001"}
