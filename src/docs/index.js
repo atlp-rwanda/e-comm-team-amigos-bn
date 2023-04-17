@@ -59,6 +59,65 @@ const options = {
     },
     apis: ['src/**/*doc.js'],
 };
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     LoggerConfig:
+ *       type: object
+ *       properties:
+ *         transports:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/TransportConfig'
+ *         format:
+ *           $ref: '#/components/schemas/FormatConfig'
+ *         defaultMeta:
+ *           type: object
+ *           properties:
+ *             service:
+ *               type: string
+ *       required:
+ *         - transports
+ *         - format
+ *         - defaultMeta
+ *
+ *   schemas:
+ *     TransportConfig:
+ *       type: object
+ *       properties:
+ *         level:
+ *           type: string
+ *         filename:
+ *           type: string
+ *       required:
+ *         - level
+ *         - filename
+ *
+ *   schemas:
+ *     FormatConfig:
+ *       type: object
+ *       properties:
+ *         json:
+ *           type: function
+ *         timestamp:
+ *           type: function
+ *         metadata:
+ *           type: function
+ *         prettyPrint:
+ *           type: function
+ *         errors:
+ *           type: function
+ *           properties:
+ *             stack:
+ *               type: boolean
+ *       required:
+ *         - json
+ *         - timestamp
+ *         - metadata
+ *         - prettyPrint
+ *         - errors
+ */
 
 const specs = swaggerJsDoc(options)
 export default specs
