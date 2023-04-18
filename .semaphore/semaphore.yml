@@ -1,0 +1,22 @@
+version: v1.0
+name: Test MyApp
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+blocks:
+  - name: Test
+    task:
+      jobs:
+        - name: Test
+          commands:
+            - checkout
+            - sem-version node 12
+            - cache restore
+            - npm install
+            - cache store
+            - npm run build --if-present
+            - npm test
+      env_vars:
+        - name: CC_TEST_REPORTER_ID
+          value: 30b7c6c0e0de6133a2902965d21a6275c5752825379571a7a1c746d0ab64f57b
