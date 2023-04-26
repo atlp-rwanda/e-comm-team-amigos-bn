@@ -19,7 +19,7 @@ passport.use(
         {
             clientID: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
-            callbackURL: '/token/auth/callback',
+            callbackURL: `${process.env.APP_URL_BACKEND}/token/auth/callback`,
             passReqToCallback: true,
         },
         (request, accessToken, refreshToken, profile, done) =>
