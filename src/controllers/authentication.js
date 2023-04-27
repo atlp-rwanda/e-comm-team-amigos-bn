@@ -42,6 +42,9 @@ const createUser = async (req, res) => {
             updatedAt: new Date(),
         });
 
+        const token = tokenGenerator({ userId: user.id }, { expiresIn: '1d' });
+        const url = `${process.env.BASE_URL}/user/verify_email/${token}`;
+
         sendMail(
             user.email,
             'Email Verification',
@@ -49,8 +52,6 @@ const createUser = async (req, res) => {
             url
         );
 
-        const token = tokenGenerator({ userId: user.id }, { expiresIn: '1d' });
-        const url = `${process.env.BASE_URL}/user/verify_email/${token}`;
         return res.status(201).json({
             message: 'Account created successfully',
             data: user,
