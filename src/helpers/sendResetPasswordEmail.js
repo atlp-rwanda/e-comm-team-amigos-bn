@@ -6,7 +6,7 @@ const sendResetMail = (recepient, subject, text, url) => new Promise((resolve, r
     service: 'gmail',
     auth: {
       user: process.env.AUTH_USER,
-      pass: process.env.AUTH_PASSWORD,
+      pass: process.env.AUTH_PASS,
     },
     tls: {
       rejectUnauthorized: false,

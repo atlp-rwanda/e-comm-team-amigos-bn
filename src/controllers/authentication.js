@@ -279,7 +279,7 @@ const forgotPassword = async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
     }
     if (userExist.verified == false) {
-        res.json({ message: 'Your account is not verified' });
+        return res.json({ message: 'Your account is not verified' });
     }
     const token = tokenGenerator(
         { email: userEmail, id: userExist.id },
