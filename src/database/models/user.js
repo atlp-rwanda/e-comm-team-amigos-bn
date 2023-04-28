@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
 
             preferredLanguage: DataTypes.STRING,
             email: { type: DataTypes.STRING, allowNull: false },
-            password: { type: DataTypes.STRING, allowNull: false },
+            password: { type: DataTypes.STRING, allowNull: true },
             birthdate: DataTypes.DATE,
             preferredCurrency: DataTypes.ENUM('Frw', 'USD'),
             gender: DataTypes.ENUM('Male', 'Female'),
@@ -64,9 +64,9 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'userId',
             as: 'orders',
         });
-        User.hasMany(models.Notification,{
+        User.hasMany(models.Notification, {
             foreignKey: 'userId',
-            as: 'notifications'
+            as: 'notifications',
         });
     };
     return User;

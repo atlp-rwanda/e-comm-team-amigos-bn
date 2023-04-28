@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import model from '../database/models';
 import generateToken from '../helpers/generateToken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export async function successGoogleLogin(req, res) {
     if (!req.user) return res.redirect('/token/auth/callback/failure');
@@ -16,19 +18,28 @@ export async function successGoogleLogin(req, res) {
         const user = await model.User.findOne({
             where: { email: userObj.email },
         });
-
-        if (!user) res.status(404).json({ user: userObj, message: 'sign up' });
-        else {
+        if (!user) {
+            const googleUser = await model.User.create({
+                firstName: userObj.given_name,
+                lastName: userObj.family_name,
+                email: userObj.email,
+            });
+            if (googleUser) {
+                const token = generateToken({
+                    userId: googleUser.id,
+                });
+                const successUrl =
+                    `${process.env.REACT_URL}/success?token=` + token;
+                res.redirect(successUrl);
+            }
+        } else {
             const newUser = user.toJSON();
             const token = generateToken({
                 userId: newUser.id,
-                role: newUser.role,
             });
-            res.status(200).json({
-                message: 'success',
-                token,
-                role: user.role,
-            });
+            const successUrl =
+                `${process.env.REACT_URL}/success?token=` + token;
+            res.redirect(successUrl);
         }
     } catch (err) {
         res.status(500).json({ error: 'Server issues!', err });
