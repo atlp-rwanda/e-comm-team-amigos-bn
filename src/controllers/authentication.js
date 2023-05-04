@@ -145,7 +145,15 @@ export const loginUser = async (req, res) => {
                 res.setHeader('Authorization', `Bearer ${token}`);
                 return res
                     .status(200)
-                    .json({ message: 'User Logged Successfully', token });
+                    .json({ 
+                        message: 'User Logged Successfully', token,
+                        user:
+                                   {
+                                     userRoles,
+                                     username: user.userName,
+                                     email: user.email,
+                                    }
+                        });
             }
             return res
                 .status(400)
@@ -239,17 +247,41 @@ export const checkotp = async (req, res) => {
     const { email, otp } = req.body;
     try {
         const user = await models.User.findOne({
-            where: { email },
+            where: { email: req.body.email },
+            include: [
+                {
+                    model: models.UserRole,
+                    as: 'UserRoles',
+                    attributes: {
+                        exclude: ['createdAt', 'updatedAt', 'id', 'userId'],
+                    },
+                    include: [
+                        {
+                            model: models.Role,
+                            as: 'Role',
+                            attributes: {
+                                exclude: [
+                                    'createdAt',
+                                    'updatedAt',
+                                    'id',
+                                    'description',
+                                ],
+                            },
+                        },
+                    ],
+                },
+            ],
         });
 
         const currenttime = new Date().getTime();
         const expiredtime = new Date(user.otpcodeexpiration).getTime();
         if (currenttime < expiredtime) {
+            const userRoles = transformUserRoles(user.UserRoles);
             bcrypt.compare(otp, user.otpcode, async (err, result) => {
                 if (err) throw err;
                 if (result) {
                     const token = jwt.sign(
-                        { userId: user.id, userRole: user.role },
+                        { userId: user.id, userEmail: user.email },
                         process.env.SECRET_KEY,
                         {
                             expiresIn: '1h',
@@ -258,7 +290,15 @@ export const checkotp = async (req, res) => {
                     res.setHeader('Authorization', `Bearer ${token}`);
                     return res
                         .status(200)
-                        .json({ message: 'Vendor Logged Successfully', token });
+                        .json({ message: 'Vendor Logged Successfully', token,
+                             user:
+                                    {
+                                            userRoles,
+                                            username: user.userName,
+                                            email: user.email,
+                                      }
+             
+              });
                 }
             });
         } else {
