@@ -3,6 +3,14 @@ import asyncHandler from 'express-async-handler';
 import models from '../database/models';
 
 const signUpValidator = asyncHandler(async (req, res, next) => {
+ const user = await models.User.findOne({
+        where: { email: req.body.email },
+    });
+    if (user) {
+        return res.status(400).json({
+            error: 'Email address already in use',
+        });
+    }
   const schema = Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
