@@ -143,17 +143,15 @@ export const loginUser = async (req, res) => {
                     }
                 );
                 res.setHeader('Authorization', `Bearer ${token}`);
-                return res
-                    .status(200)
-                    .json({ 
-                        message: 'User Logged Successfully', token,
-                        user:
-                                   {
-                                     userRoles,
-                                     username: user.userName,
-                                     email: user.email,
-                                    }
-                        });
+                return res.status(200).json({
+                    message: 'User Logged Successfully',
+                    token,
+                    user: {
+                        userRoles,
+                        username: user.userName,
+                        email: user.email,
+                    },
+                });
             }
             return res
                 .status(400)
@@ -288,17 +286,19 @@ export const checkotp = async (req, res) => {
                         }
                     );
                     res.setHeader('Authorization', `Bearer ${token}`);
+                    return res.status(200).json({
+                        message: 'Vendor Logged Successfully',
+                        token,
+                        user: {
+                            userRoles,
+                            username: user.userName,
+                            email: user.email,
+                        },
+                    });
+                } else {
                     return res
-                        .status(200)
-                        .json({ message: 'Vendor Logged Successfully', token,
-                             user:
-                                    {
-                                            userRoles,
-                                            username: user.userName,
-                                            email: user.email,
-                                      }
-             
-              });
+                        .status(401)
+                        .json({ message: 'OTPCODE is Wrong try again' });
                 }
             });
         } else {

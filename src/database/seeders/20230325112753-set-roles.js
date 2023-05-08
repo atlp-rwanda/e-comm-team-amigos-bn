@@ -9,7 +9,6 @@ module.exports = {
                 {
                     // Merchant
                     id: uuidv4(),
-
                     userId: '20230302105921-User.js',
                     roleId: '',
                     createdAt: new Date(),
@@ -18,7 +17,7 @@ module.exports = {
                 {
                     // Merchant
                     id: uuidv4(),
-                    userId: '9742df02-baea-4a75-a786-c0139c11547e',
+                    userId: '516e8361-ade3-4615-890f-8eb52d36a0ff',
                     roleId: 'a1ab5eb5-1f4f-4666-8a32-ff00a8d3649c',
                     createdAt: new Date(),
                     updatedAt: new Date(),
