@@ -12,21 +12,23 @@ const productEvents = new EventEmitter();
 
 export const checkExpiredProducts = async (req, res) => {
     try {
-      const expiredProducts = await Product.findAll({
-        where: { expiryDate: { [Op.lt]: new Date() } }
-      });
-  
-      await Promise.all(expiredProducts.map(async (product) => {
-        await product.update({ available: false });
-        await expiryNot(product);
-      }));
-  
-      res.status(200).json({ message: 'Email sent successfully' });
+        const expiredProducts = await Product.findAll({
+            where: { expiryDate: { [Op.lt]: new Date() } },
+        });
+
+        await Promise.all(
+            expiredProducts.map(async (product) => {
+                await product.update({ available: false });
+                await expiryNot(product);
+            })
+        );
+
+        res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: error.message });
     }
-  };
+};
 
 const PAGE_SIZE = 5; // Number of products per page
 export const getAllProduct = async (req, res) => {
@@ -215,7 +217,7 @@ export const getAllForSeller = async (req, res) => {
                 nextPage: nextPage,
                 product: product,
             };
-            res.status(200).json({
+            return res.status(200).json({
                 status: 'OK',
                 items: responseData,
             });
@@ -389,10 +391,10 @@ export const deleteProduct = async (req, res) => {
         const userId = req.user.id;
         const productId = req.params.id;
 
-        const userRoles = transformUserRoles(req.user.UserRoles) 
+        const userRoles = transformUserRoles(req.user.UserRoles);
 
         const product = await models.Product.findOne({
-            where: { id: productId, ...(!userRoles.includes('Admin') && userId)},
+            where: { id: productId },
         });
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -452,11 +454,11 @@ export const addProductByAdmin = async (req, res) => {
 
 // Listen for the "added" event
 productEvents.on('added', (product, userId) => {
-sendingNotification(userId, {
-    title: 'Added product',
-    body: 'Hi, you have added product to amigos e-store',
-    productId: product.id
-});
+    sendingNotification(userId, {
+        title: 'Added product',
+        body: 'Hi, you have added product to amigos e-store',
+        productId: product.id,
+    });
 });
 
 // Listen for the "added" event
@@ -464,17 +466,16 @@ productEvents.on('update', (product, userId) => {
     sendingNotification(userId, {
         title: 'Updated product',
         body: 'Hi, you have updated product from amigos store',
-        productId: product.id
+        productId: product.id,
     });
 });
-
 
 // Listen for the "removed" event
 productEvents.on('deleted', (product, userId) => {
     sendingNotification(userId, {
         title: 'Deleted product',
         body: 'Hi, you have updated product from amigos store',
-        productId: product.id
+        productId: product.id,
     });
 });
 
@@ -488,5 +489,5 @@ export default {
     updateProductAvailability,
     getAllForSeller,
     deleteProduct,
-    addProductByAdmin
+    addProductByAdmin,
 };
