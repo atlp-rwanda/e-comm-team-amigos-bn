@@ -22,7 +22,7 @@ const createUser = async (req, res) => {
         email: req.body.email,
         password: await bcrypt.hash(req.body.password, 10),
     };
-    const role = req.body.role;
+    const role = req.body.role || 'Customer';
 
     try {
         // Get Roles

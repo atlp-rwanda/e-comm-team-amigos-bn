@@ -44,8 +44,8 @@ const signUpValidator = asyncHandler(async (req, res, next) => {
                     'Password must be at least {#limit} characters long.',
                 'password.invalid': 'Password is invalid.',
             }),
-        role: Joi.string().valid('Admin', 'Merchant', 'Customer').messages({
-            'any.only': "Role must be either 'Admin' ,'Merchant', 'Customer'.",
+        role: Joi.string().valid('Merchant', 'Customer').messages({
+            'any.only': "Role must be either 'Merchant', 'Customer'.",
         }),
     });
     try {
