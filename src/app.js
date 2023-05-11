@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import cron from 'node-cron';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
+import expressWinston from 'express-winston';
+import { transports, format } from 'winston';
 import specs from './docs';
 import routes from './routes';
 import db from './database/models';
@@ -13,6 +15,7 @@ import cookieSession from 'cookie-session';
 import cartRoute from './routes/cart.routes';
 import webhook from './routes/webhook';
 const socketIo = require('socket.io');
+import loggers from '../logger';
 
 import http from 'http';
 import { Server } from 'socket.io';
@@ -24,7 +27,12 @@ const server = http.createServer(app);
 const ioServer = socketIo(server);
 const app = express();
 
+
 app.use(express.json());
+app.use(expressWinston.logger({
+   winstonInstance: loggers,
+    statusLevels:true
+}))
 
 cron.schedule('0 0 * * *', () => {
     checkExpiredProducts(); // Call your function to check for expired products
