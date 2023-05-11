@@ -22,18 +22,19 @@ const createUser = async (req, res) => {
         email: req.body.email,
         password: await bcrypt.hash(req.body.password, 10),
     };
+    const role = req.body.role;
 
     try {
         // Get Roles
         const defaultRole = await models.Role.findOne({
             where: {
-                name: 'Customer',
+                name: role,
             },
             raw: true,
         });
 
         const user = await models.User.create(userData);
-        // Create Default Role (Customer)
+        // Assign choosen role
         await models.UserRole.create({
             id: uuidv4(),
             userId: user.dataValues.id,
