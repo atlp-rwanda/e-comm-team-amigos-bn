@@ -1,5 +1,5 @@
 import express from 'express';
-import { createReview } from '../../controllers/review.controller';
+import { createReview, getReviews } from '../../controllers/review.controller';
 import { verifyToken, authorize } from '../../middleware/verifyToken';
 import validationOfRatings from '../../validations/review.validation';
 const router = express.Router();
@@ -12,6 +12,11 @@ router.post(
     authorize(['Customer']),
     validationOfRatings,
     createReview
+);
+
+router.get(
+    '/:productId/review',
+    getReviews
 );
 
 export default router;

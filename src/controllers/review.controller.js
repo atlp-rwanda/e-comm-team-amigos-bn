@@ -32,3 +32,26 @@ export const createReview = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+export const getReviews = async (req, res) => {
+    const { productId } = req.params;
+
+    try {
+        const reviews = await models.Review.findAll(
+            {
+                include: {
+                    model: models.User,
+                    as: 'user',
+                    attributes: ['firstName', 'lastName'],
+                },
+            },
+            {
+                where: { productId },
+            }
+        );
+
+        res.status(200).json({ count: reviews.length, reviews });
+    } catch (error) {
+        res.json({ error });
+    }
+};
