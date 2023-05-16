@@ -4,8 +4,9 @@ import {
     viewCart,
     cleanUpCart,
     updateCart,
+    deleteItemInCart,
 } from '../controllers/cart.controller';
-import { validateCartAdd } from '../validations/cart.validator';
+import { validateCartAdd, validateCartUpdate } from '../validations/cart.validator';
 import { verifyToken, authorize } from '../middleware/verifyToken';
 
 const router = express.Router();
@@ -18,8 +19,14 @@ router.delete(
     authorize(['Customer']),
     cleanUpCart
 );
+router.delete(
+    '/delete-cart/:id',
+    verifyToken,
+    authorize(['Customer']),
+    deleteItemInCart
+);
 
 // Update cart route
-router.put('/updateCart/:id', verifyToken, updateCart);
+router.put('/updateCart/:id', verifyToken,validateCartUpdate, updateCart);
 
 module.exports = router;

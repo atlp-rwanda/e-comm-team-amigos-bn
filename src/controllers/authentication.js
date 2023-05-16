@@ -140,7 +140,7 @@ export const loginUser = async (req, res) => {
                     { userId: user.id, userEmail: user.email },
                     process.env.SECRET_KEY,
                     {
-                        expiresIn: '1h',
+                        expiresIn: '7d',
                     }
                 );
                 res.setHeader('Authorization', `Bearer ${token}`);
@@ -283,7 +283,7 @@ export const checkotp = async (req, res) => {
                         { userId: user.id, userEmail: user.email },
                         process.env.SECRET_KEY,
                         {
-                            expiresIn: '1h',
+                            expiresIn: '7d',
                         }
                     );
                     res.setHeader('Authorization', `Bearer ${token}`);

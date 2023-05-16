@@ -5,27 +5,55 @@ import models from './../database/models';
 
 export async function validateCartAdd(req, res, next) {
     try {
-        const product = await models.Product.findByPk(req.query.productId);
+        const userId = req.user.id;
+        let product = await models.Product.findByPk(req.body.productId);
+        product = product.toJSON();
         if (!product)
             return res.status(404).json({ error: 'Product does not exist..' });
 
-        const quantity = req.query.quantity;
-        if (quantity < 1)
-            return res.status(400).json({ error: 'Quantity cannot be null..' });
-
-        if (req.session.cart) {
-            const cartproduct = req.session.cart.find(
-                (item) => item.productId == req.query.productId
-            );
-
-            if (cartproduct)
-                return res.status(400).json({
-                    error: 'Product in cart already. Please update the cart.',
-                });
+        const quantity = parseInt(req.body.quantity);
+        if (quantity < 1 || quantity > product.quantity) {
+            
+            return res.status(400).json({ error: 'Quantity not Available' });
         }
-
+            const cart = await models.Cart.findOne({ where: { userId } });
+            if (cart) {
+                const cartproduct = await cart.products.find(
+                    (item) => item.productId == req.body.productId
+                );
+                if (cartproduct)
+                    return res.status(400).json({
+                        error: 'Product in cart already. Please update the cart.',
+                    });
+                
+            }
+    
         next();
     } catch (err) {
         res.status(400).json({ status: 'fail', message: err.message });
     }
+}
+export async function validateCartUpdate(req, res, next) {
+    try {
+        const userId = req.user.id;
+        const productId = req.params.id;
+        const product = await models.Product.findOne({ where: { id: productId } });
+        const { quantity } = req.body;
+        const cart = await models.Cart.findOne({ where: { userId } });
+        if (cart) {
+            const existIteminCart = cart.products.map((product) => {
+                if (product.productId !== productId) {
+                    return res.status(404).json({
+                        message: 'Item not found in cart',
+                    });
+                }
+            });
+            if (quantity < 1 || quantity > product.quantity) {
+                return res.status(400).json({ error: 'Quantity not available' });
+            }
+        }
+    next();
+} catch (err) {
+    res.status(400).json({ status: 'fail', message: err.message });
+}
 }

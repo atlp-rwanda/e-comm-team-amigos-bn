@@ -5,18 +5,17 @@
 *      post:
 *        summary: Add items/products to the shopping cart
 *        tags: [Cart]
-*        parameters:
-*          - in: query
-*            name: productId
-*            schema: 
-*              type: string
-*              format: uuid
-*              description: The Id of the product to put in shopping cart
-*          - in: query
-*            name: quantity
-*            schema: 
-*              type: integer
-*            description: The quantity of given product that you want to put in the cart
+*        requestBody:
+*            required: true
+*            content:
+*              application/json:
+*                schema:
+*                  type: object
+*                  properties:
+*                    productId:
+*                      type: string
+*                    quantity:
+*                      type: integer
 *        responses:
 *              '200':
 *                description: Product added to the cart
@@ -55,7 +54,28 @@
 *                  500:
 *                     description: Internal server error
 * 
-*
+* /cart/delete-cart/{id}:
+*   delete:
+*     tags:
+*       - Cart
+*     summary: delete item in the buyer's cart
+*     parameters:
+*       - in: path
+*         name: id
+*         description: ID of the product to delete in the cart
+*         required: true
+*         schema:
+*           type: string
+*     responses:
+*       201:
+*         description: Cart clean up successfully!
+*       400:
+*         description: Bad Request
+*       404:
+*         description: Not Found
+*       500:
+*         description: Internal server error
+* 
 * /cart/updateCart/{id}:
 *   put:
 *     tags:
