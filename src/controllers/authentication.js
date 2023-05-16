@@ -124,6 +124,9 @@ export const loginUser = async (req, res) => {
                 message: 'You have to first verify your account',
             });
         }
+        if (user.isDisabled || user.status === 'inactive') {
+            return res.status(403).json({ message: 'Account disabled. Please contact support.' });
+        }
 
         const userRoles = transformUserRoles(user.UserRoles);
         bcrypt.compare(req.body.password, user.password, async (err, data) => {
