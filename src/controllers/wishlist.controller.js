@@ -60,18 +60,22 @@ export const removeFromWishlist = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-};
+}; 
+//show wishlist
 export const showWishlist = async (req, res) => {
     try {
       const buyerId = req.user.id;
       if (!buyerId) {
-        return res
-            .status(404)
-            .json({ message: 'User not found' });
-        }
+        return res.status(404).json({ message: 'User not found' });
+      }
       const wishlistItems = await models.Wishlist.findAll({
         where: { buyerId },
-        include: [models.Product],
+        include: [
+          {
+            model: models.Product,
+            as: 'product', 
+          },
+        ],
       });
       if (wishlistItems.length === 0) {
         return res.status(200).json({
