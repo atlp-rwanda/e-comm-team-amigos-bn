@@ -478,6 +478,16 @@ productEvents.on('deleted', (product, userId) => {
         productId: product.id,
     });
 });
+export const getProductsByCategory = async (req, res) => {
+    try {
+        const category = req.params;
+        console.log(category);
+        const product = await models.Product.findAll({ where: category });
+
+        if (!product) return res.status(400).json({ message: 'Bad request' });
+        return res.status(200).json({ products: product });
+    } catch (error) {}
+};
 
 export default {
     addProduct,
@@ -490,4 +500,5 @@ export default {
     getAllForSeller,
     deleteProduct,
     addProductByAdmin,
+    getProductsByCategory,
 };
