@@ -23,7 +23,7 @@ dotenv.config();
 const server = http.createServer(app);
 const ioServer = socketIo(server);
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 
 cron.schedule('0 0 * * *', () => {
@@ -55,6 +55,7 @@ app.use(
     })
 );
 
+
 app.use(
     '/cart',
     cookieSession({
@@ -71,7 +72,6 @@ app.use(passport.session());
 app.use('/cart', cartRoute);
 app.use('/token', tokenRoute);
 
-app.use(cors());
 app.use('/', routes);
 app.use('/',webhook);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
