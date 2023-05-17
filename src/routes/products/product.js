@@ -13,6 +13,7 @@ import {
     searchProduct,
     updateProduct,
     deleteProduct,
+    getProductsByCategory,
 } from '../../controllers/product.controller';
 import { authorize, verifyToken } from '../../middleware/verifyToken';
 import { getSalesStats } from '../../controllers/statistics.controller';
@@ -49,6 +50,7 @@ router.delete(
     authorize(['Merchant']),
     deleteProduct
 );
-router.get('/sales/stats', verifyToken,authorize(['Merchant']), getSalesStats);
+router.get('/sales/stats', verifyToken, authorize(['Merchant']), getSalesStats);
+router.post('/category/:category', getProductsByCategory);
 
 export default router;
