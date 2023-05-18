@@ -31,9 +31,10 @@ export async function createCart(req, res) {
 export const viewCart = async (req, res) => {
     const userId = req.user.id;
     let cart = await models.Cart.findAll({ where: { userId } });
-    cart = cart[0].toJSON();
+    cart = cart[0]?.toJSON();
     try {
         let subTotal = 0;
+        let quantity=0;
         if (!cart) {
             return res
                 .status(204)
@@ -51,8 +52,9 @@ export const viewCart = async (req, res) => {
                     let product = productData.toJSON();
                     const total = product.price * qty;
                     subTotal += total;
+                    quantity =  qty;
                     items += qty;
-                    return { ...product, total };
+                    return { ...product, total, quantity };
                 })
             );
             const cartItems = [...productDetails];
