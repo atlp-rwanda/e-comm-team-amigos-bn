@@ -17,15 +17,15 @@ const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
           .retrieve(data.customer)
           .then(async (customer) => {
             try {
-              const order = await models.Order.findOne({
-                where: {id: customer.metadata.orderId},
-              });
-              order.status = 'processing'
-              await order.save();
-              customer.metadata.orderProducts.forEach(async(element) => {
-                let product = await models.Product.findByPk(element.id);
+              let order = await models.Order.create({
+                userId: customer.metadata.orderId,
+                expected_delivery_date: Date.now() + 4 * 24 * 60 * 60 * 1000,
+            });
+              const products = await JSON.parse(customer.metadata.orderProducts);
+              products.forEach(async(element) => {
+                let product = await models.Product.findByPk(element.productId);
                 product.quantity -= element.quantity;
-                if(product.quantity === 0) product.availability = false;
+                if(product.quantity === 0) product.available = false;
                 await product.save();
               });
             } catch (err) {

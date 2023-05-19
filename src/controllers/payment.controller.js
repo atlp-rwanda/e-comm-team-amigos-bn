@@ -15,6 +15,7 @@ export const payment = async(req, res) => {
         currency: "usd",
         product_data: {
           name: item.name,
+          images: item.images
         },
         unit_amount: item.unitPrice,
       },
