@@ -5,11 +5,11 @@ const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 export const payment = async(req, res) => {
   const customer = await stripe.customers.create({
     metadata: {
-      orderId: req.body.order.orderId,
-      orderProducts: JSON.stringify(req.body.order.orderProducts)
+      userId: req.body.checkout.userId,
+      cartItems: JSON.stringify(req.body.checkout.cartItems)
     },
   });
-  const line_items = req.body.order.orderProducts.map((item) => {
+  const line_items = req.body.checkout.cartItems.map((item) => {
     return {
       price_data: {
         currency: "usd",
@@ -17,7 +17,7 @@ export const payment = async(req, res) => {
           name: item.name,
           images: item.images
         },
-        unit_amount: item.unitPrice,
+        unit_amount: item.price,
       },
       quantity: item.quantity
     };
