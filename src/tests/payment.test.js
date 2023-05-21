@@ -11,18 +11,20 @@ chai.use(chaiHttp);
 
 describe('Payment Tests', function () {
 
-  const order = {
-    "orderId": "5dfe12f3-f954-48a1-8b91-c9426eaf8720",
-    "orderProducts": [
+  const checkout = {
+    "userId": "1c9d560d-a45c-45f8-a55b-3856aaf74e1d",
+    "cartItems": [
         {
-            "orderId": "5dfe12f3-f954-48a1-8b91-c9426eaf8720",
-            "productId": "ec05a93c-2684-4bdd-b0d3-9939e7f54d72",
-            "name": "T-shirt",
-            "quantity": 1,
-            "unitPrice": 5000
+            "id": "0fbdad03-4d9a-4597-b35c-2ab9ccc7c2a5",
+            "name": "Head-set",
+            "price": 2500,
+            "quantity": 2,
+            "images": [
+                "https://firebasestorage.googleapis.com/v0/b/amigos-product-images.appspot.com/o/headeset.png_3c188417-b436-448c-a726-433d9dea6378%2Fheadeset.png_3c188417-b436-448c-a726-433d9dea6378?alt=media&token=8fd924c1-c629-46e7-9c4e-a7144026ad70",
+            ]
         }
     ]
-  }
+    }
 
   let user;
 
@@ -45,7 +47,7 @@ describe('Payment Tests', function () {
         const res = await chai
             .request(app)
             .post(`/payment`)
-            .send({order})
+            .send({checkout})
             .set('Authorization', `Bearer ${token}`);
         expect(res.status).to.equal(200);
     })
