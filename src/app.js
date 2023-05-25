@@ -6,7 +6,6 @@ import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import specs from './docs';
 import routes from './routes';
-import db from './database/models';
 import tokenRoute from './routes/token.routes';
 import passport from 'passport';
 import cookieSession from 'cookie-session';
@@ -15,13 +14,11 @@ import webhook from './routes/webhook';
 const socketIo = require('socket.io');
 
 import http from 'http';
-import { Server } from 'socket.io';
 import { checkExpiredProducts } from './controllers/product.controller';
-import { checkExpiredPassword } from './middleware/checkExpiredPassword';
+
 dotenv.config();
 
 const server = http.createServer(app);
-const ioServer = socketIo(server);
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -34,14 +31,6 @@ console.log('Cron job started');
 if (process.env.NODE_ENV === 'development') {
     app.use(logger('dev'));
 }
-
-export const httpServer = http.createServer(app);
-export const io = new Server(httpServer, {
-    cors: {
-        origin: ['http://localhost:4000'],
-        methods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    },
-});
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');

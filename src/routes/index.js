@@ -12,7 +12,7 @@ import payment from './payment';
 import users from './admin/index';
 import products from './admin/product';
 import newsletterRoutes from './newsletter.routes';
-import notificationRoutes from './notifications.routes'
+import notificatcation from './notification';
 
 const router = express.Router();
 
@@ -28,11 +28,8 @@ router.use('/users', users);
 router.use('/checkout', checkoutRouter);
 router.use('/admin/product', products);
 router.use('/newsletter', newsletterRoutes);
-router.use('/', payment)
-router.use('/notifications', notificationRoutes);
-router.get('/notifications', (req, res) => {
-    res.render('index');
-});
+router.use('/', payment);
+router.use('/', notificatcation);
 router.get('/firebase-messaging-sw.js', (req, res) =>
     res.sendFile(process.cwd() + '/public/firebase-messaging-sw.js')
 );
