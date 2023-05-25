@@ -2,11 +2,11 @@ import models from '../database/models';
 import verifySocketToken from '../helpers/verifySocketToken';
 
 const socketAuth = async (token) => {
-    if (!token) {
+    try {
+        if (!token) {
         throw new Error('Authentication error: Token missing');
     }
 
-    try {
         const decodedData = await verifySocketToken(token);
 
         if (!decodedData) {
