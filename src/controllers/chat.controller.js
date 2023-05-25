@@ -1,12 +1,17 @@
 import { Socket } from 'socket.io';
 import models from '../database/models';
 import formatMessage from '../helpers/messageHelper';
+import socketAuth from '../middleware/socketAuth';
 
 const chat = async (socket) => {
+    console.log('connected');
+    const { token } = socket.handshake.query;
+    const sender = await socketAuth(token);
     socket.on('message', async (msg) => {
-        const { userName, id } = socket.data.user;
+        const { userName, id } = sender;
         models.Chat.create({ content: msg, userId: id }).then(() => {
             console.log(`New message received: ${msg} by username ${userName}`);
+            socket.emit('message', formatMessage(userName, msg));
             socket.broadcast.emit('message', formatMessage(userName, msg));
         });
     });
