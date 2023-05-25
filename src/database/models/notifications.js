@@ -8,10 +8,6 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4
         },
-        fcmToken: {
-          allowNull: false,
-          type: DataTypes.STRING,
-        },
         userId: {
           type: DataTypes.UUID,
           allowNull: false,
@@ -22,6 +18,17 @@ module.exports = (sequelize, DataTypes) => {
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
         },
+
+        firstName: {
+          allowNull:false,
+          type: DataTypes.STRING
+        },
+
+        lastName: {
+          allowNull:false,
+          type: DataTypes.STRING
+        },
+
         isRead: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
