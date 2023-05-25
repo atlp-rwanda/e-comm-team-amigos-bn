@@ -12,7 +12,7 @@ export const io = new Server(server, {
     },
 });
 io.on('connection', chatController.chat);
-io.on('connection', notificationController)
+io.on('connection', notificationController.notifications(io));
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`App is listening on ${PORT}`);
