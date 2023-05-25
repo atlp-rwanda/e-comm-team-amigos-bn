@@ -19,16 +19,9 @@ const removeUser = (socketId) => {
 const notifications = (io) => (socket) => {
     console.log("user connected", socket.id);
     socket.on("newUser", (userId)=>{
-        const newUser = addNewUser(userId, socket.id);
+        addNewUser(userId, socket.id);
     })
-    socket.on("sendNotification", async({ userId, receiverId, firstName, lastName, title, description }) => {
-        await models.Notification.create({
-            userId: userId,
-            firstName:firstName,
-            lastName:lastName,
-            title:title,
-            body:description
-        });
+    socket.on("sendNotification", async({ receiverId, firstName, lastName, title, description }) => {
         const receiver = getUser(receiverId);
         if(receiver){
             io.to(receiver?.socketId).emit("getNotification", {
@@ -37,6 +30,14 @@ const notifications = (io) => (socket) => {
                 title,
                 description,
               });
+
+            await models.Notification.create({
+            userId: receiverId,
+            firstName:firstName,
+            lastName:lastName,
+            title:title,
+            body:description
+        });
         }
       });
     socket.on("disconnect", ()=>{
@@ -73,7 +74,41 @@ const getNotifications = async (req, res) => {
     }
 };
 
+const markNotifications = async (req, res) => {
+    try{
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res
+                .status(401)
+                .json({ message: 'Authorization header missing' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+        const userId = decodedToken.userId;
+        const notifications = await models.Notification.findAll({
+            where: {
+                userId: userId,
+            },
+        });
+
+        notifications.forEach(async(element) => {
+            let notification = await models.Notification.findByPk(element.id);
+            if(notification.isRead === false) notification.isRead = true;
+            await notification.save();
+          });
+        res.status(200).json({message: 'Notifications marked as read'});
+        
+    }catch(error){
+        res.status(400).json({
+            status: 'Bad Request',
+            error: error.message,
+        });
+    }
+}
+
 export default {
     notifications,
     getNotifications,
+    markNotifications,
 };
