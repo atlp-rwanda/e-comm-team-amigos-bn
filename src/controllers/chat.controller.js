@@ -9,7 +9,11 @@ const chat = async (socket) => {
     const sender = await socketAuth(token);
     socket.on('message', async (msg) => {
         const { userName, id } = sender;
-        models.Chat.create({ content: msg, userId: id }).then(() => {
+        models.Chat.create({
+            content: msg,
+            userId: id,
+            userName: userName,
+        }).then(() => {
             console.log(`New message received: ${msg} by username ${userName}`);
             socket.emit('message', formatMessage(userName, msg));
             socket.broadcast.emit('message', formatMessage(userName, msg));
